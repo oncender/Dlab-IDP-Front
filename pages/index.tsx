@@ -21,7 +21,7 @@ const Home: NextPage = () => {
 
 
   return (
-    <div className="flex min-h-screen justify-center items-center">
+    <div className="flex min-h-screen justify-center items-center pt-16">
       <div className="w-96 max-w-md md:max-w-lg rounded flex-col item-center shadow-lg my-2 px-2">
         <div className="flex justify-between bg-blue-100">
           <div>{startYear}</div>
