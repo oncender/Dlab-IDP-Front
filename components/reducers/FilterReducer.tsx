@@ -1,4 +1,5 @@
 import {useReducer} from "react";
+import {FILTER_ACTION} from "./constant"
 
 interface CategoryObj {
     name : string
@@ -33,13 +34,20 @@ const initFilSt: FilterStateObj = {
     ]
 };
 
-// Filter Default action
-const FILTER_ACTION = {
-    'CATEGORY_ADD':'categoryAdd',
-    'CATEGORY_DEL':'categoryDel',
-    'FLOAT_ADD':'floatAdd',
-    'FLOAT_UPDATE':'floatUpdate',
-};
+
+const selectArr = (arrValue: Array<any>, arrTargetSelect : CategoryObj[], names: string):
+    [Array<string | void>,Array<boolean | void>] => {
+        // select only arrValue in arrTargetSelect value
+    let selectedArr : Array<string | void> = arrTargetSelect.filter(function(fil){
+        return (fil.name == names) ? true : false}).map((v) => (v.value))
+    if (selectedArr.length ==0){
+        return [[],[]]
+    }
+    let temp_set : Set<string> =  new Set(selectedArr as Array<string>)
+    const itClicked = (arrValue  as Array<string>).map((v) => temp_set.has(v) ? true : false);
+    return [selectedArr,itClicked]
+    }
+
 
 // Filter Reducer define
 function FilReducer(state : FilterStateObj,action: ActionObj) {
@@ -51,10 +59,14 @@ function FilReducer(state : FilterStateObj,action: ActionObj) {
                 float:state.float,
             };
         case FILTER_ACTION.CATEGORY_DEL:
-            return {
-                category:state.category.filter(cate_value=> cate_value.value != action.value.value),
+            let c = {
+                category:state.category.filter(function(cate_value){
+                    // console.log("incallback:",cate_value.value,action.value.value)
+                    return cate_value.value != action.value.value ? true : false}),
                 float:state.float,
-            };
+            }
+            console.log("after del",c)
+            return c;
         case FILTER_ACTION.FLOAT_ADD:
             return {
                 category:state.category,
@@ -71,7 +83,7 @@ function FilReducer(state : FilterStateObj,action: ActionObj) {
     }
 }
 
-export {FilReducer, FILTER_ACTION, initFilSt}
+export {FilReducer, initFilSt, selectArr}
 
 
 
