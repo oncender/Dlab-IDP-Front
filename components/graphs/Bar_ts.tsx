@@ -66,5 +66,3 @@ const DemoColumn = () => {
 
   return <Column {...config} />;
 };
-
-ReactDOM.render(<DemoColumn />, document.getElementById('container'));
