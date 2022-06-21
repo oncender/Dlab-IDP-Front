@@ -30,7 +30,7 @@ const Detail: NextPage = ({chartData, cardData}: InferGetServerSidePropsType<typ
         'ddd' : '투자자산유형' // no avail yet
     }
 
-
+    function Bu
     const itValue: Array<string> = ['실물','대출','개발(펀드)','개발(PF)']
     const [itDefault,itClicked] = selectArr(itValue,initFilSt.category,labels['it'])
     const [clickArrit,setClickArrit] = useState(itClicked)
@@ -46,6 +46,7 @@ const Detail: NextPage = ({chartData, cardData}: InferGetServerSidePropsType<typ
     const [dddDefault,dddClicked] = selectArr(dddValue,initFilSt.category,labels['ddd'])
     // React.useMemo()
 
+
   // chartData, cardData 파라미터로 받아서 사용
   return (
     <FilContext.Provider value ={{filterInfo, filDispat}}>
@@ -54,12 +55,6 @@ const Detail: NextPage = ({chartData, cardData}: InferGetServerSidePropsType<typ
             <p className="text-4xl">필터 영역</p>
               <div className="inline-flex">
                   <div className='block'>
-                      <ButtonGroup
-                          labels={labels['it']}
-                          buttons= {itValue}
-                          isclicked={clickArrit}
-                          setClick = {setClickArrit}
-                      />
                       <ButtonGroup
                           labels={labels['ft']}
                           buttons={ftValue}

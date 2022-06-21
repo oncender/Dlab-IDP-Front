@@ -65,7 +65,6 @@ function FilReducer(state : FilterStateObj,action: ActionObj) {
                     return cate_value.value != action.value.value ? true : false}),
                 float:state.float,
             }
-            console.log("after del",c)
             return c;
         case FILTER_ACTION.FLOAT_ADD:
             return {
@@ -80,6 +79,8 @@ function FilReducer(state : FilterStateObj,action: ActionObj) {
                 category: state.category,
                 float: newFloat
             }
+        default:
+            return state
     }
 }
 const FilContext = createContext(initFilSt);
