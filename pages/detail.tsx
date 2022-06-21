@@ -6,13 +6,13 @@ import {
 import type { SliderMarks } from 'antd/lib/slider'
 import axios from 'axios';
 
-import React, {useEffect, useReducer, useMemo, createContext} from 'react'
+import React, {useEffect, useReducer, useMemo, createContext, useState} from 'react'
 import {ReactNode} from "react";
 import type { NextPage, GetServerSideProps, InferGetServerSidePropsType } from 'next'
 
 import ButtonGroup from "../components/partials/buttongroup"
 import MultiSelect from "../components/partials/multiSelect";
-import { initFilSt, FilReducer ,selectArr } from "../components/reducers/FilterReducer";
+import { initFilSt, FilReducer ,selectArr, FilContext } from "../components/reducers/FilterReducer";
 import {FILTER_ACTION} from "../components/reducers/constant"
 
 // let zip = (a1: any, a2: any) => a1.map((x, i) => [x, a2[i]]);
@@ -21,7 +21,8 @@ const Detail: NextPage = ({chartData, cardData}: InferGetServerSidePropsType<typ
   // category button def
 
     const [filterInfo, filDispat] = useReducer(FilReducer,initFilSt)
-    const UserContext = createContext(initFilSt);
+
+
     const labels = {
         'it' : '투자유형',
         'ft': '펀드구분',
@@ -32,9 +33,11 @@ const Detail: NextPage = ({chartData, cardData}: InferGetServerSidePropsType<typ
 
     const itValue: Array<string> = ['실물','대출','개발(펀드)','개발(PF)']
     const [itDefault,itClicked] = selectArr(itValue,initFilSt.category,labels['it'])
+    const [clickArrit,setClickArrit] = useState(itClicked)
 
     const ftValue: Array<string> = ['Fund','PFV','Reits']
     const [ftDefault,ftClicked] = selectArr(ftValue,initFilSt.category,labels['ft'])
+    const [clickArrft,setClickArrft] = useState(ftClicked)
 
     const cccValue: Array<string> = ['Core+','Core','Value-added','Opportunistic']
     const [cccDefault,cccClicked] = selectArr(cccValue,initFilSt.category,labels['ccc'])
@@ -45,7 +48,7 @@ const Detail: NextPage = ({chartData, cardData}: InferGetServerSidePropsType<typ
 
   // chartData, cardData 파라미터로 받아서 사용
   return (
-    <UserContext.Provider value ={[filterInfo, filDispat]}>
+    <FilContext.Provider value ={{filterInfo, filDispat}}>
       <div className="flex-col pt-16 item-center">
           <div className="grid">
             <p className="text-4xl">필터 영역</p>
@@ -54,14 +57,14 @@ const Detail: NextPage = ({chartData, cardData}: InferGetServerSidePropsType<typ
                       <ButtonGroup
                           labels={labels['it']}
                           buttons= {itValue}
-                          isclicked={itClicked}
-                          dispatch = {filDispat}
+                          isclicked={clickArrit}
+                          setClick = {setClickArrit}
                       />
                       <ButtonGroup
                           labels={labels['ft']}
                           buttons={ftValue}
-                          isclicked={ftClicked}
-                          dispatch = {filDispat}
+                          isclicked={clickArrft}
+                          setClick = {setClickArrft}
                       />
                   </div>
                       <div className='block'>
@@ -89,7 +92,7 @@ const Detail: NextPage = ({chartData, cardData}: InferGetServerSidePropsType<typ
           </div>
 
         </div>
-    </UserContext.Provider>
+    </FilContext.Provider>
   )
 }
 

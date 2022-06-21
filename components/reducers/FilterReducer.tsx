@@ -1,4 +1,4 @@
-import {useReducer} from "react";
+import {useReducer, createContext} from "react";
 import {FILTER_ACTION} from "./constant"
 
 interface CategoryObj {
@@ -82,8 +82,8 @@ function FilReducer(state : FilterStateObj,action: ActionObj) {
             }
     }
 }
-
-export {FilReducer, initFilSt, selectArr}
+const FilContext = createContext(initFilSt);
+export {FilReducer, initFilSt, selectArr, FilContext}
 
 
 
