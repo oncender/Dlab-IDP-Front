@@ -46,47 +46,51 @@ const Detail: NextPage = ({chartData, cardData}: InferGetServerSidePropsType<typ
   // chartData, cardData 파라미터로 받아서 사용
   return (
     <UserContext.Provider value ={[filterInfo, filDispat]}>
-      <div className="flex-col pt-16 item-center">
-          <div className="grid">
-            <p className="text-4xl">필터 영역</p>
-              <div className="inline-flex">
+      <div className="flex">
+          
+        <aside className="self-start sticky top-16 border border-solid border-gray-300 rounded-lg w-64 ml-16">
+          사이드바 sticky
+          <div className="inline-flex">
+              <div className='block'>
+                  <ButtonGroup
+                      labels={labels['it']}
+                      buttons= {itValue}
+                      isclicked={itClicked}
+                      dispatch = {filDispat}
+                  />
+                  <ButtonGroup
+                      labels={labels['ft']}
+                      buttons={ftValue}
+                      isclicked={ftClicked}
+                      dispatch = {filDispat}
+                  />
+              </div>
                   <div className='block'>
-                      <ButtonGroup
-                          labels={labels['it']}
-                          buttons= {itValue}
-                          isclicked={itClicked}
+                      <MultiSelect
+                          labels = {labels['ccc']}
+                          options = {cccValue}
+                          defaultOptions={cccDefault}
                           dispatch = {filDispat}
                       />
-                      <ButtonGroup
-                          labels={labels['ft']}
-                          buttons={ftValue}
-                          isclicked={ftClicked}
+                      <MultiSelect
+                          labels = {labels['ddd']}
+                          options = {dddDefault}
+                          defaultOptions={dddDefault}
                           dispatch = {filDispat}
                       />
                   </div>
-                      <div className='block'>
-                          <MultiSelect
-                              labels = {labels['ccc']}
-                              options = {cccValue}
-                              defaultOptions={cccDefault}
-                              dispatch = {filDispat}
-                          />
-                          <MultiSelect
-                              labels = {labels['ddd']}
-                              options = {dddDefault}
-                              defaultOptions={dddDefault}
-                              dispatch = {filDispat}
-                          />
-                      </div>
-              </div>
-
-          <p className="text-4xl text-center">차트 영역</p>
-            {/* 차트컴포넌트 추가 */}
           </div>
-          <div className="">
-          <p className="text-4xl text-center">카드 영역</p>
-            {/* 카드컴포넌트 추가 */}
+        </aside>
+        <div className="grow flex-col mt-16 mr-16 items-center">
+          <div className="h-96">
+            <p className="text-4xl text-center">차트 영역</p>
+              {/* 차트컴포넌트 추가 */}
           </div>
+          <div className="h-96">
+            <p className="text-4xl text-center">카드 영역</p>
+              {/* 카드컴포넌트 추가 */}
+          </div>
+        </div>
 
         </div>
     </UserContext.Provider>
