@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ant-design/plots": "^1.0.9",
     "antd": "^4.21.2",
     "axios": "^0.27.2",
     "next": "12.1.6",
