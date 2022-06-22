@@ -1,9 +1,6 @@
-import React, { useContext } from 'react';
-import ReactDOM from 'react-dom';
 import { Column, G2 } from '@ant-design/plots';
-import { dataContext } from "../../pages/info";
-const DemoColumn = () => {
-  const { data } = useContext(dataContext);
+
+const AumLpcorp = ({data}: {data:any}) => {
   G2.registerInteraction('element-link', {
     start: [
       {
@@ -50,6 +47,8 @@ const DemoColumn = () => {
       },
     ],
   };
-
+  console.log("chart1 aumLpCorp ",config)
   return <Column {...config} />;
 };
+
+export default AumLpcorp

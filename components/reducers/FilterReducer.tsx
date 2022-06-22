@@ -18,8 +18,6 @@ const selectArr = (arrValue: Array<any>, arrTargetSelect : CategoryObj[], names:
 
 // Filter Reducer define
 function filReducer(state : FilterStateObj,action: ActionObj) {
-    console.log(state)
-    console.log(action)
     switch (action.typ){
         case FILTER_ACTION.CATEGORY_ADD:
             return {
@@ -27,13 +25,11 @@ function filReducer(state : FilterStateObj,action: ActionObj) {
                 float:state.float,
             };
         case FILTER_ACTION.CATEGORY_DEL:
-            let c = {
+            return {
                 category:state.category.filter(function(cate_value){
-                    // console.log("incallback:",cate_value.value,action.value.value)
                     return cate_value.value != action.value.value ? true : false}),
                 float:state.float,
-            }
-            return c;
+            };
         case FILTER_ACTION.FLOAT_ADD:
             return {
                 category:state.category,
@@ -43,7 +39,7 @@ function filReducer(state : FilterStateObj,action: ActionObj) {
             var index = state.float.findIndex(i => i.name == action.value.name)
             var newFloat = [...state.float]
             newFloat[index] = action.value as FloatObj
-            console.log("slider updated",newFloat[index].value)
+            // console.log("slider updated",newFloat[index].value)
             return {
                 category: state.category,
                 float: newFloat

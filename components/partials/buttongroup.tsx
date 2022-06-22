@@ -24,18 +24,15 @@ const ButtonGroup = ({label, buttons, isclicked, setClick}:
                   {label : string, buttons : Array<string>, isclicked : Array<boolean>, setClick: any}) => {
       const {_,filDispat} = useContext(FilContext);
       const buttonValue: ReactNode[] = [];
-      const [action,setAction] = useState({typ:null});
       let name = getKeyByValue(LABELS,label)
       const onClick = (e: MouseEvent,num: number) => {
             num = Number(num)
             let actionType =  (isclicked[num]) ?  FILTER_ACTION.CATEGORY_DEL : FILTER_ACTION.CATEGORY_ADD
-            setAction({typ:actionType,value:{'name':name,'value':e.target.textContent}})
+            let newaction ={typ:actionType,value:{'name':name,'value':buttons[num]}}
             isclicked[num] = !isclicked[num]
             setClick([...isclicked])
+            filDispat(newaction)
       };
-      useEffect(() => {
-          filDispat(action)
-        }, [action]);
 
       for (let i =0; i< buttons.length;i++){
             buttonValue.push(ButtonPart(i,isclicked[i],buttons[i],onClick));};

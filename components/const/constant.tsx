@@ -17,7 +17,7 @@ export const INIT_FILST: FilterStateObj = {
         {'name':'at','value':'중'},
         {'name':'at','value':'오피스'},
         {'name':'at','value':'호텔'},
-        {'name':'rate','value':'고금리'}
+        {'name':'rate','value':'고정'}
     ],
     float :[
         {'name':'loanamt','value':[150000000000,427000000000]},
@@ -38,4 +38,10 @@ export const LABELS = {
     'rate': '금리 종류'
 }
 
-
+export const APIURL = {
+    ROWCOUNT:"http://localhost:8080/api/v1/debtRowCount",
+    TABLE : "http://localhost:8080/api/v1/debt/dataTable",
+    CARD:"http://localhost:8080/.."
+}
+// PLTONE:"http://localhost:8080/api/v1/debt/graphLeft",
+// PLTTWO:"http://localhost:8080/api/v1/debt/graphRight",

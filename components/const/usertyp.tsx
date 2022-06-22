@@ -1,21 +1,41 @@
 
-
+// for filter object
+interface FilterStateObj {
+    category : CategoryObj[],
+    float : FloatObj[]
+}
 interface CategoryObj {
     name : string
     value : string
 }
 interface FloatObj {
-    name : string,
+    name : string
     value : [number, number]
 }
-interface FilterStateObj {
-    category : CategoryObj[],
-    float : FloatObj[]
-}
 
+// for Async Hook
+interface ApiFlowObj{
+    loading: boolean
+    data: any
+    error: boolean
+  }
 interface ActionObj{
     typ : string,
     value : CategoryObj | FloatObj
 }
 
-export type {ActionObj, FilterStateObj, FloatObj, CategoryObj}
+// for chart Data
+interface rateAtData{
+    sdaterate:string
+    at:string
+    loandate:string
+    loanamt:string
+}
+interface aumLpcorp{
+    lpcorp:string
+    loandate:string
+    loanamt:string
+}
+
+
+export type {ActionObj, FilterStateObj, FloatObj, CategoryObj, ApiFlowObj}
