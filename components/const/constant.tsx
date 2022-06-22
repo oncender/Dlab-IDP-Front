@@ -39,9 +39,11 @@ export const LABELS = {
 }
 
 export const APIURL = {
-    ROWCOUNT:"http://localhost:8080/api/v1/debtRowCount",
-    TABLE : "http://localhost:8080/api/v1/debt/dataTable",
-    CARD:"http://localhost:8080/.."
+    ROWCOUNT:"/api/v1/debtRowCount",
+    TABLE : "/api/v1/debt/dataTable",
+    CARD:"..",
+    PLTONE:"/api/v1/debt/graphLeft",
+    PLTTWO:"/api/v1/debt/graphRight"
 }
 // PLTONE:"http://localhost:8080/api/v1/debt/graphLeft",
 // PLTTWO:"http://localhost:8080/api/v1/debt/graphRight",

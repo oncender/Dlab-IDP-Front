@@ -38,4 +38,4 @@ interface aumLpcorp{
 }
 
 
-export type {ActionObj, FilterStateObj, FloatObj, CategoryObj, ApiFlowObj}
+export type {ActionObj, FilterStateObj, FloatObj, CategoryObj, ApiFlowObj, rateAtData, aumLpcorp}

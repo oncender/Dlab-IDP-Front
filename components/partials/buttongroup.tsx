@@ -16,12 +16,13 @@ const ButtonPart = (num:number ,isclicked: boolean, name: string, onClick: any) 
             // disabled = {isclicked}
             // type = {isclicked ? 'dashed' : 'default'}
             shape = 'default'>
-            {name_gen(name,isclicked)}
+            {name_gen()}
          </Button>)
 }
 
 const ButtonGroup = ({label, buttons, isclicked, setClick}:
                   {label : string, buttons : Array<string>, isclicked : Array<boolean>, setClick: any}) => {
+      // @ts-ignore
       const {_,filDispat} = useContext(FilContext);
       const buttonValue: ReactNode[] = [];
       let name = getKeyByValue(LABELS,label)
