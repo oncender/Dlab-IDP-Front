@@ -23,7 +23,7 @@ const SliderFil = ({label,curntval,mmVal,setSlider} :
         setSlider(value)
         setAction({"typ":actionType,"value":{"name":name,"value":value}})
       }
-    const calcStep = (curntval:[number&2],mmVal:[number&2]) =>{
+    const calcStep = (curntval:[number,number],mmVal:[number,number]) =>{
             // todo need to calc logic
             return 1E8
         }
@@ -34,22 +34,24 @@ const SliderFil = ({label,curntval,mmVal,setSlider} :
         }, [action]);
 
     const sliders: ReactNode[] = [];
-    sliders.push(<Slider
-                range
-                marks={marks}
-                min={mmVal[0]}
-                max={mmVal[1]}
-                step={calcStep(mmVal,curntval)}
-                defaultValue={curntval}
-                onChange={(value) => {handleYearSlider(value)}}
-            />)
+    sliders.push(
+        <Slider
+            range
+            marks={marks}
+            min={mmVal[0]}
+            max={mmVal[1]}
+            step={calcStep(curntval,mmVal)}
+            defaultValue={curntval}
+            key={'slider'+label}
+            onChange={(value) => {handleYearSlider(value)}}
+        />)
     return (
-        <div>
-            <span>
+        <>
+            <span key ={'span'+label}>
                 {label}
             </span>
             {sliders}
-        </div>
+        </>
     )}
 
 export default SliderFil

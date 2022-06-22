@@ -21,7 +21,7 @@ import { INIT_FILST, INIT_LOANAMT,LABELS, MM_LOANAMT } from "../components/const
 const Detail: NextPage = ({chartData, cardData}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
     // category button def
     const [filterInfo, filDispat] = useReducer(filReducer as Function,INIT_FILST)
-
+    console.log("filterinfo init",filterInfo)
     const ButtonGender = (label : string, buttons : Array<string>, isclicked : Array<boolean>, setClick: Function) => {
         return (<ButtonGroup
                       label={label}

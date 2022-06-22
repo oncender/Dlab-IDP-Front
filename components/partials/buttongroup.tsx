@@ -5,13 +5,14 @@ import { FilContext } from "../reducers/FilterReducer"
 import {FILTER_ACTION, LABELS} from "../const/constant"
 import { getKeyByValue } from "../const/utils"
 
-const ButtonPart = (key:number ,isclicked: boolean, name: string, onClick: any) => {
-    const name_gen = (name,isclicked) => {
-        return name +  (isclicked ? '': ' - 눌림(이모티콘으로 바뀜)')
+const ButtonPart = (num:number ,isclicked: boolean, name: string, onClick: any) => {
+    const name_gen = () => {
+        return name +  (isclicked ? ' - 눌림(이모티콘으로 바뀜)':'')
     }
     return (
          <Button
-            onClick={(e) => onClick(e,key)}
+            key={name}
+            onClick={(e) => onClick(e,num)}
             // disabled = {isclicked}
             // type = {isclicked ? 'dashed' : 'default'}
             shape = 'default'>
@@ -25,11 +26,11 @@ const ButtonGroup = ({label, buttons, isclicked, setClick}:
       const buttonValue: ReactNode[] = [];
       const [action,setAction] = useState({typ:null});
       let name = getKeyByValue(LABELS,label)
-      const onClick = (e: MouseEvent,key: number) => {
-            key = Number(key)
-            let actionType =  (isclicked[key]) ?  FILTER_ACTION.CATEGORY_DEL : FILTER_ACTION.CATEGORY_ADD
+      const onClick = (e: MouseEvent,num: number) => {
+            num = Number(num)
+            let actionType =  (isclicked[num]) ?  FILTER_ACTION.CATEGORY_DEL : FILTER_ACTION.CATEGORY_ADD
             setAction({typ:actionType,value:{'name':name,'value':e.target.textContent}})
-            isclicked[key] = !isclicked[key]
+            isclicked[num] = !isclicked[num]
             setClick([...isclicked])
       };
       useEffect(() => {
