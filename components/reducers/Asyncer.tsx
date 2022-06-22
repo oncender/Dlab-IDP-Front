@@ -1,7 +1,7 @@
 import { useReducer, useEffect } from 'react';
 import { ApiFlowObj } from "../const/usertyp"
 
-function apiReducer(state: ApiFlowObj, action: {type:string,data:any,eror:boolean}) {
+function apiReducer(state: ApiFlowObj, action: {type:string,data:any,error:null|any}) {
   switch (action.type) {
     case 'LOADING':
       return {

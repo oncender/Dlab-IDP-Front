@@ -3,13 +3,13 @@ import { Scatter } from '@ant-design/plots';
 const RateAtPlot = ({data}: {data:any}) => {
 
   const config = {
-    appendPadding: 30,
     data,
-    xField: 'change in female rate',
-    yField: 'change in male rate',
-    sizeField: 'pop',
-    colorField: 'continent',
-    color: ['#ffd500', '#82cab2', '#193442', '#d18768', '#7e827a'],
+    appendPadding: 30,
+    xField: 'loandate',
+    yField: 'sdaterate',
+    sizeField: 'loanamt',
+    colorField: 'at',
+    color: ['#ffd500', '#82cab2', '#193442', '#d18768', '#9a1b7a','#3c82a5','#e728a7'],
     size: [4, 30],
     shape: 'circle',
     pointStyle: {
@@ -17,8 +17,6 @@ const RateAtPlot = ({data}: {data:any}) => {
       stroke: '#bbb',
     },
     xAxis: {
-      min: -25,
-      max: 5,
       grid: {
         line: {
           style: {
@@ -38,27 +36,36 @@ const RateAtPlot = ({data}: {data:any}) => {
           stroke: '#aaa',
         },
       },
+      tickInterval:0.01,
+      maxLimit:12,
+      minLimit:2.00,
     },
-    quadrant: {
-      xBaseline: 0,
-      yBaseline: 0,
-      labels: [
-        {
-          content: 'Male decrease,\nfemale increase',
-        },
-        {
-          content: 'Female decrease,\nmale increase',
-        },
-        {
-          content: 'Female & male decrease',
-        },
-        {
-          content: 'Female &\n male increase',
-        },
-      ],
-    },
+    style: {
+      position:'relative',
+      height: '400px',
+      width: '80vw'
+            }
+    // quadrant: {
+    //   xBaseline: 0,
+    //   yBaseline: 0,
+    //   labels: [
+    //     {
+    //       content: 'Male decrease,\nfemale increase',
+    //     },
+    //     {
+    //       content: 'Female decrease,\nmale increase',
+    //     },
+    //     {
+    //       content: 'Female & male decrease',
+    //     },
+    //     {
+    //       content: 'Female &\n male increase',
+    //     },
+    //   ],
+    // },
   };
-  console.log("chart1 rateAtPlot ",config)
+  let {_, ...forLog} = config;
+  //console.log("chart1 rateAtPlot ",forLog,data[0])
   return <Scatter {...config} />;
 };
 

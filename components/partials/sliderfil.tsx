@@ -7,7 +7,7 @@ import { getKeyByValue } from "../const/utils"
 
 const SliderFil = ({label,curntval,mmVal,setSlider} :
     {label: string, curntval: [number,number], mmVal: [number,number], setSlider: Function}) => {
-
+    // @ts-ignore
     const {_,filDispat} = useContext(FilContext);
     const [action,setAction] = useState({typ:null});
 
@@ -21,6 +21,7 @@ const SliderFil = ({label,curntval,mmVal,setSlider} :
     const handleYearSlider = (value: [number, number]) => {
         let actionType = FILTER_ACTION.FLOAT_UPDATE
         setSlider(value)
+        // @ts-ignore
         setAction({"typ":actionType,"value":{"name":name,"value":value}})
       }
     const calcStep = (curntval:[number,number],mmVal:[number,number]) =>{
