@@ -8,7 +8,7 @@ export default function MultiSelect(props: any){
     };
     const changeOptions = (value: string[]) => {
         // props.FilterUpdate(value)
-        console.log(`selected ${value}`);
+        // console.log(`selected ${value}`);
     };
 
     return (

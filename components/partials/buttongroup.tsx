@@ -1,42 +1,44 @@
-import React, {ReactNode} from 'react'
-import React, {useEffect, useState, useMemo} from 'react'
+import {ReactNode ,useEffect, useMemo, useContext, useState} from 'react'
 
 import { Button } from 'antd'
-import {FILTER_ACTION} from "../reducers/constant"
+import { FilContext } from "../reducers/FilterReducer"
+import {FILTER_ACTION, LABELS} from "../const/constant"
+import { getKeyByValue } from "../const/utils"
 
-const ButtonPart = (isclicked: boolean, key: string, onClick: any) => {
+const ButtonPart = (num:number ,isclicked: boolean, name: string, onClick: any) => {
+    const name_gen = () => {
+        return name +  (isclicked ? ' - 눌림(이모티콘으로 바뀜)':'')
+    }
     return (
          <Button
-            key = {key}
-            onClick={onClick}
+            key={name}
+            onClick={(e) => onClick(e,num)}
             // disabled = {isclicked}
-            type = {isclicked ? 'dashed' : 'default'}
+            // type = {isclicked ? 'dashed' : 'default'}
             shape = 'default'>
-            {key}
+            {name_gen(name,isclicked)}
          </Button>)
 }
 
-const ButtonGroup = ({labels, buttons, isclicked, dispatch}:
-                  {labels : string, buttons : Array<string>, isclicked : Array<boolean>, dispatch: any}) => {
+const ButtonGroup = ({label, buttons, isclicked, setClick}:
+                  {label : string, buttons : Array<string>, isclicked : Array<boolean>, setClick: any}) => {
+      const {_,filDispat} = useContext(FilContext);
       const buttonValue: ReactNode[] = [];
-      console.log(labels,isclicked)
-      const onClick = (e: MouseEvent) => {
-            let actionType =  (e.currentTarget.disabled) ?  FILTER_ACTION.CATEGORY_DEL : FILTER_ACTION.CATEGORY_ADD
-            let action = {typ:actionType,value:{'name':labels,'value':e.target.textContent}}
-            console.log(action)
-            dispatch(action)
+      let name = getKeyByValue(LABELS,label)
+      const onClick = (e: MouseEvent,num: number) => {
+            num = Number(num)
+            let actionType =  (isclicked[num]) ?  FILTER_ACTION.CATEGORY_DEL : FILTER_ACTION.CATEGORY_ADD
+            let newaction ={typ:actionType,value:{'name':name,'value':buttons[num]}}
+            isclicked[num] = !isclicked[num]
+            setClick([...isclicked])
+            filDispat(newaction)
       };
 
       for (let i =0; i< buttons.length;i++){
-            buttonValue.push(ButtonPart(isclicked[i],buttons[i],onClick)
-                    // <ButtonPart isclicked={isclicked[i]}
-                    //             key={buttons[i]}
-                    //             onClick={onClick} />
-            );
-      };
+            buttonValue.push(ButtonPart(i,isclicked[i],buttons[i],onClick));};
       return (
           <div>
-            <span>{labels}</span>
+            <span>{label}</span>
                 {buttonValue}
           </div>
       )

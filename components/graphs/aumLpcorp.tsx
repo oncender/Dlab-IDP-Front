@@ -1,22 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import { Column, G2 } from '@ant-design/plots';
-import { data } from './data_test'
-const DemoColumn = () => {
-  const [data, setData] = useState([]);
 
-  useEffect(() => {
-    asyncFetch();
-  }, []);
-
-  const asyncFetch = () => {
-    fetch('https://gw.alipayobjects.com/os/antfincdn/jSRiL%26YNql/percent-column.json')
-      .then((response) => response.json())
-      .then((json) => setData(json))
-      .catch((error) => {
-        console.log('fetch data failed', error);
-      });
-  };
+const AumLpcorp = ({data}: {data:any}) => {
   G2.registerInteraction('element-link', {
     start: [
       {
@@ -63,6 +47,8 @@ const DemoColumn = () => {
       },
     ],
   };
-
+  console.log("chart1 aumLpCorp ",config)
   return <Column {...config} />;
 };
+
+export default AumLpcorp
