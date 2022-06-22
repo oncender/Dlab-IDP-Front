@@ -18,6 +18,8 @@ const selectArr = (arrValue: Array<any>, arrTargetSelect : CategoryObj[], names:
 
 // Filter Reducer define
 function filReducer(state : FilterStateObj,action: ActionObj) {
+    console.log(state)
+    console.log(action)
     switch (action.typ){
         case FILTER_ACTION.CATEGORY_ADD:
             return {
