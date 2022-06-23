@@ -1,4 +1,4 @@
-import {ReactNode ,useEffect, useMemo, useContext, useState} from 'react'
+import {ReactNode} from 'react'
 
 import { Button } from 'antd'
 import { FilContext } from "../reducers/FilterReducer"
@@ -20,10 +20,9 @@ const ButtonPart = (num:number ,isclicked: boolean, name: string, onClick: any) 
          </Button>)
 }
 
-const ButtonGroup = ({label, buttons, isclicked, setClick}:
-                  {label : string, buttons : Array<string>, isclicked : Array<boolean>, setClick: any}) => {
+const ButtonGroup = ({label, buttons, isclicked, setClick,filDispat}:
+                  {label : string, buttons : Array<string>, isclicked : Array<boolean>, setClick: Function, filDispat: Function}) => {
       // @ts-ignore
-      const {_,filDispat} = useContext(FilContext);
       const buttonValue: ReactNode[] = [];
       let name = getKeyByValue(LABELS,label)
       const onClick = (e: MouseEvent,num: number) => {
@@ -43,6 +42,6 @@ const ButtonGroup = ({label, buttons, isclicked, setClick}:
                 {buttonValue}
           </div>
       )
-}
+};
 
 export default ButtonGroup

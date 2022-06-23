@@ -31,11 +31,39 @@ interface rateAtData{
     loandate:string
     loanamt:string
 }
+
+interface fromApiV1{
+    [key:string]:string
+}
+
+interface rateAtData{
+    sdaterate:number
+    at:string
+    loandate:string
+    loanamt:number
+}
 interface aumLpcorp{
     lpcorp:string
     loandate:string
-    loanamt:string
+    loanamt:number
+}
+
+interface cardComp{
+    src?:string  // source url for each card image or icon
+    fn:string
+    lpcorp:string
+    an:string
+    aum:number
+    sdaterate:number
+    duration:string
+    loanamt:number
+}
+
+interface pageCountTyp{
+    data:cardComp[],
+    hasMore:boolean
 }
 
 
-export type {ActionObj, FilterStateObj, FloatObj, CategoryObj, ApiFlowObj, rateAtData, aumLpcorp}
+export type {ActionObj, FilterStateObj, FloatObj, CategoryObj, ApiFlowObj,
+    fromApiV1,rateAtData,aumLpcorp,cardComp,pageCountTyp}

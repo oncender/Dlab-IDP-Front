@@ -1,7 +1,6 @@
 import { Scatter } from '@ant-design/plots';
 
 const RateAtPlot = ({data}: {data:any}) => {
-
   const config = {
     data,
     appendPadding: 30,
@@ -36,8 +35,8 @@ const RateAtPlot = ({data}: {data:any}) => {
           stroke: '#aaa',
         },
       },
-      tickInterval:0.01,
-      maxLimit:12,
+      tickInterval:0.005,
+      maxLimit:12.00,
       minLimit:2.00,
     },
     style: {
@@ -64,8 +63,6 @@ const RateAtPlot = ({data}: {data:any}) => {
     //   ],
     // },
   };
-  let {_, ...forLog} = config;
-  //console.log("chart1 rateAtPlot ",forLog,data[0])
   return <Scatter {...config} />;
 };
 

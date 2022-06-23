@@ -1,39 +1,26 @@
 import {SliderMarks} from "antd/lib/slider";
 import {ReactNode, useContext, useEffect, useState} from "react";
 import {Slider} from "antd";
-import {FilContext} from "../reducers/FilterReducer";
 import {FILTER_ACTION, LABELS} from "../const/constant";
 import { getKeyByValue } from "../const/utils"
 
-const SliderFil = ({label,curntval,mmVal,setSlider} :
-    {label: string, curntval: [number,number], mmVal: [number,number], setSlider: Function}) => {
-    // @ts-ignore
-    const {_,filDispat} = useContext(FilContext);
-    const [action,setAction] = useState({typ:null});
+const SliderFil = ({label,curntval,mmVal,setSlider,filDispat} :
+    {label: string, curntval: [number,number], mmVal: [number,number], setSlider: Function, filDispat: Function}) => {
 
-    let mark1:number = curntval[0]
-    let mark2:number = curntval[1]
     const marks: SliderMarks = {
-        mark1: {style: {paddingLeft: '20px'}, label: '2011'},
-        mark2: {style: {paddingRight: '20px'}, label: '2022'},
+        [curntval[0]]: {style: {paddingLeft: '20px'}, label: `${curntval[0]/1E8}억`},
+        [curntval[1]]: {style: {paddingRight: '20px'}, label: `${curntval[1]/1E8}억`},
         }
-        let name = getKeyByValue(LABELS,label)
+    let name = getKeyByValue(LABELS,label)
     const handleYearSlider = (value: [number, number]) => {
         let actionType = FILTER_ACTION.FLOAT_UPDATE
         setSlider(value)
-        // @ts-ignore
-        setAction({"typ":actionType,"value":{"name":name,"value":value}})
+        filDispat({"typ":actionType,"value":{"name":name,"value":value}})
       }
     const calcStep = (curntval:[number,number],mmVal:[number,number]) =>{
-            // todo need to calc logic
+            // todo need to calc logic for exponentially
             return 1E8
         }
-
-
-    useEffect(() => {
-        filDispat(action)
-        }, [action]);
-
     const sliders: ReactNode[] = [];
     sliders.push(
         <Slider
@@ -47,12 +34,12 @@ const SliderFil = ({label,curntval,mmVal,setSlider} :
             onChange={(value) => {handleYearSlider(value)}}
         />)
     return (
-        <>
-            <span key ={'span'+label}>
+        <div key ={label}>
+            <span>
                 {label}
             </span>
             {sliders}
-        </>
+        </div>
     )}
 
 export default SliderFil

@@ -1,6 +1,32 @@
 import {CategoryObj, FilterStateObj, FloatObj} from "./usertyp";
 
 
+export function zip(a1: any, a2: any){
+    return a1.map((x, i) => [x, a2[i]]);
+}
+
+export function parseFloatDef(val,defaultval){
+    return parseFloat(val) ? parseFloat(val) : defaultval
+}
+
+export function groupbyCount(obArr: Array<any>, countBy: number) {
+    return obArr.reduce(
+        (r, o, idx) => {
+            const key = parseInt(String(idx / countBy))
+            r[key] = (r[key] || [])
+            r[key].push(o)
+            return r
+        }, {}
+    )
+}
+
+
+
+export function getTempRem(rempx:number,targetpx:number):string{
+    return `${targetpx/rempx}rem`
+}
+
+
 export function getKeyByValue(object: any, value : any) {
   return Object.keys(object).find(key => object[key] === value);
 }

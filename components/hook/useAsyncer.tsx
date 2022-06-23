@@ -6,7 +6,7 @@ function apiReducer(state: ApiFlowObj, action: {type:string,data:any,error:null|
     case 'LOADING':
       return {
         loading: true,
-        data: null,
+        data: state.data,
         error: null
       };
     case 'SUCCESS':
@@ -15,36 +15,50 @@ function apiReducer(state: ApiFlowObj, action: {type:string,data:any,error:null|
         data: action.data,
         error: null
       };
+    case 'CLEAR':
+      return {
+    loading: false,
+    data: [],
+    error: false
+  }
     case 'ERROR':
       return {
         loading: false,
-        data: null,
+        data: [],
         error: action.error
       };
     default:
       throw new Error(`Unhandled action type: ${action.type}`);
   }
 }
-
-function Asyncer(callback: Function, deps = [], skip = false) {
-  const [apiState, apiDispatch] = useReducer(apiReducer, {
+const initialState = {
     loading: false,
-    data: null,
+    data: [],
     error: false
-  });
-
+  }
+function useAsyncer(callback: Function ,deps = [],clears:[], skip = false) {
+  const [apiState, apiDispatch] = useReducer(apiReducer, initialState);
   const fetchData = async () => {
     apiDispatch({ type: 'LOADING' });
+    let data
     try {
-      const data = await callback();
-      apiDispatch({ type: 'SUCCESS', data });
+       data = await callback();
+       apiDispatch({ type: 'SUCCESS', data:[...apiState.data,...data.data]})
     } catch (e) {
-      apiDispatch({ type: 'ERROR', error: e });
+      console.log("error",e)
+      apiDispatch({ type: 'ERROR'});
     }
   };
-
+  // useEffect(()=>{
+  //   console.log("Clear")
+  //   ;
+  //   if (skip) return;
+  //   return ( ()=> fetchData());
+  //     },clears
+  // )
   useEffect(() => {
-    if (skip) return;
+    console.log("deps!!")
+    if (skip) return apiDispatch({ type: 'CLEAR'});
     fetchData();
     // eslint-disable-next-line
   }, deps);
@@ -52,4 +66,4 @@ function Asyncer(callback: Function, deps = [], skip = false) {
   return [apiState, fetchData];
 }
 
-export default Asyncer;
+export default useAsyncer;

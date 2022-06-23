@@ -20,30 +20,50 @@ export const INIT_FILST: FilterStateObj = {
         {'name':'rate','value':'고정'}
     ],
     float :[
-        {'name':'loanamt','value':[150000000000,427000000000]},
+        {'name':'debt','value':[300E8,427E8]},
     ]
 };
 
-export const INIT_LOANAMT:[number,number] = [15E8,427E8]
+export const INIT_DEBT:[number,number] = [200E8,800E8]
 
 // need to be fixed by real min max value
-export const MM_LOANAMT:[number,number] = [1E8,1000E8]
+export const MM_DEBT:[number,number] = [1E8,1000E8]
 
 // labels for each filter (label : button1 button2 ...) | (label \n slider ---- )
 export const LABELS = {
     'it' : '투자 유형',
     'seniorstr': '대출 순위',
     'at' : '자산 유형',
-    'loanamt' : '대출 약정금',
+    'debt' : '대출 약정금',
     'rate': '금리 종류'
 }
+
+export const CARD_LABELS = {
+    'fn':"펀드명",
+    'lpcorp':"대주명회사",
+    'an':"자산명",
+    'loanamt':"대출약정금",
+    'aum':"대출총액",
+    'sdaterate':"체결이자",
+    'duration':"듀레이션"
+    }
 
 export const APIURL = {
     ROWCOUNT:"/api/v1/debtRowCount",
     TABLE : "/api/v1/debt/dataTable",
-    CARD:"..",
+    CARD_ALL:"/api/v1/debt/dataTable",
     PLTONE:"/api/v1/debt/graphLeft",
-    PLTTWO:"/api/v1/debt/graphRight"
+    PLTTWO:"/api/v1/debt/graphRight",
+    CARDPAGE:"/api/v1/debt/dataTable" //will be replace
 }
 // PLTONE:"http://localhost:8080/api/v1/debt/graphLeft",
 // PLTTWO:"http://localhost:8080/api/v1/debt/graphRight",
+
+
+export const TEMPCSS = {
+    "height": 2235,
+    "width": 1440,
+    "left": 761,
+    "top": -560,
+    "border-radius": 0
+}
