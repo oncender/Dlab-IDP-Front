@@ -1,11 +1,12 @@
 import {SliderMarks} from "antd/lib/slider";
 import {ReactNode, useContext, useEffect, useState} from "react";
-import {Slider} from "antd";
+import { Selct } from "antd";
 import {FILTER_ACTION, LABELS} from "../const/constant";
 import { getKeyByValue } from "../const/utils"
 
-const SliderFil = ({label,curntval,mmVal,setSlider,filDispat} :
-    {label: string, curntval: [number,number], mmVal: [number,number], setSlider: Function, filDispat: Function}) => {
+const SortSelect = ({options,curntOtion,desAsc,setCurntOption,setResult} :
+    {options: string[], curntOtion: string, desAsc: boolean, setSlider: Function, filDispat: Function}) => {
+    const { Option } = Select;
 
     const marks: SliderMarks = {
         [curntval[0]]: {style: {paddingLeft: '20px'}, label: `${curntval[0]/1E8}억`},

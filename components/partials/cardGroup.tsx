@@ -22,13 +22,13 @@ const CardPart = ({keystring, cardData, loading}: { keystring: string, cardData:
         <Card key={keystring} hoverable>
             <Row>
                 <Col>
-                    <Card key={keystring+"col1"}
-                        cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
-                                    style={{
-                                        width: 184,
-                                        height: 184
-                                    }}/>}
-                        style={{width: (980 / 5 * 1)}}
+                    <Card key={keystring + "col1"}
+                          cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+                                      style={{
+                                          width: 184,
+                                          height: 184
+                                      }}/>}
+                          style={{width: (980 / 5 * 1)}}
                     />
                 </Col>
                 <Col style={{width: (980 / 5 * 3)}}>
@@ -61,24 +61,23 @@ const CardPart = ({keystring, cardData, loading}: { keystring: string, cardData:
 
 
 const CardGroup = ({data, refFunc}: { data: cardComp[], refFunc: Function }) => {
-    if (data != undefined) {
-        // const CardValue: ReactNode[] = [];
-        let c = data.map((val, idx) => {
+    if (data == undefined) return;
 
-            const isLastElement = data.length-1 === idx + 1;
-            return (
-                isLastElement ? (
-                    <CardPart keystring={val.fn + val.lpcorp} cardData={val} ref={() => {refFunc()}} />
-                ) : (
+    return  data.map((val, idx) => {
+        const isLastElement = data.length - 1 === idx + 1;
+        return (
+            isLastElement ? (
+                <div ref={refFunc}>
                     <CardPart keystring={val.fn + val.lpcorp} cardData={val}/>
-                )
-            )})
-        console.log(c)
-        return c
-    }
+                </div>
+            ) : (
+                <CardPart keystring={val.fn + val.lpcorp} cardData={val}/>
+            )
+        )
+    })
+};
 
-        // {/*<Switch checked={!loading} onChange={() => (setLoading(!loading))}/>*/}
-    }
-    ;
+// {/*<Switch checked={!loading} onChange={() => (setLoading(!loading))}/>*/}
 
-    export default CardGroup
+
+export default CardGroup

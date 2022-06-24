@@ -1,5 +1,6 @@
+import styles from "../styles/Select.module.css"
 import {Divider} from 'antd'
-import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback} from 'react'
+import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode} from 'react'
 import type {NextPage, GetServerSideProps, InferGetServerSidePropsType} from 'next'
 
 // Hook Import
@@ -14,9 +15,9 @@ import AumLpcorp from "../components/graphs/aumLpcorp";
 import CardGroup from "../components/partials/cardGroup"
 
 // Component dependent Import
-import {APIURL, INIT_FILST, INIT_DEBT, LABELS, MM_DEBT} from "../components/const/constant"
+import {APIURL, INIT_FILST, INIT_DEBT, LABELS, MM_DEBT, SORT_LABELS} from "../components/const/constant"
 import {parseFloatDef, apiParamGen, groupbyKeys, sortObjectVal, urlGen} from "../components/const/utils";
-import {fromApiV1, rateAtData, aumLpcorp, cardComp, pageCountTyp} from "../components/const/usertyp"
+import {fromApiV1, rateAtData, aumLpcorp, cardComp, pageCountTyp, ApiFlowObj} from "../components/const/usertyp"
 import axios from "axios";
 
 
@@ -27,10 +28,19 @@ const Detail: NextPage = ({
                           }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
     /* State & Reducer DEF */
     // all category reducer def
-    const [filterInfo, filDispat] = useReducer(filReducer as Function, fromHomeData.filterInit)
+    // @ts-ignore
+    const [filterInfo, filDispat] = useReducer(filReducer, fromHomeData.filterInit);
     // chartData State
-    const [chartD, setCharD] = useState(chartData)
-    const [chartClc, setChartClc] = useState(false)
+    const [chartD, setCharD] = useState(chartData);
+    const [chartClc, setChartClc] = useState(false);
+    // cardData State
+    const [cardPage, setCardPage] = useState(0);
+    const [start, setStart] = useState(true);
+    const [apiState] = useAsyncer(getCardPage, [cardPage], [filterInfo], start);
+    // sorting State
+    const [selctState,setSelect] = useState(SORT_LABELS['it']);
+    const [ascState,setAscState] = useState(true);
+    // const [slcClickState,setSlcClickState]:[ReactNode[],Function] = useState([]);
 
     // button component dependent param def
     const itValue: Array<string> = ['실물', '대출', '개발(펀드)', '개발(PF)'];
@@ -52,8 +62,8 @@ const Detail: NextPage = ({
     const [sldrval, setSldrval] = useState(fromHomeData.sldrInit)
     // chart component dependent param def
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]) => {
-        let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: {}, two: {}}
-
+        console.log("data1", data1)
+        let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: [], two: []}
         // @ts-ignore
         alldata['one'] = data1.map((item) => {
             return {
@@ -102,65 +112,48 @@ const Detail: NextPage = ({
             (a, b) => sortObjectVal(a, b, 'loandate')
         )
         alldata['two'] = topn.concat(nontopn)
+        console.log(alldata['one'], alldata['two'])
         return alldata
     }
+    async function getGraph() {
+        // setter: State setter callback, should be given in the Hook or elsewhere,
+        let params = apiParamGen(filterInfo)
+        let cancel
+        console.log(urlGen(APIURL.PLTONE, params))
+        let reqConfig1: {} = {
+            method: "GET",
+            url: APIURL.PLTONE,
+            params: params,
+            cancelToken: new axios.CancelToken(c => cancel = c)
+        }
+        let reqConfig2: {} = {
+            method: "GET",
+            url: APIURL.PLTTWO,
+            params: params,
+            cancelToken: new axios.CancelToken(c => cancel = c)
+        }
+        let res1
+        let res2
+        try {
+            res1 = await axios(reqConfig1);
+        } catch (e) {
+            if (axios.isCancel(e)) {
+                console.log("error2", e)
+            }
+        }
+        try {
+            res2 = await axios(reqConfig2);
+        } catch (e) {
+            if (axios.isCancel(e)) {
+                console.log("error2", e)
+            }
+        }
+        // @ts-ignore
+        setCharD(preProcessChart(res1.data['datag1'], res2.data['datag2']))
+        console.log("graph Called")
+    }
     // card component dependent param def
-    //: fromApiV1[]
-    // const preProcessCard = (data:any) => {
-    //     function durationParser(num: number): string {
-    //         // @ts-ignore
-    //         let year = parseInt(num / 12);
-    //         let month = num % 12;
-    //         let durStr = '';
-    //         if (year > 0) {
-    //             durStr += `${year}년`
-    //         }
-    //         if (month != 0) {
-    //             durStr += year == 0 ? "" : " "
-    //             durStr += `${month}개월`
-    //         }
-    //         return durStr;
-    //     }
-    //
-    //     return new Promise((resolve, reject) => {
-    //         // const compDataPageSplit: cardComp[] = data.map((val) => {
-    //         //     return {
-    //         //         fn: val.fn,
-    //         //         lpcorp: val.lpcorp,
-    //         //         an: val.an,
-    //         //         aum: parseFloatDef(val.aum, null),
-    //         //         loanamt: parseFloatDef(val.loanamt, null),
-    //         //         sdaterate: parseFloatDef(val.sdaterate, null),
-    //         //         duration: durationParser(parseFloatDef(val.duration, 0))
-    //         //     }
-    //         // })
-    //         // todo after pagecount api updated,delow need delete,above should be run
-    //         const compData: cardComp[] = data.data.data.map((val) => {
-    //             return {
-    //                 fn: val.fn,
-    //                 lpcorp: val.lpcorp,
-    //                 an: val.an,
-    //                 aum: parseFloatDef(val.aum, null),
-    //                 loanamt: parseFloatDef(val.loanamt, null),
-    //                 sdaterate: parseFloatDef(val.sdaterate, null),
-    //                 duration: durationParser(parseFloatDef(val.duration, 0))
-    //             }
-    //         })
-    //         const compDataPageSplit: pageCountTyp = {
-    //             data: compData.reduce((r, o, i) => {
-    //                 let key = Math.floor(Math.random() * compData.length)
-    //                 if (i < 10) {
-    //                     r.push(compData[key])
-    //                 }
-    //                 return r
-    //             }, []),
-    //             hasMore: true
-    //         }
-    //         resolve(compDataPageSplit)
-    //     })
-    // }
-
-    const preProcessCard = (data: fromApiV1[]) => {
+    const preProcessCard = (data: fromApiV1[]):pageCountTyp => {
         function durationParser(num: number): string {
             // @ts-ignore
             let year = parseInt(num / 12);
@@ -176,19 +169,6 @@ const Detail: NextPage = ({
             return durStr;
         }
 
-        // const compDataPageSplit: cardComp[] = data.map((val) => {
-        //     return {
-        //         fn: val.fn,
-        //         lpcorp: val.lpcorp,
-        //         an: val.an,
-        //         aum: parseFloatDef(val.aum, null),
-        //         loanamt: parseFloatDef(val.loanamt, null),
-        //         sdaterate: parseFloatDef(val.sdaterate, null),
-        //         duration: durationParser(parseFloatDef(val.duration, 0))
-        //     }
-        // })
-        // todo after pagecount api updated,delow need delete,above should be run
-
         const compData: cardComp[] = data.map((val) => {
             return {
                 fn: val.fn,
@@ -200,8 +180,13 @@ const Detail: NextPage = ({
                 duration: durationParser(parseFloatDef(val.duration, 0))
             }
         })
-        const compDataPageSplit: pageCountTyp = {
-            data: compData.reduce((r, o, i) => {
+        // return = {
+        //     data: compData,
+        //     hasMore: true
+        // }
+        // todo after pagecount api updated,delow need delete,above should be run, hasMore logic need to be added.
+        return {
+            data: compData.reduce((r: cardComp[], o: cardComp, i: number) => {
                 let key = Math.floor(Math.random() * compData.length)
                 if (i < 10) {
                     r.push(compData[key])
@@ -210,9 +195,56 @@ const Detail: NextPage = ({
             }, []),
             hasMore: true
         }
-        return compDataPageSplit
     }
+    async function getCardPage() {
+        // setter: State setter callback, should be given in the Hook or elsewhere,
+        let params = apiParamGen(filterInfo)
+        // just for mock
+        // params['pagenum'] = cardPage
+        let cancel
+        let reqConfig: {} = {
+            method: "GET",
+            url: APIURL.CARDPAGE,
+            params: params,
+            cancelToken: new axios.CancelToken(c => cancel = c)
+        }
 
+        let res;
+        try {
+            res = await axios(reqConfig);
+        } catch (e) {
+            if (axios.isCancel(e)) {
+                console.log("error", e)
+            }
+        }
+        // @ts-ignore
+        res = preProcessCard(res.data.data as fromApiV1[])
+        return res;
+    }
+        // infinite scroll ref
+    const observer = useRef();
+    const lastCardRef = useCallback(
+        // observer always refer last card div component
+        (node: any) => {
+            if (apiState.loading) return;
+            //
+            if (observer.current) { // @ts-ignore
+                observer.current.disconnect();
+            }
+            // if need to more load (hasMore == true), observer redefine & cardPage +1
+            // @ts-ignore
+            observer.current = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && apiState.hasMore) {
+                    setCardPage((prev) => prev + 1);
+                }
+            });
+            if (node) {
+                // @ts-ignore
+                observer.current.observe(node);
+            }
+        },
+        [apiState.loading, apiState.hasMore]
+    );
 
     /* Component DEF */
     // button component def
@@ -276,107 +308,48 @@ const Detail: NextPage = ({
                            onClick={setChartClc}
         />)
     }, [chartD.two, chartClc])
-
     // card component def
+    const cardBoard = useMemo(() => {
+        // @ts-ignore
+        return (<CardGroup data={apiState.data}
+                           refFunc={lastCardRef}/>)
+    }, [apiState.data])
 
 
     /* request api function */
     // API.TABLE
-    let isSubscribed = true;
 
-    async function getGraph(isSubscribed: boolean) {
-        let params = apiParamGen(filterInfo)
-        let url1: string = urlGen(APIURL.PLTONE, params)
-        let url2: string = urlGen(APIURL.PLTTWO, params)
-        const response1 = await fetch(
-            url1, {method: "get"}).catch(e => {
-            console.warn(`Fetch 2 error: ${e.message}`)
-            return null
-        })
-        const response2 = await fetch(
-            url2, {method: "get"}).catch(e => {
-            console.warn(`Fetch 2 error: ${e.message}`)
-            return null
-        })
-        if ((response1 == null) || (response2 == null)) {
-            return
-        }
-        const data1 = await response1.json();
-        const data2 = await response2.json();
-        if (isSubscribed) {
-            setCharD(preProcessChart(data1['datag1'], data2['datag2']))
-        }
-    }
-
-    async function getCardPage() {
-        // setter: State setter callback, should be given in the Hook or elsewhere,
-        let params = apiParamGen(filterInfo)
-        // just for mock
-        // params['pagenum'] = cardPage
-        let cancel
-        let reqConfig: {} = {
-            method: "GET",
-            url: APIURL.CARDPAGE,
-            params: params,
-            cancelToken: new axios.CancelToken(c => cancel = c)
-        }
-        let res;
-        try {
-            res = await axios(reqConfig);
-        } catch (req) {
-            console.log("res start")
-        }
-        res = preProcessCard(res.data.data)
-        return res;
-    }
-    //preProcessCard
 
     // API.SCROLL CARD
     // cardData State
-    const [cardD, setCardD] = useState(cardData)
-    const [cardPage, setCardPage] = useState(0);
+
 
     // filter to api query
     useEffect(() => {
-        getGraph(isSubscribed);
+        // after filter updated, Graph should be reloaded
+        getGraph();
         return (() => {
-            isSubscribed = false
+            // after filter updated, CardPage should be reloaded
             setStart(true)
             setCardPage(1)
         })
     }, [filterInfo])
 
-    useEffect(()=>{
-        setStart(false),[]
+    // Aftrer page rendered once, start
+    useEffect(() => {
+        setStart(false), []
     })
-    const [start,setStart] = useState(true)
-    const [apiState, fetchData] = useAsyncer(getCardPage, [cardPage,filterInfo],[filterInfo], start);
 
-    const hasMore = true
-    const observer = useRef();
-    const lastCardRef = useCallback(
-        (node: any) => {
-            console.log("called!!")
-            if (apiState.loading) return;
-            if (observer.current) observer.current.disconnect();
-            observer.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting && hasMore) {
-                    setCardPage((prev) => prev + 1);
-                }
-            });
-            if (node) observer.current.observe(node);
-        },
-        [apiState.loading, hasMore]
-    );
 
-    const cardBoard = (<CardGroup data={apiState.data}
-                                  refFunc={lastCardRef}/>)
 
+
+
+    // const cardNumber = `총 대출건수는 ${cardAll.length}건 입니다.`
 
     return (
         <div>
             <div className="flex">
-                <aside className="self-start sticky top-16 border border-solid border-gray-300 rounded-lg w-64 ml-16">
+                <aside className={"self-start sticky top-16 border border-solid border-gray-300 rounded-lg w-64 ml-16"}>
                     사이드바 sticky
                     {iTButton}
                     {aTButton}
@@ -384,23 +357,24 @@ const Detail: NextPage = ({
                     {rateButton}
                     {lamtSldr}
                 </aside>
+                <div className="grow flex-col mt-16 mr-16 items-center">
+                    <div className="h-96">
+                        <p className="text-4xl text-center">차트 영역</p>
+                        {chartOne}
+                        <Divider orientation="left"/>
+                        {chartTwo}
+                    </div>
+                    <Divider orientation="left"/>
+                    <div className="h-96">
+                        <p className="text-4xl text-center">카드 영역</p>
+                        {cardBoard}
+                        <div>{apiState.loading && "로딩중입니다...."}</div>
+                        <div>{apiState.error && "에러발생XXXX"}</div>
+                    </div>
+                </div>
             </div>
 
-            <div className="grow flex-col mt-16 mr-16 items-center">
-                <div className="h-96">
-                    <p className="text-4xl text-center">차트 영역</p>
-                    {/*{chartOne}*/}
-                    <Divider orientation="left"/>
-                    {/*{chartTwo}*/}
-                </div>
-                <Divider orientation="left"/>
-                <div className="h-96">
-                    <p className="text-4xl text-center">카드 영역</p>
-                    {cardBoard}
-                    <div>{apiState.loading && "로딩중입니다...."}</div>
-                    <div>{apiState.error && "에러발생XXXX"}</div>
-                </div>
-            </div>
+
         </div>
     )
 }

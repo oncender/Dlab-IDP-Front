@@ -37,6 +37,22 @@ export const LABELS = {
     'debt' : '대출 약정금',
     'rate': '금리 종류'
 }
+// sorting params name
+export const SORT_LABELS = {
+    'it' : '투자 유형',
+    'seniorstr': '대출 순위',
+    'at' : '자산 유형',
+    'debt' : '대출 약정금',
+    'rate': '금리 종류',
+    'fn':"펀드명",
+    'lpcorp':"대주명회사",
+    'an':"자산명",
+    'loanamt':"대출약정금",
+    'aum':"대출총액",
+    'sdaterate':"체결이자",
+    'duration':"듀레이션"
+}
+
 
 export const CARD_LABELS = {
     'fn':"펀드명",
