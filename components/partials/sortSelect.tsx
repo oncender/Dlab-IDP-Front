@@ -1,47 +1,38 @@
-import {SliderMarks} from "antd/lib/slider";
 import {ReactNode, useContext, useEffect, useState} from "react";
-import { Selct } from "antd";
-import {FILTER_ACTION, LABELS} from "../const/constant";
-import { getKeyByValue } from "../const/utils"
 
-const SortSelect = ({options,curntOtion,desAsc,setCurntOption,setResult} :
-    {options: string[], curntOtion: string, desAsc: boolean, setSlider: Function, filDispat: Function}) => {
-    const { Option } = Select;
+import {Select} from "antd";
+import {SORT_LABELS} from "../const/constant";
+import {getKeyByValue} from "../const/utils"
 
-    const marks: SliderMarks = {
-        [curntval[0]]: {style: {paddingLeft: '20px'}, label: `${curntval[0]/1E8}억`},
-        [curntval[1]]: {style: {paddingRight: '20px'}, label: `${curntval[1]/1E8}억`},
-        }
-    let name = getKeyByValue(LABELS,label)
-    const handleYearSlider = (value: [number, number]) => {
-        let actionType = FILTER_ACTION.FLOAT_UPDATE
-        setSlider(value)
-        filDispat({"typ":actionType,"value":{"name":name,"value":value}})
-      }
-    const calcStep = (curntval:[number,number],mmVal:[number,number]) =>{
-            // todo need to calc logic for exponentially
-            return 1E8
-        }
-    const sliders: ReactNode[] = [];
-    sliders.push(
-        <Slider
-            range
-            marks={marks}
-            min={mmVal[0]}
-            max={mmVal[1]}
-            step={calcStep(curntval,mmVal)}
-            defaultValue={curntval}
-            key={'slider'+label}
-            onAfterChange={(value) => {handleYearSlider(value)}}
-            // onChange={(value) => {handleYearSlider(value)}}
-        />)
+const {Option} = Select;
+const SortSelect = ({curntOption, desAsc, setcurntOption, setdesAsc}:
+                        { curntOption: string, desAsc: boolean, setcurntOption: Function, setdesAsc: Function }) => {
+
+    // console.log(curntOption, desAsc,setcurntOption, setdesAsc)
+    const sortOptions = Object.keys(SORT_LABELS).map((k) => {
+        // @ts-ignore
+        return (<Option value={SORT_LABELS[k]}></Option>)
+    })
     return (
-        <div key ={label}>
-            <span>
-                {label}
-            </span>
-            {sliders}
-        </div>
-    )}
-
-export default SliderFil
+        <>
+            <Select
+                defaultValue={curntOption}
+                style={{width: 120}}
+                bordered={false}
+                onChange={(value: string) => {
+                    console.log(`selected ${value}`)
+                    setcurntOption(value)}}>
+                {sortOptions}
+            </Select>
+            <Select defaultValue={desAsc}
+                    style={{width: 120}}
+                    bordered={false}
+                    onChange={(value: string) => {
+                        console.log(`selected ${value}`)
+                        setdesAsc(value)}}>
+                <Option value={true}>오름차순</Option>
+                <Option value={false}>내림차순</Option>
+            </Select>
+        </>)
+}
+export default SortSelect

@@ -1,5 +1,5 @@
-import styles from "../styles/Select.module.css"
 import {Divider} from 'antd'
+import "../styles/Button.module.css"
 import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode} from 'react'
 import type {NextPage, GetServerSideProps, InferGetServerSidePropsType} from 'next'
 
@@ -12,8 +12,8 @@ import ButtonGroup from "../components/partials/buttongroup"
 import SliderFil from "../components/partials/sliderfil";
 import RateAtPlot from "../components/graphs/rateAtPlot";
 import AumLpcorp from "../components/graphs/aumLpcorp";
-import CardGroup from "../components/partials/cardGroup"
-
+import CardGroup from "../components/partials/cardGroup";
+import SortSelect from "../components/partials/sortSelect";
 // Component dependent Import
 import {APIURL, INIT_FILST, INIT_DEBT, LABELS, MM_DEBT, SORT_LABELS} from "../components/const/constant"
 import {parseFloatDef, apiParamGen, groupbyKeys, sortObjectVal, urlGen} from "../components/const/utils";
@@ -31,6 +31,7 @@ const Detail: NextPage = ({
     // @ts-ignore
     const [filterInfo, filDispat] = useReducer(filReducer, fromHomeData.filterInit);
     // chartData State
+    const [rowCount, setRowCount] = useState(0);
     const [chartD, setCharD] = useState(chartData);
     const [chartClc, setChartClc] = useState(false);
     // cardData State
@@ -149,6 +150,7 @@ const Detail: NextPage = ({
             }
         }
         // @ts-ignore
+        setRowCount(res1.data['datag1'].length)
         setCharD(preProcessChart(res1.data['datag1'], res2.data['datag2']))
         console.log("graph Called")
     }
@@ -322,8 +324,6 @@ const Detail: NextPage = ({
 
     // API.SCROLL CARD
     // cardData State
-
-
     // filter to api query
     useEffect(() => {
         // after filter updated, Graph should be reloaded
@@ -334,17 +334,14 @@ const Detail: NextPage = ({
             setCardPage(1)
         })
     }, [filterInfo])
-
     // Aftrer page rendered once, start
     useEffect(() => {
         setStart(false), []
     })
 
-
-
-
-
-    // const cardNumber = `총 대출건수는 ${cardAll.length}건 입니다.`
+    const cardNumber = (<div className="border-b-2">총 대출건수는 {rowCount}건 입니다.</div>)
+    const solSect = (<SortSelect curntOption={selctState} desAsc={ascState}
+                                 setcurntOption={setSelect} setdesAsc={setAscState}/>)
 
     return (
         <div>
@@ -357,16 +354,21 @@ const Detail: NextPage = ({
                     {rateButton}
                     {lamtSldr}
                 </aside>
+                <i className="fa-solid fa-thumbs-up fa-5x"></i>
                 <div className="grow flex-col mt-16 mr-16 items-center">
-                    <div className="h-96">
+                    <div className="h-96 overflow-y-scroll">
                         <p className="text-4xl text-center">차트 영역</p>
                         {chartOne}
                         <Divider orientation="left"/>
                         {chartTwo}
                     </div>
                     <Divider orientation="left"/>
-                    <div className="h-96">
+                    <div className="h-96 overflow-visible">
                         <p className="text-4xl text-center">카드 영역</p>
+                        <div display={"inline-block"}>
+                            {cardNumber}
+                            {solSect}
+                        </div>
                         {cardBoard}
                         <div>{apiState.loading && "로딩중입니다...."}</div>
                         <div>{apiState.error && "에러발생XXXX"}</div>
