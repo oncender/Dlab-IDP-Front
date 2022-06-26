@@ -15,7 +15,14 @@ const RateAtPlot = ({data}: {data:any}) => {
       fillOpacity: 0.8,
       stroke: '#bbb',
     },
+    title:{
+      text:"이자율",
+      position:"end"
+    },
     xAxis: {
+      label: {
+        formatter: (v) => `${v.split('-').splice(0,2).join("/")}`,
+      },
       grid: {
         line: {
           style: {
@@ -30,6 +37,9 @@ const RateAtPlot = ({data}: {data:any}) => {
       },
     },
     yAxis: {
+      label: {
+        formatter: (v) => `${(parseFloat(v)).toFixed(2)} %`,
+      },
       line: {
         style: {
           stroke: '#aaa',
@@ -41,8 +51,8 @@ const RateAtPlot = ({data}: {data:any}) => {
     },
     style: {
       position:'relative',
-      height: '400px',
-      width: '80vw'
+      // height: '400px',
+      // width: '80vw'
             }
     // quadrant: {
     //   xBaseline: 0,

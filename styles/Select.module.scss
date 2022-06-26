@@ -1,0 +1,60 @@
+@mixin scale_size($size) {
+  @if $size == 'large' {
+    $font_size: 3 !global;
+    $font_option_size: 2 !global;
+    $padding_right: 2.5 !global;
+  } @else if $size == 'medium' {
+    $font_size: 2 !global;
+    $font_option_size: 1 !global;
+    $padding_right: 0.5 !global;
+  } @else if $size == 'small' {
+    $font_size: 1.5 !global;
+    $font_option_size: 1 !global;
+    $padding_right: 0.5 !global;
+  }
+  .customSelect {
+    margin-right: 16px;
+    background: transparent;
+    color: white;
+    font-family: 'sans';
+    font-size: $font_size * 1rem;
+    font-weight: 100;
+    padding-right: $padding_right*1rem;
+    border-bottom: 1px solid white;
+
+    & option {
+      background-color: transparent;
+      color: rgb(100, 100, 100);
+      font-family: 'sans';
+      font-size: $font_option_size*1rem;
+      padding-left: 0.5rem;
+    }
+
+    @if ($size == 'large') or ($size == 'medium') {
+      &:hover {
+        cursor: pointer;
+        font-weight: 600;
+      }
+    }
+  }
+  @content
+}
+
+@media screen and (min-width: 769px) {
+  @include scale_size('large') {
+    .customSelect {
+      appearance: none; //
+      background-image: url('../public/down_arrow.png'); //
+      background-repeat: no-repeat; //
+      background-position: calc(100% - 3px) calc(50% + 4px); //
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  @include scale_size('medium')
+}
+
+@media screen and (max-width: 640px) {
+  @include scale_size('small')
+}

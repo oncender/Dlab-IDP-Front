@@ -1,4 +1,4 @@
-import styles from "../../styles/Select.module.css"
+import styles from "../../styles/Select.module.scss"
 
 type Option = {
   value: string

@@ -45,36 +45,42 @@ const initialState = {
     hasMore: true
 }
 
-function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [], skip = false) {
+function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [], start: boolean=false,setStart:Function) {
     const [apiState, apiDispatch] = useReducer(apiReducer, initialState);
-    const fetchData = async (loading: boolean) => {
+    const fetchData = async (loading: boolean,clear:boolean) => {
+        if (!start) return setStart(true);
         apiDispatch({type: 'LOADING'});
         let data
         try {
             data = await callback();
             if (loading) {
-                await asyncwait(2000)
+                await asyncwait(500)
             }
-            apiDispatch({type: 'SUCCESS', data: [...apiState.data, ...data.data],hasMore:data.hasMore})
+            if (clear){
+                console.log([...data.data].length)
+                apiDispatch({type: 'SUCCESS', data: [...data.data],hasMore:data.hasMore})
+            } else {
+                console.log([...apiState.data,...data.data].length)
+                apiDispatch({type: 'SUCCESS', data: [...apiState.data, ...data.data],hasMore:data.hasMore})
+            }
         } catch (e) {
             console.log("error", e)
             apiDispatch({type: 'ERROR'});
         }
     };
+
+    // useEffect(() => {
+    //         console.log("Clear")
+    //         if (skip) return apiDispatch({type: 'CLEAR'});
+    //         fetchData(true,true);
+    //     }, clears
+    // )
     useEffect(() => {
-            console.log("Clear")
-            apiDispatch({type: 'CLEAR'})
-            return (() => fetchData());
-        }, clears
-    )
-    useEffect(() => {
-        console.log("deps!!", deps[1])
-        if (skip) return apiDispatch({type: 'CLEAR'});
-        fetchData(true);
+        fetchData(true,false);
         // eslint-disable-next-line
     }, deps);
 
-    return [apiState, fetchData];
+    return [apiState, apiDispatch,fetchData];
 }
 
 export default useAsyncer;

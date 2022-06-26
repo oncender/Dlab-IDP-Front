@@ -1,7 +1,8 @@
-import "../../styles/Button.module.css"
+import styles from "../../styles/Button.module.scss"
+
 import {faCheckSquare, faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {faAngry} from "@fortawesome/free-regular-svg-icons";
-
+// import "../../styles/Button.module.scss"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ReactNode} from 'react'
 
@@ -12,8 +13,11 @@ import {getKeyByValue} from "../const/utils"
 import {
     faBriefcase, faTruck, faHotel, faCartShopping, faHouseChimney, faOilWell, faBuilding,
     faBuildingCircleCheck, faHandHoldingDollar, faUsers, faMoneyCheckAlt,
-    faCircleCheck, faCircleMinus, faCircleExclamation
+    faCircleCheck, faCircleMinus, faCircleExclamation,faPercent,
+    faEllipsis,faWaveSquare
 } from "@fortawesome/free-solid-svg-icons";
+// faCircleEllipsisVertical, faWavePulse : pro
+
 
 const NAME_ICON = {
     '오피스': faBriefcase,
@@ -23,68 +27,51 @@ const NAME_ICON = {
     '복합': faBuilding,
     '주거': faHouseChimney,
     '특별자산': faOilWell,
-    '기타': '',
+    '기타': faEllipsis,
     '실물': faBuildingCircleCheck,
     '대출': faHandHoldingDollar,
     '개발(펀드)': faUsers,
     '개발(PF)': faMoneyCheckAlt, //faMoneyCheckPen
     '선': faCircleCheck,
     '중': faCircleMinus,
-    '후': faCircleExclamation
+    '후': faCircleExclamation,
+    '고정':faPercent,
+    '변동':faWaveSquare,
 }
-
-/*
-- 자산유형
-    - 오피스 : fa-briefcase
-    - 물류 : fa-truck
-    - 호텔 : fa-hotel
-    - 리테일 : fa-cart-shopping
-    - 복합 : fa-buildings
-    - 주거 : fa-house-chimney
-    - 특별자산 : fa-oil-well
-    - 기타 :
-- 투자유형
-    - 실물 : fa-building-circle-check
-    - 대출 : fa-hand-holding-dollar
-    - 개발(펀드) : fa-users
-    - 개발(PF) : fa-money-check-pen
-- 대출순위
-    - 선 : fa-circle-check
-    - 중 : fa-circle-minus
-    - 후 : fa-circle-exclamation
- */
 
 //["solid", "fa-briefcase"]
 const ButtonPart = (num: number, isclicked: boolean, name: string, onClick: any) => {
     const name_gen = () => {
         if (isclicked) {
-            return (<div className ={"text-filter-btn-clicked-self"}><FontAwesomeIcon icon={NAME_ICON[name]} size="lg" pull={'left'} inverse/><b>{name}</b></div>)
+            return (<><FontAwesomeIcon icon={NAME_ICON[name]} size="lg" pull={'left'} inverse/><b>{name}</b></>)
         } else {
-            return (<div className ={"text-filter-btn-unclicked-self"} ><FontAwesomeIcon icon={NAME_ICON[name]} size="lg" pull={'left'}/><b>{name}</b></div>)
+            return (<><FontAwesomeIcon icon={NAME_ICON[name]} size="lg" pull={'left'}/><b>{name}</b></>)
         }
     }
     if (isclicked) {
         return (
-            <div className={"text-center bg-filter-btn-clicked-bg"} style={{'width':'fit-content','display':'inline-table'}}>
+            <div style={{'width':'fit-content','display':'inline-table'}}>
                 <Button
+                    className={styles["ant-btn-primary"]}
                     key={name}
                     onClick={(e) => onClick(e, num)}
                     // disabled = {isclicked}
                     type = {'primary'}
-                    shape='default'>
+                    shape='round'>
                     {name_gen()}
                 </Button>
             </div>)
     } else {
         return (
-            <div className={"text-center bg-filter-btn-unclicked-bg"} style={{'width':'fit-content','display':'inline-table'}}>
+            <div style={{'width':'fit-content','display':'inline-table'}}>
 
                 <Button
+                    className={styles["ant-btn-default"]}
                     key={name}
                     onClick={(e) => onClick(e, num)}
                     // disabled = {isclicked}
                     // type = {isclicked ? 'dashed' : 'default'}
-                    shape='default'>
+                    shape='round'>
                     {name_gen()}
                 </Button></div>)
     }
@@ -97,6 +84,7 @@ const ButtonGroup = ({label, buttons, isclicked, setClick, filDispat}:
                          { label: string, buttons: Array<string>, isclicked: Array<boolean>, setClick: Function, filDispat: Function }) => {
     // @ts-ignore
     const buttonValue: ReactNode[] = [];
+    console.log("buton render",label)
     let name = getKeyByValue(LABELS, label)
     const onClick = (e: MouseEvent, num: number) => {
         num = Number(num)
@@ -114,7 +102,7 @@ const ButtonGroup = ({label, buttons, isclicked, setClick, filDispat}:
     return (
         <>
         <Row>
-            <span><b>{label}</b></span>
+            <span className="filterName">{label}</span>
         </Row>
         <Row>
             {buttonValue}

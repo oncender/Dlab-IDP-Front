@@ -83,3 +83,10 @@ export const TEMPCSS = {
     "top": -560,
     "border-radius": 0
 }
+
+// For draggin type def
+export const ItemTypes = {
+    ContentS : 'ContentS',
+
+}
+

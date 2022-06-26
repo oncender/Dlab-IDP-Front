@@ -1,24 +1,36 @@
+import styles from "../styles/Detail.module.scss"
 import {Divider} from 'antd'
-import "../styles/Button.module.css"
+
 import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode} from 'react'
 import type {NextPage, GetServerSideProps, InferGetServerSidePropsType} from 'next'
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 // Hook Import
 import {filReducer, selectArr, FilContext} from "../components/reducers/FilterReducer";
 import useAsyncer from "../components/hook/useAsyncer";
-
+import useMoveScrool from "../components/hook/useScroll"
 // Component Import
-import ButtonGroup from "../components/partials/buttongroup"
-import SliderFil from "../components/partials/sliderfil";
+import {useDrag, useDrop} from 'react-dnd';
+import AsideFilters from "../components/partials/asideFilters"
 import RateAtPlot from "../components/graphs/rateAtPlot";
 import AumLpcorp from "../components/graphs/aumLpcorp";
 import CardGroup from "../components/partials/cardGroup";
 import SortSelect from "../components/partials/sortSelect";
 // Component dependent Import
-import {APIURL, INIT_FILST, INIT_DEBT, LABELS, MM_DEBT, SORT_LABELS} from "../components/const/constant"
+import {APIURL, INIT_FILST, INIT_DEBT, LABELS, MM_DEBT, SORT_LABELS, ItemTypes} from "../components/const/constant"
 import {parseFloatDef, apiParamGen, groupbyKeys, sortObjectVal, urlGen} from "../components/const/utils";
-import {fromApiV1, rateAtData, aumLpcorp, cardComp, pageCountTyp, ApiFlowObj} from "../components/const/usertyp"
+import {
+    fromApiV1,
+    rateAtData,
+    aumLpcorp,
+    cardComp,
+    pageCountTyp,
+    ApiFlowObj,
+    FilterStateObj
+} from "../components/const/usertyp"
 import axios from "axios";
+import DragDrop from "../components/partials/dragDrop";
 
 
 const Detail: NextPage = ({
@@ -35,35 +47,53 @@ const Detail: NextPage = ({
     const [chartD, setCharD] = useState(chartData);
     const [chartClc, setChartClc] = useState(false);
     // cardData State
-    const [cardPage, setCardPage] = useState(0);
-    const [start, setStart] = useState(true);
-    const [apiState] = useAsyncer(getCardPage, [cardPage], [filterInfo], start);
+    const [cardPage, setCardPage] = useState(1);
+    const [start, setStart] = useState(false);
+    const [element, onMoveToElement] = useMoveScrool()
+    const [apiState, apiDispatch, _] = useAsyncer(getCardPage, [cardPage,], [], start, setStart);
     // sorting State
-    const [selctState,setSelect] = useState(SORT_LABELS['it']);
-    const [ascState,setAscState] = useState(true);
+    const [selctState, setSelect] = useState(SORT_LABELS['it']);
+    const [ascState, setAscState] = useState(true);
     // const [slcClickState,setSlcClickState]:[ReactNode[],Function] = useState([]);
 
-    // button component dependent param def
-    const itValue: Array<string> = ['실물', '대출', '개발(펀드)', '개발(PF)'];
-    const itClicked = selectArr(itValue, INIT_FILST.category, 'it');
-    const [clickArrIt, setClickArrIt] = useState(itClicked);
+    // css item for dynamic grid change
+    const asidefilters_js = {
+        "style": {
+            "grid-column": "1/8",
+            "grid-row": "1"
+        },  //4+5+3+2+2}
+        "key": "asidefilter",
+        "index": 0
+    }
+    const content_js = {
+        "style": {
+            "grid-column": '8/40',
+            "grid-row": "1fr"
+        },
+        "key": "contents_all",
+        "index": 1
+    }
+    const blank_js = {
+        "style": {
+            "grid-column": '40/41',
+            "grid-row": "1/41"
+        },
+        "key": "contents_all",
+        "index": 1
 
-    const seniorstrValue: Array<string> = ['선', '중', '후'];
-    const seniorstrClicked = selectArr(seniorstrValue, INIT_FILST.category, 'seniorstr');
-    const [clickArrSeniorstr, setClickArrSeniorstr] = useState(seniorstrClicked);
+    }
+    const cardcomps_js = {
+        "style": {},
+    }
+    const chartcomps_js = {
+        "grid-column": '8/40',
+        "grid-row": '1/20',
+    }
 
-    const atValue: Array<string> = ['오피스', '물류', '호텔', '리테일', '복합', '주거', '특별자산', '기타'];
-    const atClicked = selectArr(atValue, INIT_FILST.category, 'at');
-    const [clickArrAt, setClickArrAt] = useState(atClicked);
 
-    const rateValue: Array<string> = ['고정', '변동'];
-    const rateClicked = selectArr(rateValue, INIT_FILST.category, 'rate');
-    const [clickArrRate, setClickArrRate] = useState(rateClicked);
-    // slider component dependent def
-    const [sldrval, setSldrval] = useState(fromHomeData.sldrInit)
     // chart component dependent param def
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]) => {
-        console.log("data1", data1)
+        console.log("data1 length in preProcessChart", data1.length)
         let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: [], two: []}
         // @ts-ignore
         alldata['one'] = data1.map((item) => {
@@ -82,11 +112,14 @@ const Detail: NextPage = ({
                 "loanamt": parseFloatDef(item.loanamt, 0)
             }
         });
+
         const topNcorp: Set<string> = groupbyKeys(data2, 'loanamt', ['lpcorp']).filter((val) => {
+            // to ignoring 이지스사모... corp names
             {
                 return !val.lpcorp.includes("사모")
             }
         }).sort(
+            // sort by all loan amount sum of each corp & slicing only top 10
             (a, b) => sortObjectVal(a, b, 'loanamt')).slice(-10).reverse()
             .reduce((r, o) => {
                 r.add(o.lpcorp)
@@ -95,12 +128,14 @@ const Detail: NextPage = ({
         data2 = groupbyKeys(data2, 'loanamt', ['lpcorp', 'loandate'])
 
         // @ts-ignore
+        // top 10 copr select
         const topn: rateAtData[] = data2.filter((val) => {
             return topNcorp.has(val["lpcorp"])
         }).sort(
             (a, b) => sortObjectVal(a, b, 'loandate')
         )
         // @ts-ignore
+        // non top 10 copr should be replaced to "기타"
         const nontopn: rateAtData[] = groupbyKeys(data2.filter((val) => {
                 return !topNcorp.has(val["lpcorp"])
             }),
@@ -113,9 +148,10 @@ const Detail: NextPage = ({
             (a, b) => sortObjectVal(a, b, 'loandate')
         )
         alldata['two'] = topn.concat(nontopn)
-        console.log(alldata['one'], alldata['two'])
+        // console.log(alldata['one'], alldata['two'])
         return alldata
     }
+
     async function getGraph() {
         // setter: State setter callback, should be given in the Hook or elsewhere,
         let params = apiParamGen(filterInfo)
@@ -152,10 +188,11 @@ const Detail: NextPage = ({
         // @ts-ignore
         setRowCount(res1.data['datag1'].length)
         setCharD(preProcessChart(res1.data['datag1'], res2.data['datag2']))
-        console.log("graph Called")
+
     }
+
     // card component dependent param def
-    const preProcessCard = (data: fromApiV1[]):pageCountTyp => {
+    const preProcessCard = (data: fromApiV1[]): pageCountTyp => {
         function durationParser(num: number): string {
             // @ts-ignore
             let year = parseInt(num / 12);
@@ -198,7 +235,8 @@ const Detail: NextPage = ({
             hasMore: true
         }
     }
-    async function getCardPage() {
+
+    async function getCardPage(ret: boolean = true) {
         // setter: State setter callback, should be given in the Hook or elsewhere,
         let params = apiParamGen(filterInfo)
         // just for mock
@@ -221,10 +259,16 @@ const Detail: NextPage = ({
         }
         // @ts-ignore
         res = preProcessCard(res.data.data as fromApiV1[])
-        return res;
+        if (ret) {
+            return res;
+        } else {
+            apiDispatch({type: 'SUCCESS', data: [...res.data], hasMore: res.hasMore})
+        }
     }
-        // infinite scroll ref
+
+    // infinite scroll ref
     const observer = useRef();
+
     const lastCardRef = useCallback(
         // observer always refer last card div component
         (node: any) => {
@@ -249,58 +293,7 @@ const Detail: NextPage = ({
     );
 
     /* Component DEF */
-    // button component def
-    const iTButton = useMemo(() => {
-            return (<ButtonGroup
-                label={LABELS['it']}
-                buttons={itValue}
-                isclicked={clickArrIt}
-                setClick={setClickArrIt}
-                filDispat={filDispat}
-            />)
-        }, [clickArrIt]
-    )
-    const seniorstrButton = useMemo(() => {
-        return (<ButtonGroup
-            label={LABELS['seniorstr']}
-            buttons={seniorstrValue}
-            isclicked={clickArrSeniorstr}
-            setClick={setClickArrSeniorstr}
-            filDispat={filDispat}
-        />)
-    }, [clickArrSeniorstr])
-    const aTButton = useMemo(() => {
-            return (<ButtonGroup
-                label={LABELS['at']}
-                buttons={atValue}
-                isclicked={clickArrAt}
-                setClick={setClickArrAt}
-                filDispat={filDispat}
-            />)
-        }, [clickArrAt]
-    )
-    const rateButton = useMemo(() => {
-            return (<ButtonGroup
-                label={LABELS['rate']}
-                buttons={rateValue}
-                isclicked={clickArrRate}
-                setClick={setClickArrRate}
-                filDispat={filDispat}
-            />)
-        }, [clickArrRate]
-    )
-    // slider component def
-    const lamtSldr = useMemo(() => {
-        return (
-            <SliderFil
-                label={LABELS['debt']}
-                curntval={sldrval}
-                setSlider={setSldrval}
-                mmVal={MM_DEBT}
-                filDispat={filDispat}
-            />)
-    }, [sldrval])
-    // chart component def
+    // level 1
     const chartOne = useMemo(() => {
         return (<RateAtPlot data={chartD.one}/>)
     }, [chartD.one])
@@ -310,16 +303,129 @@ const Detail: NextPage = ({
                            onClick={setChartClc}
         />)
     }, [chartD.two, chartClc])
-    // card component def
-    const cardBoard = useMemo(() => {
-        // @ts-ignore
-        return (<CardGroup data={apiState.data}
-                           refFunc={lastCardRef}/>)
-    }, [apiState.data])
+    const solSect = (<SortSelect curntOption={selctState} desAsc={ascState}
+                                 setcurntOption={setSelect} setdesAsc={setAscState}/>)
+    // level 0
+    const asideFil_old = useMemo(() => {
+        return (
+            <div style={asidefilters_js.style}>
+                <AsideFilters
+                    fromHomeData={fromHomeData}
+                    filDispat={filDispat}
+                />
+            </div>
+        )
+    }, [])
+    const asideFil = useMemo(() => {
+        return (
+                <AsideFilters
+                    fromHomeData={fromHomeData}
+                    filDispat={filDispat}
+                />
+        )
+    }, [])
 
 
-    /* request api function */
-    // API.TABLE
+        // dnd zero layour def
+    const [zeroArr, setZeroArr] = useState(['chart1','chart2']);
+    const [dragAside, setDragAside] = useState(false);
+    const moveContentZero = (contentID: string, toIndex: number) => {
+        const index = zeroArr.indexOf(contentID);
+        let newOrder = [...zeroArr];
+        newOrder.splice(index, 1);
+        newOrder.splice(toIndex, 0, contentID);
+        setZeroArr(newOrder)
+    };
+
+
+    const chartComps = useMemo(() => {
+        return (
+            <div className={styles.chart} ref={element}>
+                {chartOne}
+                {chartTwo}
+            </div>
+        )},[chartD, chartClc])
+    //
+    // const chartComps = useMemo(() => {
+    //     return (
+    //         <div className={styles.chart} ref={element}>
+    //             {
+    //                 <DragDrop
+    //         id={'chart1'}
+    //         index={0}
+    //         moveContentZero={moveContentZero}
+    //         someDragging={dragAside}
+    //         setsomeDragging={setDragAside}
+    //         content={chartOne}
+    //         itemType={ItemTypes.ContentS}
+    //         style={{}}
+    //     />}
+    //             {
+    //                         <DragDrop
+    //         id={'chart2'}
+    //         index={1}
+    //         moveContentZero={moveContentZero}
+    //         someDragging={dragAside}
+    //         setsomeDragging={setDragAside}
+    //         content={chartTwo}
+    //         itemType={ItemTypes.ContentS}
+    //         style={{}}
+    //     />
+    //                 }
+    //         </div>)
+    // }, [chartD, chartClc])
+    const cardComps = useMemo(() => {
+            console.log(apiState.data.length)
+            onMoveToElement()
+            return (
+                <div className={styles.card} style={cardcomps_js.style}>
+                    <span className={styles.filter}>
+                        <div className="border-b-2">총 대출건수는 {rowCount}건 입니다.</div>
+                        {solSect}
+                    </span>
+                    <span className={styles.board}>
+                        <CardGroup data={apiState.data}
+                                   refFunc={lastCardRef}
+                        />
+                    <div className={styles.boardError}>
+                        {apiState.loading && "로딩중입니다...."}
+                        {apiState.error && "에러발생XXXX"}
+                    </div>
+                    </span>
+                </div>)
+        }, [apiState.data]
+    )
+
+    const DContent = (
+        <DragDrop
+            id={'Contents'}
+            index={1}
+            moveContentZero={moveContentZero}
+            someDragging={dragAside}
+            setsomeDragging={setDragAside}
+            content={(<>
+                    {chartComps}
+                    {cardComps}
+            </>)}
+            itemType={ItemTypes.ContentS}
+            style={content_js.style}
+        />
+    )
+    const DBlock = (
+        <DragDrop
+            id={'NullBlock'}
+            index={2}
+            moveContentZero={moveContentZero}
+            someDragging={dragAside}
+            setsomeDragging={setDragAside}
+            content={(
+                <div style={blank_js.style}>
+                    only for testing
+                </div>
+            )}
+            itemType={ItemTypes.ContentS}/>
+    )
+
 
 
     // API.SCROLL CARD
@@ -328,55 +434,44 @@ const Detail: NextPage = ({
     useEffect(() => {
         // after filter updated, Graph should be reloaded
         getGraph();
+        apiDispatch({type: 'CLEAR'})
         return (() => {
             // after filter updated, CardPage should be reloaded
             setStart(true)
-            setCardPage(1)
+            if (cardPage != 1) {
+                setCardPage(1)
+            } else {
+                getCardPage(false)
+            }
+
         })
     }, [filterInfo])
-    // Aftrer page rendered once, start
-    useEffect(() => {
-        setStart(false), []
-    })
 
-    const cardNumber = (<div className="border-b-2">총 대출건수는 {rowCount}건 입니다.</div>)
-    const solSect = (<SortSelect curntOption={selctState} desAsc={ascState}
-                                 setcurntOption={setSelect} setdesAsc={setAscState}/>)
 
     return (
         <div>
-            <div className="flex">
-                <aside className={"self-start sticky top-16 border border-solid border-gray-300 rounded-lg w-64 ml-16"}>
-                    사이드바 sticky
-                    {iTButton}
-                    {aTButton}
-                    {seniorstrButton}
-                    {rateButton}
-                    {lamtSldr}
-                </aside>
-                <i className="fa-solid fa-thumbs-up fa-5x"></i>
-                <div className="grow flex-col mt-16 mr-16 items-center">
-                    <div className="h-96 overflow-y-scroll">
-                        <p className="text-4xl text-center">차트 영역</p>
-                        {chartOne}
-                        <Divider orientation="left"/>
-                        {chartTwo}
+            <DndProvider backend={HTML5Backend}>
+                <div className={styles.sectionContents}>
+                    {asideFil_old}
+                    <div style={content_js.style}>
+                    {chartComps}
+                    {cardComps}
                     </div>
-                    <Divider orientation="left"/>
-                    <div className="h-96 overflow-visible">
-                        <p className="text-4xl text-center">카드 영역</p>
-                        <div display={"inline-block"}>
-                            {cardNumber}
-                            {solSect}
-                        </div>
-                        {cardBoard}
-                        <div>{apiState.loading && "로딩중입니다...."}</div>
-                        <div>{apiState.error && "에러발생XXXX"}</div>
+                    <div style={blank_js.style}>
+                        only for testing
                     </div>
+                    {/*{DAside}*/}
+                    {/*{DContent}*/}
+                    {/*{DBlock}*/}
+                    {/*{asideFil}*/}
+                    {/*<div style={content_js.style}>*/}
+                    {/*    {chartComps}*/}
+                    {/*    {cardComps}*/}
+                    {/*</div>*/}
+
+
                 </div>
-            </div>
-
-
+            </DndProvider>
         </div>
     )
 }

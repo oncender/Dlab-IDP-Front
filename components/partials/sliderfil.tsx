@@ -3,6 +3,7 @@ import {ReactNode, useContext, useEffect, useState} from "react";
 import {Slider} from "antd";
 import {FILTER_ACTION, LABELS} from "../const/constant";
 import { getKeyByValue } from "../const/utils"
+import styles from "../../styles/Button.module.scss";
 
 const SliderFil = ({label,curntval,mmVal,setSlider,filDispat} :
     {label: string, curntval: [number,number], mmVal: [number,number], setSlider: Function, filDispat: Function}) => {
@@ -36,7 +37,7 @@ const SliderFil = ({label,curntval,mmVal,setSlider,filDispat} :
         />)
     return (
         <div key ={label}>
-            <span>
+            <span className="filterName">
                 {label}
             </span>
             {sliders}

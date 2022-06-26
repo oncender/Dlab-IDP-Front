@@ -18,10 +18,6 @@ module.exports = {
     colors: {
       // 'big-btn-green-bf': '#67FFBF',
       // 'big-btn-green-af': '#D0FFEB',
-      'filter-btn-clicked-self': '#FFFFFF',
-      'filter-btn-clicked-bg': '#182E53',
-      'filter-btn-unclicked-self': '#5A5A5A',
-      'filter-btn-unclicked-bg': '#9D9D9D',
     },
     container: {
       padding: {

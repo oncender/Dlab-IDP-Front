@@ -1,0 +1,29 @@
+.sectionContents{
+	display : grid;
+	//grid-template-rows: repeat(20,5%);
+	grid-template-columns: repeat(40,1fr);
+}
+.chart {
+		display : flex;
+		flex-direction: column;
+		& .one{
+		};
+		& .two{
+
+		};
+	}
+.card {
+	//display : flex;
+	//flex-direction: column;
+	//justify-content: flex-end;
+	.filter {
+	}
+	.board {
+
+	}
+	.board-error{
+
+	}
+}
+
+
