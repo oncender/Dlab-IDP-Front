@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { NextPage } from 'next';
 import tableStyles from "../styles/Table.module.scss";
 import mainStyles from "../styles/main.module.scss";
-import HashLoader from 'react-spinners/HashLoader';
+import GridLoader from 'react-spinners/GridLoader';
 import BigSelect from '../components/partials/bigSelectMain';
 
 const Home: NextPage = () => {
@@ -64,10 +64,12 @@ const Home: NextPage = () => {
       </div>
 
       <div className="w-full">
-        <div className="flex justify-center content-center">
-          {/* <Spin spinning={loading} size="large">
-          어떤 컨텐츠
-          </Spin> */}
+        <div className="flex justify-center items-center">
+          {loading?
+          <div className="my-20">
+            <GridLoader loading={loading} color='#67FFBF' size={30} />
+          </div>
+          :
           <div className={tableStyles.modelTable}>
             <table >
               <thead>
@@ -90,9 +92,14 @@ const Home: NextPage = () => {
               </tr>
               </tbody>
             </table>
+            <button 
+              className="bg-[#67FFBF] w-full h-16 text-2xl sm:w-72 sm:h-16 sm:text-3xl sm:m-10 md:w-96 md:h-20 md:text-4xl md:mb-20 rounded-lg text-blue-900 transition hover:scale-110 hover:duration-150 hover:ease-in-out hover:bg-[#BAFBE0]"
+              onClick={handleClick}>
+              모든 사례 보기
+            </button>
           </div>
-          <HashLoader loading={loading} color='#67FFBF' size={100} />
-          </div>
+          }
+        </div>
       </div>
     </div>
   )
