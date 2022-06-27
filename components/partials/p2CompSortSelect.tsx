@@ -5,7 +5,7 @@ import {SORT_LABELS} from "../const/p2Constant";
 import {getKeyByValue} from "../const/p2Utils"
 
 const {Option} = Select;
-const P2CompSortSelect = ({curntOption, desAsc, setcurntOption, setdesAsc}:
+const CompSortSelect = ({curntOption, desAsc, setcurntOption, setdesAsc}:
                         { curntOption: string, desAsc: boolean, setcurntOption: Function, setdesAsc: Function }) => {
 
     // console.log(curntOption, desAsc,setcurntOption, setdesAsc)
@@ -35,4 +35,4 @@ const P2CompSortSelect = ({curntOption, desAsc, setcurntOption, setdesAsc}:
             </Select>
         </>)
 }
-export default P2CompSortSelect
+export default CompSortSelect

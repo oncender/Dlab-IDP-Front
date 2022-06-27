@@ -80,7 +80,7 @@ const ButtonPart = (num: number, isclicked: boolean, name: string, onClick: any)
 
 }
 
-const P2CompButtonGroup = ({label, buttons, isclicked, setClick, filDispat}:
+const CompButtonGroup = ({label, buttons, isclicked, setClick, filDispat}:
                          { label: string, buttons: Array<string>, isclicked: Array<boolean>, setClick: Function, filDispat: Function }) => {
     // @ts-ignore
     const buttonValue: ReactNode[] = [];
@@ -111,4 +111,4 @@ const P2CompButtonGroup = ({label, buttons, isclicked, setClick, filDispat}:
     )
 };
 
-export default P2CompButtonGroup
+export default CompButtonGroup

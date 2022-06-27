@@ -11,11 +11,11 @@ import {
     ApiFlowObj,
     FilterStateObj
 } from "../const/p2Usertyp"
-import P2CompButtonGroup from "./p2CompButtonGroup";
-import P2CompSliderfil from "./p2CompSliderfil";
+import CompButtonGroup from "./p2CompButtonGroup";
+import CompSliderfil from "./p2CompSliderfil";
 import { useDrag, useDrop } from 'react-dnd';
 
-const P2CompAsideFilters = ({id, index ,fromHomeData,filDispat}:
+const AsideFilters = ({id, index ,fromHomeData,filDispat}:
                           {   id: string, index: number,
                               fromHomeData:{filterInit:FilterStateObj,sldrInit:[number,number]},
                               filDispat:Function,styleJs:{[key:string]:string}
@@ -41,7 +41,7 @@ const P2CompAsideFilters = ({id, index ,fromHomeData,filDispat}:
 
     // button component def
     const iTButton = useMemo(() => {
-        return (<P2CompButtonGroup
+        return (<CompButtonGroup
             label={LABELS['it']}
             buttons={itValue}
             isclicked={clickArrIt}
@@ -50,7 +50,7 @@ const P2CompAsideFilters = ({id, index ,fromHomeData,filDispat}:
         />)
     }, [clickArrIt])
     const seniorstrButton = useMemo(() => {
-        return (<P2CompButtonGroup
+        return (<CompButtonGroup
             label={LABELS['seniorstr']}
             buttons={seniorstrValue}
             isclicked={clickArrSeniorstr}
@@ -59,7 +59,7 @@ const P2CompAsideFilters = ({id, index ,fromHomeData,filDispat}:
         />)
     }, [clickArrSeniorstr])
     const aTButton = useMemo(() => {
-        return (<P2CompButtonGroup
+        return (<CompButtonGroup
             label={LABELS['at']}
             buttons={atValue}
             isclicked={clickArrAt}
@@ -68,7 +68,7 @@ const P2CompAsideFilters = ({id, index ,fromHomeData,filDispat}:
         />)
     }, [clickArrAt])
     const rateButton = useMemo(() => {
-        return (<P2CompButtonGroup
+        return (<CompButtonGroup
             label={LABELS['rate']}
             buttons={rateValue}
             isclicked={clickArrRate}
@@ -79,7 +79,7 @@ const P2CompAsideFilters = ({id, index ,fromHomeData,filDispat}:
     // slider component def
     const lamtSldr = useMemo(() => {
         return (
-            <P2CompSliderfil
+            <CompSliderfil
                 label={LABELS['debt']}
                 curntval={sldrval}
                 setSlider={setSldrval}
@@ -98,4 +98,4 @@ const P2CompAsideFilters = ({id, index ,fromHomeData,filDispat}:
     )
 }
 
-export default P2CompAsideFilters
+export default AsideFilters

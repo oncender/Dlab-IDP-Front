@@ -1,7 +1,7 @@
 import {Column, G2} from '@ant-design/plots';
 import {Button} from "antd";
 
-const P2GraphAumLpcorp = ({data, chartClc, onClick}: { data: any, chartClc: boolean, onClick: Function }) => {
+const AumLpcorp = ({data, chartClc, onClick}: { data: any, chartClc: boolean, onClick: Function }) => {
     G2.registerInteraction('element-link', {
         start: [
             {
@@ -86,4 +86,4 @@ const P2GraphAumLpcorp = ({data, chartClc, onClick}: { data: any, chartClc: bool
         </div>)
 };
 
-export default P2GraphAumLpcorp
+export default AumLpcorp

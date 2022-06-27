@@ -1,6 +1,6 @@
 import { Scatter } from '@ant-design/plots';
 
-const P2GraphRateAtPlot = ({data}: {data:any}) => {
+const RateAtPlot = ({data}: {data:any}) => {
   const config = {
     data,
     appendPadding: 30,
@@ -76,4 +76,4 @@ const P2GraphRateAtPlot = ({data}: {data:any}) => {
   return <Scatter {...config} />;
 };
 
-export default P2GraphRateAtPlot
+export default RateAtPlot

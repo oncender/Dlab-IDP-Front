@@ -3,7 +3,7 @@ import {useDrag, useDrop} from 'react-dnd';
 import React, {ReactNode, useEffect, useState} from "react";
 import {ItemTypes} from "../const/p2Constant";
 
-const P2CompDragDrop = ({id, index, moveContentZero, someDragging, setsomeDragging,content,itemType,style}: {
+const CompDragDrop = ({id, index, moveContentZero, someDragging, setsomeDragging,content,itemType,style}: {
     id: string,
     index: number,
     moveContentZero: Function,
@@ -86,4 +86,4 @@ const P2CompDragDrop = ({id, index, moveContentZero, someDragging, setsomeDraggi
     );
 }
 
-export default P2CompDragDrop
+export default CompDragDrop

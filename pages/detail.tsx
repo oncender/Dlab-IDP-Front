@@ -12,11 +12,11 @@ import useAsyncer from "../components/hook/useAsyncer";
 import useMoveScrool from "../components/hook/useScroll"
 // Component Import
 import {useDrag, useDrop} from 'react-dnd';
-import P2CompAsideFilters from "../components/partials/p2CompAsideFilters"
-import P2GraphRateAtPlot from "../components/graphs/p2GraphRateAtPlot";
-import P2GraphAumLpcorp from "../components/graphs/p2GraphAumLpcorp";
-import P2CompCardGroup from "../components/partials/p2CompCardGroup";
-import P2CompSortSelect from "../components/partials/p2CompSortSelect";
+import AsideFilters from "../components/partials/p2CompAsideFilters"
+import RateAtPlot from "../components/graphs/p2GraphRateAtPlot";
+import AumLpcorp from "../components/graphs/p2GraphAumLpcorp";
+import CompCardGroup from "../components/partials/p2CompCardGroup";
+import CompSortSelect from "../components/partials/p2CompSortSelect";
 // Component dependent Import
 import {APIURL, INIT_FILST, INIT_DEBT, LABELS, MM_DEBT, SORT_LABELS, ItemTypes} from "../components/const/p2Constant"
 import {parseFloatDef, apiParamGen, groupbyKeys, sortObjectVal, urlGen} from "../components/const/p2Utils";
@@ -30,7 +30,7 @@ import {
     FilterStateObj
 } from "../components/const/p2Usertyp"
 import axios from "axios";
-import P2CompDragDrop from "../components/partials/p2CompDragDrop.tsx";
+import CompDragDrop from "../components/partials/p2CompDragDrop.tsx";
 
 
 const Detail: NextPage = ({
@@ -67,7 +67,7 @@ const Detail: NextPage = ({
     }
     const content_js = {
         "style": {
-            "gridColumn": '10/40',
+            "gridColumn": '10/36',
             "gridRow": "1fr"
         },
         "key": "contents_all",
@@ -75,7 +75,7 @@ const Detail: NextPage = ({
     }
     const blank_js = {
         "style": {
-            "gridColumn": '40/41',
+            "gridColumn": '36/41',
             "gridRow": "1/41"
         },
         "key": "contents_all",
@@ -310,21 +310,21 @@ const Detail: NextPage = ({
     /* Component DEF */
     // level 1
     const chartOne = useMemo(() => {
-        return (<P2GraphRateAtPlot data={chartD.one}/>)
+        return (<RateAtPlot data={chartD.one}/>)
     }, [chartD.one])
     const chartTwo = useMemo(() => {
-        return (<P2GraphAumLpcorp data={chartD.two}
+        return (<AumLpcorp data={chartD.two}
                                   chartClc={chartClc}
                                   onClick={setChartClc}
         />)
     }, [chartD.two, chartClc])
-    const solSect = (<P2CompSortSelect curntOption={selctState} desAsc={ascState}
+    const solSect = (<CompSortSelect curntOption={selctState} desAsc={ascState}
                                        setcurntOption={setSelect} setdesAsc={setAscState}/>)
     // level 0
     const asideFil_old = useMemo(() => {
         return (
             <div style={asidefilters_js.style}>
-                <P2CompAsideFilters
+                <AsideFilters
                     fromHomeData={fromHomeData}
                     filDispat={filDispat}
                 />
@@ -333,7 +333,7 @@ const Detail: NextPage = ({
     }, [])
     const asideFil = useMemo(() => {
         return (
-                <P2CompAsideFilters
+                <AsideFilters
                     fromHomeData={fromHomeData}
                     filDispat={filDispat}
                 />
@@ -365,7 +365,7 @@ const Detail: NextPage = ({
     //     return (
     //         <div className={styles.chart} ref={element}>
     //             {
-    //                 <P2CompDragDrop
+    //                 <CompDragDrop
     //         id={'chart1'}
     //         index={0}
     //         moveContentZero={marveContentZero}
@@ -376,7 +376,7 @@ const Detail: NextPage = ({
     //         style={{}}
     //     />}
     //             {
-    //                         <P2CompDragDrop
+    //                         <CompDragDrop
     //         id={'chart2'}
     //         index={1}
     //         moveContentZero={moveContentZero}
@@ -402,7 +402,7 @@ const Detail: NextPage = ({
                     </div>
                     </span>
                     <span className={styles.board}>
-                        <P2CompCardGroup data={apiState.data}
+                        <CompCardGroup data={apiState.data}
                                          refFunc={lastCardRef}
                         />
                     <div className={styles.boardError}>
@@ -415,7 +415,7 @@ const Detail: NextPage = ({
     )
 
     const DContent = (
-        <P2CompDragDrop
+        <CompDragDrop
             id={'Contents'}
             index={1}
             moveContentZero={moveContentZero}
@@ -430,7 +430,7 @@ const Detail: NextPage = ({
         />
     )
     const DBlock = (
-        <P2CompDragDrop
+        <CompDragDrop
             id={'NullBlock'}
             index={2}
             moveContentZero={moveContentZero}

@@ -5,7 +5,7 @@ import {FILTER_ACTION, LABELS} from "../const/p2Constant";
 import { getKeyByValue } from "../const/p2Utils"
 import styles from "../../styles/Button.module.scss";
 
-const P2CompSliderfil = ({label,curntval,mmVal,setSlider,filDispat} :
+const CompSliderfil = ({label,curntval,mmVal,setSlider,filDispat} :
     {label: string, curntval: [number,number], mmVal: [number,number], setSlider: Function, filDispat: Function}) => {
 
     const marks: SliderMarks = {
@@ -44,4 +44,4 @@ const P2CompSliderfil = ({label,curntval,mmVal,setSlider,filDispat} :
         </div>
     )}
 
-export default P2CompSliderfil
+export default CompSliderfil
