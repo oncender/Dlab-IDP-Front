@@ -238,7 +238,8 @@ const Detail: NextPage = ({
 
     async function getCardPage(ret: boolean = true) {
         // setter: State setter callback, should be given in the Hook or elsewhere,
-        let params = apiParamGen(filterInfo)
+        let params = Object.assign({},apiParamGen(filterInfo),
+            {'pageCount': cardPage});
         // just for mock
         // params['pagenum'] = cardPage
         let cancel
