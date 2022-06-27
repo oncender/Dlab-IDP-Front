@@ -2,7 +2,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { NextPage } from 'next';
 
 import { APIURL } from '../components/constants/page3Const';
-import {aumLpcorp, rateAtData} from "../components/const/usertyp";
+import {aumLpcorp, rateAtData} from "../components/const/p2Usertyp";
 
 const DetailINfo: NextPage  = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
     console.log('home')

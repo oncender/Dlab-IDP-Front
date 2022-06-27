@@ -12,14 +12,14 @@ import useAsyncer from "../components/hook/useAsyncer";
 import useMoveScrool from "../components/hook/useScroll"
 // Component Import
 import {useDrag, useDrop} from 'react-dnd';
-import AsideFilters from "../components/partials/asideFilters"
-import RateAtPlot from "../components/graphs/rateAtPlot";
-import AumLpcorp from "../components/graphs/aumLpcorp";
-import CardGroup from "../components/partials/cardGroup";
-import SortSelect from "../components/partials/sortSelect";
+import P2CompAsideFilters from "../components/partials/p2CompAsideFilters"
+import P2GraphRateAtPlot from "../components/graphs/p2GraphRateAtPlot";
+import P2GraphAumLpcorp from "../components/graphs/p2GraphAumLpcorp";
+import P2CompCardGroup from "../components/partials/p2CompCardGroup";
+import P2CompSortSelect from "../components/partials/p2CompSortSelect";
 // Component dependent Import
-import {APIURL, INIT_FILST, INIT_DEBT, LABELS, MM_DEBT, SORT_LABELS, ItemTypes} from "../components/const/constant"
-import {parseFloatDef, apiParamGen, groupbyKeys, sortObjectVal, urlGen} from "../components/const/utils";
+import {APIURL, INIT_FILST, INIT_DEBT, LABELS, MM_DEBT, SORT_LABELS, ItemTypes} from "../components/const/p2Constant"
+import {parseFloatDef, apiParamGen, groupbyKeys, sortObjectVal, urlGen} from "../components/const/p2Utils";
 import {
     fromApiV1,
     rateAtData,
@@ -28,9 +28,9 @@ import {
     pageCountTyp,
     ApiFlowObj,
     FilterStateObj
-} from "../components/const/usertyp"
+} from "../components/const/p2Usertyp"
 import axios from "axios";
-import DragDrop from "../components/partials/dragDrop";
+import P2CompDragDrop from "../components/partials/p2CompDragDrop.tsx";
 
 
 const Detail: NextPage = ({
@@ -59,24 +59,24 @@ const Detail: NextPage = ({
     // css item for dynamic grid change
     const asidefilters_js = {
         "style": {
-            "grid-column": "1/8",
-            "grid-row": "1"
+            "gridColumn": "2/9",
+
         },  //4+5+3+2+2}
         "key": "asidefilter",
         "index": 0
     }
     const content_js = {
         "style": {
-            "grid-column": '8/40',
-            "grid-row": "1fr"
+            "gridColumn": '10/40',
+            "gridRow": "1fr"
         },
         "key": "contents_all",
         "index": 1
     }
     const blank_js = {
         "style": {
-            "grid-column": '40/41',
-            "grid-row": "1/41"
+            "gridColumn": '40/41',
+            "gridRow": "1/41"
         },
         "key": "contents_all",
         "index": 1
@@ -86,8 +86,8 @@ const Detail: NextPage = ({
         "style": {},
     }
     const chartcomps_js = {
-        "grid-column": '8/40',
-        "grid-row": '1/20',
+        "gridColumn": '8/40',
+        "gridRow": '1/20',
     }
 
 
@@ -156,13 +156,14 @@ const Detail: NextPage = ({
         // setter: State setter callback, should be given in the Hook or elsewhere,
         let params = apiParamGen(filterInfo)
         let cancel
-        console.log(urlGen(APIURL.PLTONE, params))
+
         let reqConfig1: {} = {
             method: "GET",
-            url: APIURL.PLTONE,
+            url: APIURL.PLTONE+"?",
             params: params,
             cancelToken: new axios.CancelToken(c => cancel = c)
         }
+
         let reqConfig2: {} = {
             method: "GET",
             url: APIURL.PLTTWO,
@@ -185,6 +186,7 @@ const Detail: NextPage = ({
                 console.log("error2", e)
             }
         }
+
         // @ts-ignore
         setRowCount(res1.data['datag1'].length)
         setCharD(preProcessChart(res1.data['datag1'], res2.data['datag2']))
@@ -207,6 +209,15 @@ const Detail: NextPage = ({
             }
             return durStr;
         }
+        function imagePath(img: string): string {
+            if (!parseInt(img)){
+                // after mock image file added.
+                return ''  //e.g. mock_pic/{img}.png
+            } else {
+                return `building_pic/${img}.png` // only {number} returned in api
+            }
+
+        }
 
         const compData: cardComp[] = data.map((val) => {
             return {
@@ -216,29 +227,32 @@ const Detail: NextPage = ({
                 aum: parseFloatDef(val.aum, null),
                 loanamt: parseFloatDef(val.loanamt, null),
                 sdaterate: parseFloatDef(val.sdaterate, null),
-                duration: durationParser(parseFloatDef(val.duration, 0))
+                duration: durationParser(parseFloatDef(val.duration, 0)),
+                img : imagePath(val.img),
             }
         })
-        // return = {
-        //     data: compData,
+        return {
+             data: compData,
+             hasMore: true
+        }
+        // todo after pagecount api updated,delow need delete,above should be run, hasMore logic need to be added.
+        // return {
+        //     data: compData.reduce((r: cardComp[], o: cardComp, i: number) => {
+        //         let key = Math.floor(Math.random() * compData.length)
+        //         if (i < 10) {
+        //             r.push(compData[key])
+        //         }
+        //         return r
+        //     }, []),
         //     hasMore: true
         // }
-        // todo after pagecount api updated,delow need delete,above should be run, hasMore logic need to be added.
-        return {
-            data: compData.reduce((r: cardComp[], o: cardComp, i: number) => {
-                let key = Math.floor(Math.random() * compData.length)
-                if (i < 10) {
-                    r.push(compData[key])
-                }
-                return r
-            }, []),
-            hasMore: true
-        }
     }
 
     async function getCardPage(ret: boolean = true) {
         // setter: State setter callback, should be given in the Hook or elsewhere,
-        let params = apiParamGen(filterInfo)
+        let params = Object.assign({},apiParamGen(filterInfo),
+            {'pageCount': cardPage});
+        console.log('cardgen',["http://localhost:8080/",urlGen(APIURL.CARDPAGE, params)].join(""))
         // just for mock
         // params['pagenum'] = cardPage
         let cancel
@@ -255,6 +269,7 @@ const Detail: NextPage = ({
         } catch (e) {
             if (axios.isCancel(e)) {
                 console.log("error", e)
+
             }
         }
         // @ts-ignore
@@ -295,21 +310,21 @@ const Detail: NextPage = ({
     /* Component DEF */
     // level 1
     const chartOne = useMemo(() => {
-        return (<RateAtPlot data={chartD.one}/>)
+        return (<P2GraphRateAtPlot data={chartD.one}/>)
     }, [chartD.one])
     const chartTwo = useMemo(() => {
-        return (<AumLpcorp data={chartD.two}
-                           chartClc={chartClc}
-                           onClick={setChartClc}
+        return (<P2GraphAumLpcorp data={chartD.two}
+                                  chartClc={chartClc}
+                                  onClick={setChartClc}
         />)
     }, [chartD.two, chartClc])
-    const solSect = (<SortSelect curntOption={selctState} desAsc={ascState}
-                                 setcurntOption={setSelect} setdesAsc={setAscState}/>)
+    const solSect = (<P2CompSortSelect curntOption={selctState} desAsc={ascState}
+                                       setcurntOption={setSelect} setdesAsc={setAscState}/>)
     // level 0
     const asideFil_old = useMemo(() => {
         return (
             <div style={asidefilters_js.style}>
-                <AsideFilters
+                <P2CompAsideFilters
                     fromHomeData={fromHomeData}
                     filDispat={filDispat}
                 />
@@ -318,7 +333,7 @@ const Detail: NextPage = ({
     }, [])
     const asideFil = useMemo(() => {
         return (
-                <AsideFilters
+                <P2CompAsideFilters
                     fromHomeData={fromHomeData}
                     filDispat={filDispat}
                 />
@@ -350,10 +365,10 @@ const Detail: NextPage = ({
     //     return (
     //         <div className={styles.chart} ref={element}>
     //             {
-    //                 <DragDrop
+    //                 <P2CompDragDrop
     //         id={'chart1'}
     //         index={0}
-    //         moveContentZero={moveContentZero}
+    //         moveContentZero={marveContentZero}
     //         someDragging={dragAside}
     //         setsomeDragging={setDragAside}
     //         content={chartOne}
@@ -361,7 +376,7 @@ const Detail: NextPage = ({
     //         style={{}}
     //     />}
     //             {
-    //                         <DragDrop
+    //                         <P2CompDragDrop
     //         id={'chart2'}
     //         index={1}
     //         moveContentZero={moveContentZero}
@@ -387,8 +402,8 @@ const Detail: NextPage = ({
                     </div>
                     </span>
                     <span className={styles.board}>
-                        <CardGroup data={apiState.data}
-                                   refFunc={lastCardRef}
+                        <P2CompCardGroup data={apiState.data}
+                                         refFunc={lastCardRef}
                         />
                     <div className={styles.boardError}>
                         {apiState.loading && "로딩중입니다...."}
@@ -400,7 +415,7 @@ const Detail: NextPage = ({
     )
 
     const DContent = (
-        <DragDrop
+        <P2CompDragDrop
             id={'Contents'}
             index={1}
             moveContentZero={moveContentZero}
@@ -415,7 +430,7 @@ const Detail: NextPage = ({
         />
     )
     const DBlock = (
-        <DragDrop
+        <P2CompDragDrop
             id={'NullBlock'}
             index={2}
             moveContentZero={moveContentZero}
@@ -461,7 +476,7 @@ const Detail: NextPage = ({
                     {cardComps}
                     </div>
                     <div style={blank_js.style}>
-                        only for testing
+
                     </div>
                     {/*{DAside}*/}
                     {/*{DContent}*/}

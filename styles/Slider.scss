@@ -5,4 +5,8 @@
 .ant-slider-handle{
   border: map-get($slider,"handle","border");
   background: map-get($slider,"handle","bg");
+  &.ant-tooltip-open{
+    opacity: 0.3;
+    border-color: map-get($slider,"handle","border");
+  }
 }

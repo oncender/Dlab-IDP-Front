@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import type { NextPage } from 'next'
-import BigSelect from '../components/partials/bigSelectMain'
+import BigSelect from '../components/partials/p1CompBigSelectMain'
 
 const Home: NextPage = () => {
   const [loanPriority, setLoanPriority] = useState('선')
