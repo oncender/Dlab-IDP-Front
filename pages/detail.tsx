@@ -380,8 +380,11 @@ const Detail: NextPage = ({
             return (
                 <div className={styles.card} style={cardcomps_js.style}>
                     <span className={styles.filter}>
-                        <div className="border-b-2">총 대출건수는 {rowCount}건 입니다.</div>
-                        {solSect}
+                        <div className={styles.title}>총 대출건수는 {rowCount}건 입니다.</div>
+                        {/*"border-b-2" style={{"width":"40%"}}*/}
+                        <div className={styles.sort}style={{'display':'flex','justify-content':'flex-end'}}>
+                            {solSect}
+                    </div>
                     </span>
                     <span className={styles.board}>
                         <CardGroup data={apiState.data}

@@ -1,6 +1,5 @@
 .sectionContents{
 	display : grid;
-	//grid-template-rows: repeat(20,5%);
 	grid-template-columns: repeat(40,1fr);
 }
 .chart {
@@ -17,6 +16,17 @@
 	//flex-direction: column;
 	//justify-content: flex-end;
 	.filter {
+		.title {
+			width:40%;
+			border-bottom-width: 2px;
+			border-bottom-color: rgba(16, 28, 59, 0.97);
+		}
+		.sort {
+			display:flex;
+			justify-content:flex-end;
+		}
+
+
 	}
 	.board {
 
