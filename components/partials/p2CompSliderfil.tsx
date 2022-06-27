@@ -3,7 +3,7 @@ import {ReactNode, useContext, useEffect, useState} from "react";
 import {Slider} from "antd";
 import {FILTER_ACTION, LABELS} from "../const/p2Constant";
 import { getKeyByValue } from "../const/p2Utils"
-import styles from "../../styles/Button.module.scss";
+
 
 const CompSliderfil = ({label,curntval,mmVal,setSlider,filDispat} :
     {label: string, curntval: [number,number], mmVal: [number,number], setSlider: Function, filDispat: Function}) => {
