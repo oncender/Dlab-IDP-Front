@@ -1,7 +1,6 @@
 import { Scatter } from '@ant-design/plots';
 
 const RateAtPlot = ({data}: {data:any}) => {
-
   const config = {
     data,
     appendPadding: 30,
@@ -16,7 +15,14 @@ const RateAtPlot = ({data}: {data:any}) => {
       fillOpacity: 0.8,
       stroke: '#bbb',
     },
+    title:{
+      text:"이자율",
+      position:"end"
+    },
     xAxis: {
+      label: {
+        formatter: (v) => `${v.split('-').splice(0,2).join("/")}`,
+      },
       grid: {
         line: {
           style: {
@@ -31,19 +37,22 @@ const RateAtPlot = ({data}: {data:any}) => {
       },
     },
     yAxis: {
+      label: {
+        formatter: (v) => `${(parseFloat(v)).toFixed(2)} %`,
+      },
       line: {
         style: {
           stroke: '#aaa',
         },
       },
-      tickInterval:0.01,
-      maxLimit:12,
+      tickInterval:0.005,
+      maxLimit:12.00,
       minLimit:2.00,
     },
     style: {
       position:'relative',
-      height: '400px',
-      width: '80vw'
+      // height: '400px',
+      // width: '80vw'
             }
     // quadrant: {
     //   xBaseline: 0,
@@ -64,8 +73,6 @@ const RateAtPlot = ({data}: {data:any}) => {
     //   ],
     // },
   };
-  let {_, ...forLog} = config;
-  //console.log("chart1 rateAtPlot ",forLog,data[0])
   return <Scatter {...config} />;
 };
 

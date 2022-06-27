@@ -1,0 +1,39 @@
+.sectionContents{
+	display : grid;
+	grid-template-columns: repeat(40,1fr);
+}
+.chart {
+		display : flex;
+		flex-direction: column;
+		& .one{
+		};
+		& .two{
+
+		};
+	}
+.card {
+	//display : flex;
+	//flex-direction: column;
+	//justify-content: flex-end;
+	.filter {
+		.title {
+			width:40%;
+			border-bottom-width: 2px;
+			border-bottom-color: rgba(16, 28, 59, 0.97);
+		}
+		.sort {
+			display:flex;
+			justify-content:flex-end;
+		}
+
+
+	}
+	.board {
+
+	}
+	.board-error{
+
+	}
+}
+
+

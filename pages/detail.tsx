@@ -1,224 +1,495 @@
-import {
-    Button,
-    Slider,
-    Select
-} from 'antd'
-import type { SliderMarks } from 'antd/lib/slider'
-import axios from 'axios';
+import styles from "../styles/Detail.module.scss"
+import {Divider} from 'antd'
 
-import React, {useEffect, useReducer, useMemo, createContext, useState} from 'react'
-import {ReactNode} from "react";
-import type { NextPage, GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode} from 'react'
+import type {NextPage, GetServerSideProps, InferGetServerSidePropsType} from 'next'
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
-import ButtonGroup from "../components/partials/buttongroup"
-import SliderFil from "../components/partials/sliderfil";
-import { filReducer ,selectArr, FilContext } from "../components/reducers/FilterReducer";
-import {APIURL, INIT_FILST, INIT_LOANAMT, LABELS, MM_LOANAMT} from "../components/const/constant"
-import {apiParamGen, getKeyByValue, groupbyKeys, objectMap, sortObjectVal, urlGen} from "../components/const/utils";
-import { rateAtData, aumLpcorp } from "../components/const/usertyp"
-import Asyncer from "../components/reducers/Asyncer";
-import {CategoryObj} from "../components/const/usertyp";
+// Hook Import
+import {filReducer, selectArr, FilContext} from "../components/reducers/FilterReducer";
+import useAsyncer from "../components/hook/useAsyncer";
+import useMoveScrool from "../components/hook/useScroll"
+// Component Import
+import {useDrag, useDrop} from 'react-dnd';
+import AsideFilters from "../components/partials/asideFilters"
 import RateAtPlot from "../components/graphs/rateAtPlot";
 import AumLpcorp from "../components/graphs/aumLpcorp";
+import CardGroup from "../components/partials/cardGroup";
+import SortSelect from "../components/partials/sortSelect";
+// Component dependent Import
+import {APIURL, INIT_FILST, INIT_DEBT, LABELS, MM_DEBT, SORT_LABELS, ItemTypes} from "../components/const/constant"
+import {parseFloatDef, apiParamGen, groupbyKeys, sortObjectVal, urlGen} from "../components/const/utils";
+import {
+    fromApiV1,
+    rateAtData,
+    aumLpcorp,
+    cardComp,
+    pageCountTyp,
+    ApiFlowObj,
+    FilterStateObj
+} from "../components/const/usertyp"
+import axios from "axios";
+import DragDrop from "../components/partials/dragDrop";
 
 
-// let zip = (a1: any, a2: any) => a1.map((x, i) => [x, a2[i]]);
-
-const Detail: NextPage = ({chartData, cardData,fromHomeData}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Detail: NextPage = ({
+                              chartData,
+                              cardData,
+                              fromHomeData
+                          }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
     /* State & Reducer DEF */
     // all category reducer def
-    const [filterInfo, filDispat] = useReducer(filReducer as Function, fromHomeData.filterInit)
+    // @ts-ignore
+    const [filterInfo, filDispat] = useReducer(filReducer, fromHomeData.filterInit);
     // chartData State
-    const [chartD,setCharD] = useState(chartData)
-    const [chartClc,setChartClc] = useState(false)
+    const [rowCount, setRowCount] = useState(0);
+    const [chartD, setCharD] = useState(chartData);
+    const [chartClc, setChartClc] = useState(false);
     // cardData State
-    const [cardD,setCardD] = useState(cardData)
+    const [cardPage, setCardPage] = useState(1);
+    const [start, setStart] = useState(false);
+    const [element, onMoveToElement] = useMoveScrool()
+    const [apiState, apiDispatch, _] = useAsyncer(getCardPage, [cardPage,], [], start, setStart);
+    // sorting State
+    const [selctState, setSelect] = useState(SORT_LABELS['it']);
+    const [ascState, setAscState] = useState(true);
+    // const [slcClickState,setSlcClickState]:[ReactNode[],Function] = useState([]);
 
+    // css item for dynamic grid change
+    const asidefilters_js = {
+        "style": {
+            "grid-column": "1/8",
+            "grid-row": "1"
+        },  //4+5+3+2+2}
+        "key": "asidefilter",
+        "index": 0
+    }
+    const content_js = {
+        "style": {
+            "grid-column": '8/40',
+            "grid-row": "1fr"
+        },
+        "key": "contents_all",
+        "index": 1
+    }
+    const blank_js = {
+        "style": {
+            "grid-column": '40/41',
+            "grid-row": "1/41"
+        },
+        "key": "contents_all",
+        "index": 1
 
-    // button component dependent param def
-    const itValue: Array<string> = ['실물','대출','개발(펀드)','개발(PF)'];
-    const itClicked = selectArr(itValue,INIT_FILST.category,'it');
-    const [clickArrIt,setClickArrIt] = useState(itClicked);
-
-    const seniorstrValue: Array<string> = ['선','중','후'];
-    const seniorstrClicked = selectArr(seniorstrValue,INIT_FILST.category,'seniorstr');
-    const [clickArrSeniorstr,setClickArrSeniorstr] = useState(seniorstrClicked);
-
-    const atValue: Array<string> = ['오피스','물류','호텔','리테일','복합','주거','특별자산','기타'];
-    const atClicked = selectArr(atValue,INIT_FILST.category,'at');
-    const [clickArrAt,setClickArrAt] = useState(atClicked);
-
-    const rateValue: Array<string> = ['고정','변동'];
-    const rateClicked = selectArr(rateValue,INIT_FILST.category,'rate');
-    const [clickArrRate,setClickArrRate] = useState(rateClicked);
-    // slider component dependent def
-    const [sldrval, setSldrval] = useState(fromHomeData.sldrInit)
-    // chart component dependent param def
-    const preProcessChart = (data1:rateAtData[],data2:aumLpcorp[]) => {
-        let alldata = { one: {}, two: {}}
-        alldata['one'] = data1.map((item)=>{
-             return {
-                 "sdaterate": parseFloat(item.sdaterate) ? parseFloat(item.sdaterate) : null,
-                 "at": item.at,
-                 "loandate":item.loandate,
-                 "loanamt": parseFloat(item.loanamt) ? parseFloat(item.loanamt) : null
-             }})
-        data2 = data2.map((item)=>{
-             return {
-                 "lpcorp": item.lpcorp,
-                 "loandate":item.loandate.slice(0,4),
-                 "loanamt": parseFloat(item.loanamt) ? parseFloat(item.loanamt) : 0
-             }})
-        const topNcorp : Set<string>= groupbyKeys(data2,'loanamt',['lpcorp']).filter((val)=>{
-            {return !val.lpcorp.includes("사모") ? true : false}
-        }).sort(
-            (a,b) =>sortObjectVal(a,b,'loanamt')).slice(-10).reverse()
-            .reduce((r,o) => {
-                r.add(o.lpcorp)
-                return r},new Set)
-        data2 = groupbyKeys(data2,'loanamt',['lpcorp','loandate'])
-        data2 = data2.filter( (val) => {return topNcorp.has(val["lpcorp"])}).sort(
-            (a,b) =>sortObjectVal(a,b,'loandate')
-        )
-        console.log(data2)
-        alldata['two'] = data2
-        return alldata
+    }
+    const cardcomps_js = {
+        "style": {},
+    }
+    const chartcomps_js = {
+        "grid-column": '8/40',
+        "grid-row": '1/20',
     }
 
 
-    /* Component DEF */
-    // button component def
-    const iTButton = useMemo(() => {
-        return (<ButtonGroup
-                      label={LABELS['it']}
-                      buttons= {itValue}
-                      isclicked={clickArrIt}
-                      setClick = {setClickArrIt}
-                  />)
-    },[clickArrIt]
-    )
-    const seniorstrButton = useMemo(() =>{
-        return (<ButtonGroup
-                      label={LABELS['seniorstr']}
-                      buttons= {seniorstrValue}
-                      isclicked={clickArrSeniorstr}
-                      setClick = {setClickArrSeniorstr}
-                  />)},[clickArrSeniorstr])
-    const aTButton = useMemo(() =>{
-        return (<ButtonGroup
-                      label={LABELS['at']}
-                      buttons= {atValue}
-                      isclicked={clickArrAt}
-                      setClick = {setClickArrAt}
-                  />)},[clickArrAt]
-    )
-    const rateButton = useMemo(() =>{
-        return (<ButtonGroup
-                      label={LABELS['rate']}
-                      buttons= {rateValue}
-                      isclicked={clickArrRate}
-                      setClick = {setClickArrRate}
-                  />)},[clickArrRate]
-    )
-    // slider component def
-    const lamtSldr = useMemo(() =>{
-        return (
-            <SliderFil
-                label={LABELS['loanamt']}
-                curntval={sldrval}
-                setSlider={setSldrval}
-                mmVal={MM_LOANAMT}
+    // chart component dependent param def
+    const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]) => {
+        console.log("data1 length in preProcessChart", data1.length)
+        let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: [], two: []}
+        // @ts-ignore
+        alldata['one'] = data1.map((item) => {
+            return {
+                "sdaterate": parseFloatDef(item.sdaterate, null),
+                "at": item.at,
+                "loandate": item.loandate,
+                "loanamt": parseFloatDef(item.loanamt, null)
+            }
+        });
 
-            />)
-    },[sldrval])
-    // chart component def
+        data2 = data2.map((item) => {
+            return {
+                "lpcorp": item.lpcorp,
+                "loandate": item.loandate.slice(0, 4),
+                "loanamt": parseFloatDef(item.loanamt, 0)
+            }
+        });
+
+        const topNcorp: Set<string> = groupbyKeys(data2, 'loanamt', ['lpcorp']).filter((val) => {
+            // to ignoring 이지스사모... corp names
+            {
+                return !val.lpcorp.includes("사모")
+            }
+        }).sort(
+            // sort by all loan amount sum of each corp & slicing only top 10
+            (a, b) => sortObjectVal(a, b, 'loanamt')).slice(-10).reverse()
+            .reduce((r, o) => {
+                r.add(o.lpcorp)
+                return r
+            }, new Set)
+        data2 = groupbyKeys(data2, 'loanamt', ['lpcorp', 'loandate'])
+
+        // @ts-ignore
+        // top 10 copr select
+        const topn: rateAtData[] = data2.filter((val) => {
+            return topNcorp.has(val["lpcorp"])
+        }).sort(
+            (a, b) => sortObjectVal(a, b, 'loandate')
+        )
+        // @ts-ignore
+        // non top 10 copr should be replaced to "기타"
+        const nontopn: rateAtData[] = groupbyKeys(data2.filter((val) => {
+                return !topNcorp.has(val["lpcorp"])
+            }),
+            'loanamt', ['loandate']).map((item) => {
+                return {
+                    "lpcorp": "기타", "loandate": item.loandate, "loanamt": item.loanamt
+                }
+            }
+        ).sort(
+            (a, b) => sortObjectVal(a, b, 'loandate')
+        )
+        alldata['two'] = topn.concat(nontopn)
+        // console.log(alldata['one'], alldata['two'])
+        return alldata
+    }
+
+    async function getGraph() {
+        // setter: State setter callback, should be given in the Hook or elsewhere,
+        let params = apiParamGen(filterInfo)
+        let cancel
+        console.log(urlGen(APIURL.PLTONE, params))
+        let reqConfig1: {} = {
+            method: "GET",
+            url: APIURL.PLTONE,
+            params: params,
+            cancelToken: new axios.CancelToken(c => cancel = c)
+        }
+        let reqConfig2: {} = {
+            method: "GET",
+            url: APIURL.PLTTWO,
+            params: params,
+            cancelToken: new axios.CancelToken(c => cancel = c)
+        }
+        let res1
+        let res2
+        try {
+            res1 = await axios(reqConfig1);
+        } catch (e) {
+            if (axios.isCancel(e)) {
+                console.log("error2", e)
+            }
+        }
+        try {
+            res2 = await axios(reqConfig2);
+        } catch (e) {
+            if (axios.isCancel(e)) {
+                console.log("error2", e)
+            }
+        }
+        // @ts-ignore
+        setRowCount(res1.data['datag1'].length)
+        setCharD(preProcessChart(res1.data['datag1'], res2.data['datag2']))
+
+    }
+
+    // card component dependent param def
+    const preProcessCard = (data: fromApiV1[]): pageCountTyp => {
+        function durationParser(num: number): string {
+            // @ts-ignore
+            let year = parseInt(num / 12);
+            let month = num % 12;
+            let durStr = '';
+            if (year > 0) {
+                durStr += `${year}년`
+            }
+            if (month != 0) {
+                durStr += year == 0 ? "" : " "
+                durStr += `${month}개월`
+            }
+            return durStr;
+        }
+
+        const compData: cardComp[] = data.map((val) => {
+            return {
+                fn: val.fn,
+                lpcorp: val.lpcorp,
+                an: val.an,
+                aum: parseFloatDef(val.aum, null),
+                loanamt: parseFloatDef(val.loanamt, null),
+                sdaterate: parseFloatDef(val.sdaterate, null),
+                duration: durationParser(parseFloatDef(val.duration, 0))
+            }
+        })
+        // return = {
+        //     data: compData,
+        //     hasMore: true
+        // }
+        // todo after pagecount api updated,delow need delete,above should be run, hasMore logic need to be added.
+        return {
+            data: compData.reduce((r: cardComp[], o: cardComp, i: number) => {
+                let key = Math.floor(Math.random() * compData.length)
+                if (i < 10) {
+                    r.push(compData[key])
+                }
+                return r
+            }, []),
+            hasMore: true
+        }
+    }
+
+    async function getCardPage(ret: boolean = true) {
+        // setter: State setter callback, should be given in the Hook or elsewhere,
+        let params = apiParamGen(filterInfo)
+        // just for mock
+        // params['pagenum'] = cardPage
+        let cancel
+        let reqConfig: {} = {
+            method: "GET",
+            url: APIURL.CARDPAGE,
+            params: params,
+            cancelToken: new axios.CancelToken(c => cancel = c)
+        }
+
+        let res;
+        try {
+            res = await axios(reqConfig);
+        } catch (e) {
+            if (axios.isCancel(e)) {
+                console.log("error", e)
+            }
+        }
+        // @ts-ignore
+        res = preProcessCard(res.data.data as fromApiV1[])
+        if (ret) {
+            return res;
+        } else {
+            apiDispatch({type: 'SUCCESS', data: [...res.data], hasMore: res.hasMore})
+        }
+    }
+
+    // infinite scroll ref
+    const observer = useRef();
+
+    const lastCardRef = useCallback(
+        // observer always refer last card div component
+        (node: any) => {
+            if (apiState.loading) return;
+            //
+            if (observer.current) { // @ts-ignore
+                observer.current.disconnect();
+            }
+            // if need to more load (hasMore == true), observer redefine & cardPage +1
+            // @ts-ignore
+            observer.current = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && apiState.hasMore) {
+                    setCardPage((prev) => prev + 1);
+                }
+            });
+            if (node) {
+                // @ts-ignore
+                observer.current.observe(node);
+            }
+        },
+        [apiState.loading, apiState.hasMore]
+    );
+
+    /* Component DEF */
+    // level 1
     const chartOne = useMemo(() => {
-        return (<RateAtPlot data={chartD.one}/>)},[chartD.one])
+        return (<RateAtPlot data={chartD.one}/>)
+    }, [chartD.one])
     const chartTwo = useMemo(() => {
         return (<AumLpcorp data={chartD.two}
                            chartClc={chartClc}
                            onClick={setChartClc}
-        />)},[chartD.two,chartClc])
+        />)
+    }, [chartD.two, chartClc])
+    const solSect = (<SortSelect curntOption={selctState} desAsc={ascState}
+                                 setcurntOption={setSelect} setdesAsc={setAscState}/>)
+    // level 0
+    const asideFil_old = useMemo(() => {
+        return (
+            <div style={asidefilters_js.style}>
+                <AsideFilters
+                    fromHomeData={fromHomeData}
+                    filDispat={filDispat}
+                />
+            </div>
+        )
+    }, [])
+    const asideFil = useMemo(() => {
+        return (
+                <AsideFilters
+                    fromHomeData={fromHomeData}
+                    filDispat={filDispat}
+                />
+        )
+    }, [])
 
 
-    /* request api function */
-    // API.TABLE
-    // }
-    let isSubscribed = true;
-    async function getGraph(isSubscribed:boolean) {
-        let params = apiParamGen(filterInfo)
-        let url1: string = urlGen(APIURL.PLTONE, params)
-        let url2: string = urlGen(APIURL.PLTTWO, params)
+        // dnd zero layour def
+    const [zeroArr, setZeroArr] = useState(['chart1','chart2']);
+    const [dragAside, setDragAside] = useState(false);
+    const moveContentZero = (contentID: string, toIndex: number) => {
+        const index = zeroArr.indexOf(contentID);
+        let newOrder = [...zeroArr];
+        newOrder.splice(index, 1);
+        newOrder.splice(toIndex, 0, contentID);
+        setZeroArr(newOrder)
+    };
 
-        const response1 = await fetch(
-            url1, {method: "get"})
-        const response2 = await fetch(
-            url2, {method: "get"})
-        const data1 = await response1.json() ;
-        const data2 = await response2.json() ;
-        if (isSubscribed) {
-            setCharD(preProcessChart(data1['datag1'], data2['datag2']))
-        }
-    }
+
+    const chartComps = useMemo(() => {
+        return (
+            <div className={styles.chart} ref={element}>
+                {chartOne}
+                {chartTwo}
+            </div>
+        )},[chartD, chartClc])
+    //
+    // const chartComps = useMemo(() => {
+    //     return (
+    //         <div className={styles.chart} ref={element}>
+    //             {
+    //                 <DragDrop
+    //         id={'chart1'}
+    //         index={0}
+    //         moveContentZero={moveContentZero}
+    //         someDragging={dragAside}
+    //         setsomeDragging={setDragAside}
+    //         content={chartOne}
+    //         itemType={ItemTypes.ContentS}
+    //         style={{}}
+    //     />}
+    //             {
+    //                         <DragDrop
+    //         id={'chart2'}
+    //         index={1}
+    //         moveContentZero={moveContentZero}
+    //         someDragging={dragAside}
+    //         setsomeDragging={setDragAside}
+    //         content={chartTwo}
+    //         itemType={ItemTypes.ContentS}
+    //         style={{}}
+    //     />
+    //                 }
+    //         </div>)
+    // }, [chartD, chartClc])
+    const cardComps = useMemo(() => {
+            console.log(apiState.data.length)
+            onMoveToElement()
+            return (
+                <div className={styles.card} style={cardcomps_js.style}>
+                    <span className={styles.filter}>
+                        <div className={styles.title}>총 대출건수는 {rowCount}건 입니다.</div>
+                        {/*"border-b-2" style={{"width":"40%"}}*/}
+                        <div className={styles.sort}style={{'display':'flex','justify-content':'flex-end'}}>
+                            {solSect}
+                    </div>
+                    </span>
+                    <span className={styles.board}>
+                        <CardGroup data={apiState.data}
+                                   refFunc={lastCardRef}
+                        />
+                    <div className={styles.boardError}>
+                        {apiState.loading && "로딩중입니다...."}
+                        {apiState.error && "에러발생XXXX"}
+                    </div>
+                    </span>
+                </div>)
+        }, [apiState.data]
+    )
+
+    const DContent = (
+        <DragDrop
+            id={'Contents'}
+            index={1}
+            moveContentZero={moveContentZero}
+            someDragging={dragAside}
+            setsomeDragging={setDragAside}
+            content={(<>
+                    {chartComps}
+                    {cardComps}
+            </>)}
+            itemType={ItemTypes.ContentS}
+            style={content_js.style}
+        />
+    )
+    const DBlock = (
+        <DragDrop
+            id={'NullBlock'}
+            index={2}
+            moveContentZero={moveContentZero}
+            someDragging={dragAside}
+            setsomeDragging={setDragAside}
+            content={(
+                <div style={blank_js.style}>
+                    only for testing
+                </div>
+            )}
+            itemType={ItemTypes.ContentS}/>
+    )
+
+
+
     // API.SCROLL CARD
-    async function getCard(){
-        let params:any = apiParamGen(filterInfo)
-        const response = await axios.get(
-            APIURL.CARD,{
-                params: params
-            }).then((response) => {
-
-        })
-        .catch(() => {
-        });
-      return response;
-    }
-
+    // cardData State
     // filter to api query
     useEffect(() => {
-        getGraph(isSubscribed);
-        const newchartD = {one:chartD.one,two:chartD.two};
-        return () => isSubscribed = false;
-        },[filterInfo])
+        // after filter updated, Graph should be reloaded
+        getGraph();
+        apiDispatch({type: 'CLEAR'})
+        return (() => {
+            // after filter updated, CardPage should be reloaded
+            setStart(true)
+            if (cardPage != 1) {
+                setCardPage(1)
+            } else {
+                getCardPage(false)
+            }
+
+        })
+    }, [filterInfo])
+
 
     return (
-        <FilContext.Provider value ={{filterInfo, filDispat}}>
-            <div className="flex">
-                <aside className="self-start sticky top-16 border border-solid border-gray-300 rounded-lg w-64 ml-16">
-                    사이드바 sticky
-                    {iTButton}
-                    {aTButton}
-                    {seniorstrButton}
-                    {rateButton}
-                    {/*{lamtSldr}*/}
-                </aside>
-            </div>
+        <div>
+            <DndProvider backend={HTML5Backend}>
+                <div className={styles.sectionContents}>
+                    {asideFil_old}
+                    <div style={content_js.style}>
+                    {chartComps}
+                    {cardComps}
+                    </div>
+                    <div style={blank_js.style}>
+                        only for testing
+                    </div>
+                    {/*{DAside}*/}
+                    {/*{DContent}*/}
+                    {/*{DBlock}*/}
+                    {/*{asideFil}*/}
+                    {/*<div style={content_js.style}>*/}
+                    {/*    {chartComps}*/}
+                    {/*    {cardComps}*/}
+                    {/*</div>*/}
 
-            <div className="grow flex-col mt-16 mr-16 items-center">
-                  <div className="h-96">
-                    <p className="text-4xl text-center">차트 영역</p>
-                      {chartOne}
-                      {chartTwo}
-                  </div>
-                  <div className="h-96">
-                    <p className="text-4xl text-center">카드 영역</p>
-                      {/* 카드컴포넌트 추가 */}
-                  </div>
+
                 </div>
-            </FilContext.Provider>
-      )
-    }
+            </DndProvider>
+        </div>
+    )
+}
 
-export const getServerSideProps: GetServerSideProps = async (context) =>  {
+export const getServerSideProps: GetServerSideProps = async (context) => {
     // 더미 데이터
-    const chartData = { one: [], two: []}
-    chartData.one = await fetch('https://gw.alipayobjects.com/os/bmw-prod/0b37279d-1674-42b4-b285-29683747ad9a.json')
-        .then((response) => response.json())
-    chartData.two = await fetch(
-        'https://gw.alipayobjects.com/os/antfincdn/jSRiL%26YNql/percent-column.json')
-        .then((response) => response.json())
-    const cardData = {"name": "1", "aum": "2"}
-    const fromHomeData = {filterInit:INIT_FILST,sldrInit:INIT_LOANAMT}
+    const chartData: { one: rateAtData[], two: aumLpcorp[] } = {one: [], two: []}
+    // chartData.one = await fetch('https://gw.alipayobjects.com/os/bmw-prod/0b37279d-1674-42b4-b285-29683747ad9a.json')
+    //     .then((response) => response.json())
+    // chartData.two = await fetch(
+    //     'https://gw.alipayobjects.com/os/antfincdn/jSRiL%26YNql/percent-column.json')
+    //     .then((response) => response.json())
+    // const cardData = {"name": "1", "aum": "2"}
+    const cardData: { [key: number]: cardComp[] } = {}
+    const fromHomeData = {filterInit: INIT_FILST, sldrInit: INIT_DEBT}
 
     return {
         props: {
@@ -228,16 +499,16 @@ export const getServerSideProps: GetServerSideProps = async (context) =>  {
         }
     }
 
-  // 실제 API 콜
-  // chartResponse = await axiox.get(ChartURL)
-  // chartResponse = await axiox.get(cardURL)
+    // 실제 API 콜
+    // chartResponse = await axiox.get(ChartURL)
+    // chartResponse = await axiox.get(cardURL)
 
-  // return {
-  //   props: {
-  //     chartResponse.data,
-  //     chartResponse.data,
-  //   }
-  // }
+    // return {
+    //   props: {
+    //     chartResponse.data,
+    //     chartResponse.data,
+    //   }
+    // }
 }
 
 export default Detail

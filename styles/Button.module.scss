@@ -1,0 +1,54 @@
+@import "constant";
+
+
+
+.ant-btn {
+  &-primary {
+    width:100%;
+    padding:5px;
+    background:map-get($button, "click", "bg");//;//#{rever_color(16, 28, 59)}; // map-get($button, "click", "bg");
+    color: map-get($button, "click", "text");
+    border-color: map-get($button, "click", "border-color");
+    border-radius: 0.5rem;
+    &:focus{
+      background: map-get($button, "click", "bg");
+      color: map-get($button, "click", "text");
+      opacity: 0.3;
+    }
+    &:hover{
+      background: custom_revert_color(map-get($button, "reset", "bg"));
+      color: map-get($button, "click", "text");
+      opacity: 0.3;
+    }
+
+  };
+  &-default {
+    width:100%;
+    padding: 2px;
+        margin-bottom: 2px;
+    margin-inline: 2px;
+    background-color: map-get($button, "reset", "bg");
+    color: map-get($button, "reset", "text");
+    reset-color: map-get($button, "reset", "border-color");
+    border-radius: 0.5rem;
+    &:focus{
+      background: map-get($button, "reset", "bg");
+      color: map-get($button, "reset", "text");
+      opacity: 0.3;
+    }
+    &:hover{
+      //background: custom_revert_color(map-get($button, "reset", "bg"));
+      //color: map-get($button, "click", "text");
+      background: map-get($button, "reset", "bg");
+      color: map-get($button, "reset", "text");
+      opacity: 0.3;
+    }
+
+
+
+}
+
+}
+
+
+

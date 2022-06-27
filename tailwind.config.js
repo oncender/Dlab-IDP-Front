@@ -15,10 +15,10 @@ module.exports = {
       'sans' : ['Spoqa Han Sans Neo', 'Roboto', 'system-ui',],
       'blinker' : [ 'Blinker', 'sans-serif'],
     },
-    // colors: {
-    //   'big-btn-green-bf': '#67FFBF',
-    //   'big-btn-green-af': '#D0FFEB',
-    // },
+    colors: {
+      // 'big-btn-green-bf': '#67FFBF',
+      // 'big-btn-green-af': '#D0FFEB',
+    },
     container: {
       padding: {
         DEFAULT: '1rem',

@@ -1,0 +1,8 @@
+@import "constant";
+.ant-slider-track {
+  background:map-get($slider,"rail","bg")
+}
+.ant-slider-handle{
+  border: map-get($slider,"handle","border");
+  background: map-get($slider,"handle","bg");
+}

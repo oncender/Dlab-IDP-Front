@@ -1,0 +1,30 @@
+// filter button related constant
+$button: (
+        "click":(
+                "bg":rgba(16, 28, 59, 0.97),
+                "text":#FFFFFF,
+                "border-color": #FFFFFF
+        ),
+        "reset":(
+                "bg": #FFFFFF,
+                "text": rgba(16, 28, 59, 0.97),
+                "border-color" : rgba(16, 28, 59, 0.97)
+        )
+);
+
+// slider button related constant
+$slider: (
+        "rail":("bg":rgba(16, 28, 59, 0.97)),
+        "handle":(
+                "bg":#ffffff,
+                "border": rgba(16, 28, 59, 0.97) solid 2px
+        )
+
+);
+@function custom_revert_color($colors,$aaaa:0.5) {
+  $srr : red($colors);
+  $sgg : green($colors);
+  $sbb : blue($colors);
+
+  @return rgba(255-$srr,255-$sgg,255-$sbb,1-$aaaa)
+}
