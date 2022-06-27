@@ -23,6 +23,7 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "18.2.0",
     "react-rnd": "^10.3.7",
+    "react-spinners": "^0.13.1",
     "sass": "^1.53.0",
     "styled-components": "^5.3.5"
   },

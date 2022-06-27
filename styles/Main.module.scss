@@ -1,0 +1,57 @@
+@import './util.module';
+
+.mainTitle {
+    font: {
+        family: "blinker";
+        weight: 600;
+    }
+    color: white;
+
+    @include mobile{
+        font-size: 4.5rem;
+    }
+    @include tablet{
+        font-size: 6rem;
+    }
+    @include desktop{
+        font-size: 8rem;
+    }
+    
+}
+
+.mainDesc1 {
+    font: {
+        family: "blinker";
+        weight: 600;
+    }
+    color: white;
+
+    @include mobile{
+        font-size: 1.125rem;
+    }
+    @include tablet{
+        font-size: 1.5rem;
+    }
+    @include desktop{
+        font-size: 1.875rem;
+    }
+}
+
+.mainDesc2 {
+    font: {
+        family: "blinker";
+        weight: 300;
+    }
+    color: white;
+
+    @include mobile{
+        font-size: 1.5rem;
+    }
+    @include tablet{
+        font-size: 2.25rem;
+    }
+    @include desktop{
+        font-size: 3rem;
+    }
+    
+}
