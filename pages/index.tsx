@@ -66,12 +66,12 @@ const Home: NextPage = () => {
       <div className="w-full">
         <div className="flex justify-center items-center">
           {loading?
-          <div className="my-20">
+          <div className="my-20 transition transform delay-150 duration-300">
             <GridLoader loading={loading} color='#67FFBF' size={30} />
           </div>
           :
           <div className={tableStyles.modelTable}>
-            <table >
+            <table>
               <thead>
               <tr>
                 <th>구분</th>
@@ -92,6 +92,7 @@ const Home: NextPage = () => {
               </tr>
               </tbody>
             </table>
+            <p>경고문구 여기에 넣어서 잘 보이는지 확인해보기</p>
             <button 
               className="bg-[#67FFBF] w-full h-16 text-2xl sm:w-72 sm:h-16 sm:text-3xl sm:m-10 md:w-96 md:h-20 md:text-4xl md:mb-20 rounded-lg text-blue-900 transition hover:scale-110 hover:duration-150 hover:ease-in-out hover:bg-[#BAFBE0]"
               onClick={handleClick}>
