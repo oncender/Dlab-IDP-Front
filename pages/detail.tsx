@@ -1,7 +1,7 @@
 import styles from "../styles/Detail.module.scss"
 import {Divider} from 'antd'
 
-import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode} from 'react'
+import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode, createContext} from 'react'
 import type {NextPage, GetServerSideProps, InferGetServerSidePropsType} from 'next'
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
@@ -33,6 +33,8 @@ import {
 import axios from "axios";
 import CompDragDrop from "../components/partials/p2CompDragDrop";
 
+export const windowContext = createContext({windowStatus:''});
+
 
 const Detail: NextPage = ({
                               chartData,
@@ -45,6 +47,19 @@ const Detail: NextPage = ({
     const [filterInfo, filDispat] = useReducer(filReducer, fromHomeData.filterInit);
     // for window comp size handle
     const windowNow = useWindowSize()
+    function windowSizeStr(windowNow:{width:number|undefined,height:number|undefined}):string{
+        var {width,height} = windowNow
+        if (width && (width > 1180)){
+            return 'large'
+        } else if (width && (width >830)){
+            return 'medium'
+        } else if (width){
+            return 'small'
+        } else {
+            return ''
+        }
+    }
+    const windowContextval =  windowSizeStr(windowNow)
     // chartData State
     const [rowCount, setRowCount] = useState(0);
     const [chartD, setCharD] = useState(chartData);
@@ -59,14 +74,15 @@ const Detail: NextPage = ({
     useEffect(
         () => {
             if (typeof document != 'undefined') {
-                let cardDOM = document.querySelector("div[custom=ROW]");
+                let cardDOM = document.querySelector("div[custom=col21]");
                 if (cardDOM) {
                     var cardWidth = parseFloat(window.getComputedStyle(cardDOM).width)
                     var cardfontSize = parseInt(window.getComputedStyle(cardDOM).fontSize)
-
-                    var fnPlace = parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1
-                    var anPlace = parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
-                    var lpcorpPlace = parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
+                    console.log("cardWidth",cardWidth,cardfontSize,parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1)
+                    var fnPlace = 4*parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1
+                    var anPlace = 4*parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
+                    var lpcorpPlace = 4*parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
+                    console.log('result',{fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
                     if (fnPlace != cardFontRel.fn && anPlace != cardFontRel.an && lpcorpPlace != cardFontRel.lpcorp) {
                         setcardFontRel({fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
                         // console.log("ccc", {fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
@@ -81,52 +97,6 @@ const Detail: NextPage = ({
     const [selctState, setSelect] = useState(SORT_LABELS['it']);
     const [ascState, setAscState] = useState(true);
     // const [slcClickState,setSlcClickState]:[ReactNode[],Function] = useState([]);
-
-    // css item for dynamic grid change
-    const leftBlankJs = {
-        "style": {
-            "gridColumn": "1/2",
-            "gridRow": "1/41"
-        },
-        "key": "leftblank",
-        "index": 0
-
-    }
-
-    const asidefilters_js = {
-        "style": {
-            "gridColumn": "2/9",
-
-        },  //4+5+3+2+2}
-        "key": "asidefilter",
-        "index": 1
-    }
-    const content_js = {
-        "style": {
-            "gridColumn": '11/39',
-            "gridRow": "1fr"
-        },
-        "key": "contents_all",
-        "index": 2
-    }
-    const rightBlankJs = {
-        "style": {
-            "gridColumn": '40/41',
-            "gridRow": "1/41"
-        },
-        "key": "contents_all",
-        "index": 3
-
-    }
-    const cardcomps_js = {
-        "style": {},
-    }
-    const chartcomps_js = {
-        "gridColumn": '8/40',
-        "gridRow": '1/20',
-    }
-
-
     // chart component dependent param def
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]) => {
         setRowCount(data1.length)
@@ -343,7 +313,11 @@ const Detail: NextPage = ({
     }, [chartD.two, chartClc])
     const rowCountResult = useMemo(() => {
         return (
-            <div className={styles.title}>총 대출건수는 {rowCount}건 입니다.</div>
+            <div className={styles.title}>
+                <span>총 대출건수는</span>
+                <span><b>{rowCount}</b></span>
+                <span>건 입니다.</span>
+            </div>
         )
     }, [rowCount])
 
@@ -352,7 +326,7 @@ const Detail: NextPage = ({
     // level 0
     const asideFil = useMemo(() => {
         return (
-            <div style={asidefilters_js.style}>
+            <div className={styles.asideFiltersJs} key ="asidefilter" index={1}>
                 <AsideFilters
                     fromHomeData={fromHomeData}
                     filDispat={filDispat}
@@ -383,7 +357,7 @@ const Detail: NextPage = ({
 
     const cardComps = useMemo(() => {
             return (
-                <div className={styles.card} style={cardcomps_js.style}>
+                <div className={styles.card} >
                     <span className={styles.filter}>
                         {rowCountResult}
                         <div className={styles.sort}>
@@ -429,27 +403,20 @@ const Detail: NextPage = ({
 
     return (
         <div>
-            <DndProvider backend={HTML5Backend}>
-                <div className={styles.sectionContents}>
-                    <div style={leftBlankJs.style}/>
-                    {asideFil}
-                    <div style={content_js.style}>
-                        {chartComps}
-                        {cardComps}
+            <windowContext.Provider value={{windowStatus:windowContextval}}>
+                <DndProvider backend={HTML5Backend}>
+                    <div className={styles.sectionContents}>
+                        <div className={styles.leftBlankJs} key ='leftblank' index={0}/>
+                        {asideFil}
+                        <div className={styles.contentJs} key="contents_all" index={2}>
+                            {chartComps}
+                            {cardComps}
+                        </div>
+                        <div className={styles.rightBlankJs} key = "contents_all" index={3} />
+
                     </div>
-                    <div style={rightBlankJs.style}/>
-                    {/*{DAside}*/}
-                    {/*{DContent}*/}
-                    {/*{DBlock}*/}
-                    {/*{asideFil}*/}
-                    {/*<div style={content_js.style}>*/}
-                    {/*    {chartComps}*/}
-                    {/*    {cardComps}*/}
-                    {/*</div>*/}
-
-
-                </div>
-            </DndProvider>
+                </DndProvider>
+            </windowContext.Provider>
         </div>
     )
 }

@@ -136,7 +136,7 @@ const CompCardGroup = ({data, refFunc,fontRel}:
     })
 
     return (
-        <div>
+        <div className="cardGroupWrap">
             {cardParts}
         </div>
     )
