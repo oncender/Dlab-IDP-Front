@@ -1,8 +1,8 @@
 import styles from "../styles/Detail.module.scss"
-import {Divider} from 'antd'
 
 import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode} from 'react'
 import type {NextPage, GetServerSideProps, InferGetServerSidePropsType} from 'next'
+import { useRouter } from 'next/router'
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -19,7 +19,7 @@ import CompCardGroup from "../components/partials/p2CompCardGroup";
 import CompSortSelect from "../components/partials/p2CompSortSelect";
 // Component dependent Import
 import {APIURL, INIT_FILST, INIT_DEBT, LABELS, MM_DEBT, SORT_LABELS, ItemTypes} from "../components/const/p2Constant"
-import {parseFloatDef, apiParamGen, groupbyKeys, sortObjectVal, urlGen} from "../components/const/p2Utils";
+import {parseFloatDef, apiParamGen, groupbyKeys, sortObjectVal, urlGen, detailQueryParser} from "../components/const/p2Utils";
 import {
     fromApiV1,
     rateAtData,
@@ -34,10 +34,16 @@ import CompDragDrop from "../components/partials/p2CompDragDrop.tsx";
 
 
 const Detail: NextPage = ({
-                              chartData,
-                              cardData,
-                              fromHomeData
-                          }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+    chartData,
+    cardData,
+    //fromHomeData
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+    
+    // Get URL parameters via next router and setting up filter states
+    const router = useRouter();
+    const filterInitialValues = detailQueryParser(router.query);
+    const fromHomeData = {filterInit: filterInitialValues, sldrInit: INIT_DEBT}
+
     /* State & Reducer DEF */
     // all category reducer def
     // @ts-ignore
@@ -504,26 +510,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     //     .then((response) => response.json())
     // const cardData = {"name": "1", "aum": "2"}
     const cardData: { [key: number]: cardComp[] } = {}
-    const fromHomeData = {filterInit: INIT_FILST, sldrInit: INIT_DEBT}
 
     return {
         props: {
             chartData,
             cardData,
-            fromHomeData
         }
     }
-
-    // 실제 API 콜
-    // chartResponse = await axiox.get(ChartURL)
-    // chartResponse = await axiox.get(cardURL)
-
-    // return {
-    //   props: {
-    //     chartResponse.data,
-    //     chartResponse.data,
-    //   }
-    // }
 }
 
 export default Detail
