@@ -7,7 +7,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 // Hook Import
-import {filReducer, selectArr, FilContext} from "../components/reducers/FilterReducer";
+import {filReducer} from "../components/reducers/FilterReducer";
 import useAsyncer from "../components/hook/useAsyncer";
 import useMoveScrool from "../components/hook/useScroll"
 // Component Import
@@ -30,7 +30,7 @@ import {
     FilterStateObj
 } from "../components/const/p2Usertyp"
 import axios from "axios";
-import CompDragDrop from "../components/partials/p2CompDragDrop.tsx";
+import CompDragDrop from "../components/partials/p2CompDragDrop";
 
 
 const Detail: NextPage = ({
@@ -63,13 +63,23 @@ const Detail: NextPage = ({
     // const [slcClickState,setSlcClickState]:[ReactNode[],Function] = useState([]);
 
     // css item for dynamic grid change
+    const leftBlankJs = {
+        "style": {
+            "gridColumn": "1/2",
+            "gridRow": "1/41"
+        },
+        "key": "leftblank",
+        "index": 0
+
+    }
+
     const asidefilters_js = {
         "style": {
             "gridColumn": "2/9",
 
         },  //4+5+3+2+2}
         "key": "asidefilter",
-        "index": 0
+        "index": 1
     }
     const content_js = {
         "style": {
@@ -77,15 +87,15 @@ const Detail: NextPage = ({
             "gridRow": "1fr"
         },
         "key": "contents_all",
-        "index": 1
+        "index": 2
     }
-    const blank_js = {
+    const rightBlankJs = {
         "style": {
             "gridColumn": '36/41',
             "gridRow": "1/41"
         },
         "key": "contents_all",
-        "index": 1
+        "index": 3
 
     }
     const cardcomps_js = {
@@ -99,7 +109,8 @@ const Detail: NextPage = ({
 
     // chart component dependent param def
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]) => {
-        console.log("data1 length in preProcessChart", data1.length)
+        setRowCount(data1.length)
+        console.log("length in preProcessChart",data2.length,data1.length)
         let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: [], two: []}
         // @ts-ignore
         alldata['one'] = data1.map((item) => {
@@ -165,7 +176,7 @@ const Detail: NextPage = ({
 
         let reqConfig1: {} = {
             method: "GET",
-            url: APIURL.PLTONE+"?",
+            url: APIURL.PLTONE + "?",
             params: params,
             cancelToken: new axios.CancelToken(c => cancel = c)
         }
@@ -194,9 +205,7 @@ const Detail: NextPage = ({
         }
 
         // @ts-ignore
-        setRowCount(res1.data['datag1'].length)
         setCharD(preProcessChart(res1.data['datag1'], res2.data['datag2']))
-
     }
 
     // card component dependent param def
@@ -215,8 +224,9 @@ const Detail: NextPage = ({
             }
             return durStr;
         }
+
         function imagePath(img: string): string {
-            if (!parseInt(img)){
+            if (!parseInt(img)) {
                 // after mock image file added.
                 return ''  //e.g. mock_pic/{img}.png
             } else {
@@ -234,35 +244,26 @@ const Detail: NextPage = ({
                 loanamt: parseFloatDef(val.loanamt, null),
                 sdaterate: parseFloatDef(val.sdaterate, null),
                 duration: durationParser(parseFloatDef(val.duration, 0)),
-                img : imagePath(val.img),
+                img: imagePath(val.img),
+                fc : val.fc,
+                idx:val.idx,
             }
         })
         return {
-             data: compData,
-             hasMore: true
+            data: compData,
+            hasMore: true
         }
-        // todo after pagecount api updated,delow need delete,above should be run, hasMore logic need to be added.
-        // return {
-        //     data: compData.reduce((r: cardComp[], o: cardComp, i: number) => {
-        //         let key = Math.floor(Math.random() * compData.length)
-        //         if (i < 10) {
-        //             r.push(compData[key])
-        //         }
-        //         return r
-        //     }, []),
-        //     hasMore: true
-        // }
     }
 
     async function getCardPage(ret: boolean = true) {
         // setter: State setter callback, should be given in the Hook or elsewhere,
-        let params = Object.assign({},apiParamGen(filterInfo),
+        let params = Object.assign({}, apiParamGen(filterInfo),
             {'pageCount': cardPage});
-        console.log('cardgen',["http://localhost:8080/",urlGen(APIURL.CARDPAGE, params)].join(""))
+        console.log('cardgen', ["http://localhost:8080/", urlGen(APIURL.CARDPAGE, params)].join(""))
         // just for mock
         // params['pagenum'] = cardPage
-        let cancel
-        let reqConfig: {} = {
+        var cancel
+        var reqConfig: {} = {
             method: "GET",
             url: APIURL.CARDPAGE,
             params: params,
@@ -275,7 +276,6 @@ const Detail: NextPage = ({
         } catch (e) {
             if (axios.isCancel(e)) {
                 console.log("error", e)
-
             }
         }
         // @ts-ignore
@@ -320,14 +320,20 @@ const Detail: NextPage = ({
     }, [chartD.one])
     const chartTwo = useMemo(() => {
         return (<AumLpcorp data={chartD.two}
-                                  chartClc={chartClc}
-                                  onClick={setChartClc}
+                           chartClc={chartClc}
+                           onClick={setChartClc}
         />)
     }, [chartD.two, chartClc])
+    const rowCountResult = useMemo(() => {
+        return (
+            <div className={styles.title}>총 대출건수는 {rowCount}건 입니다.</div>
+        )
+    }, [rowCount])
+
     const solSect = (<CompSortSelect curntOption={selctState} desAsc={ascState}
-                                       setcurntOption={setSelect} setdesAsc={setAscState}/>)
+                                     setcurntOption={setSelect} setdesAsc={setAscState}/>)
     // level 0
-    const asideFil_old = useMemo(() => {
+    const asideFil = useMemo(() => {
         return (
             <div style={asidefilters_js.style}>
                 <AsideFilters
@@ -337,18 +343,9 @@ const Detail: NextPage = ({
             </div>
         )
     }, [])
-    const asideFil = useMemo(() => {
-        return (
-                <AsideFilters
-                    fromHomeData={fromHomeData}
-                    filDispat={filDispat}
-                />
-        )
-    }, [])
 
-
-        // dnd zero layour def
-    const [zeroArr, setZeroArr] = useState(['chart1','chart2']);
+    // dnd zero layour def
+    const [zeroArr, setZeroArr] = useState(['chart1', 'chart2']);
     const [dragAside, setDragAside] = useState(false);
     const moveContentZero = (contentID: string, toIndex: number) => {
         const index = zeroArr.indexOf(contentID);
@@ -358,14 +355,14 @@ const Detail: NextPage = ({
         setZeroArr(newOrder)
     };
 
-
     const chartComps = useMemo(() => {
         return (
             <div className={styles.chart} ref={element}>
                 {chartOne}
                 {chartTwo}
             </div>
-        )},[chartD, chartClc])
+        )
+    }, [chartD, chartClc])
     //
     // const chartComps = useMemo(() => {
     //     return (
@@ -401,15 +398,14 @@ const Detail: NextPage = ({
             return (
                 <div className={styles.card} style={cardcomps_js.style}>
                     <span className={styles.filter}>
-                        <div className={styles.title}>총 대출건수는 {rowCount}건 입니다.</div>
-                        {/*"border-b-2" style={{"width":"40%"}}*/}
-                        <div className={styles.sort}style={{'display':'flex','justify-content':'flex-end'}}>
+                        {rowCountResult}
+                        <div className={styles.sort}>
                             {solSect}
-                    </div>
+                        </div>
                     </span>
                     <span className={styles.board}>
                         <CompCardGroup data={apiState.data}
-                                         refFunc={lastCardRef}
+                                       refFunc={lastCardRef}
                         />
                     <div className={styles.boardError}>
                         {apiState.loading && "로딩중입니다...."}
@@ -417,7 +413,7 @@ const Detail: NextPage = ({
                     </div>
                     </span>
                 </div>)
-        }, [apiState.data]
+        }, [apiState.data,rowCount]
     )
 
     const DContent = (
@@ -428,8 +424,8 @@ const Detail: NextPage = ({
             someDragging={dragAside}
             setsomeDragging={setDragAside}
             content={(<>
-                    {chartComps}
-                    {cardComps}
+                {chartComps}
+                {cardComps}
             </>)}
             itemType={ItemTypes.ContentS}
             style={content_js.style}
@@ -443,13 +439,12 @@ const Detail: NextPage = ({
             someDragging={dragAside}
             setsomeDragging={setDragAside}
             content={(
-                <div style={blank_js.style}>
+                <div style={rightBlankJs.style}>
                     only for testing
                 </div>
             )}
             itemType={ItemTypes.ContentS}/>
     )
-
 
 
     // API.SCROLL CARD
@@ -476,14 +471,13 @@ const Detail: NextPage = ({
         <div>
             <DndProvider backend={HTML5Backend}>
                 <div className={styles.sectionContents}>
-                    {asideFil_old}
+                    <div style={leftBlankJs.style} />
+                    {asideFil}
                     <div style={content_js.style}>
-                    {chartComps}
-                    {cardComps}
+                        {chartComps}
+                        {cardComps}
                     </div>
-                    <div style={blank_js.style}>
-
-                    </div>
+                    <div style={rightBlankJs.style} />
                     {/*{DAside}*/}
                     {/*{DContent}*/}
                     {/*{DBlock}*/}
@@ -518,5 +512,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 }
+
 
 export default Detail

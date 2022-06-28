@@ -57,6 +57,8 @@ interface cardComp{
     sdaterate:number
     duration:string
     loanamt:number
+    idx: string
+    fc:string
 }
 
 interface pageCountTyp{
