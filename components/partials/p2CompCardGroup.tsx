@@ -1,7 +1,10 @@
 // import styles from "../../styles/Card.scss"
 import {EditOutlined, EllipsisOutlined, SettingOutlined} from '@ant-design/icons';
+import Link from 'next/link'
 import {Avatar, Card, Skeleton, Switch, Col, Row} from 'antd';
 import React, {ReactNode, useState} from 'react';
+import {useRouter} from "next/router";
+
 
 import {getTempRem} from "../const/p2Utils"
 import {cardComp} from "../const/p2Usertyp";
@@ -12,48 +15,12 @@ const {Meta} = Card;
 const CartPart = ({keystring, cardData}:
                       { keystring: string, cardData: cardComp, }) => {
     const image_url = cardData.img ? cardData.img : "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
-    console.log("cardD", cardData.img)
-    const w = '100%';
-    const h = 200;
+
     const col4Data = [`${cardData.loanamt}억`, `${cardData.aum}억`, `${cardData.sdaterate.toFixed(2)}%`, cardData.duration]
-    const bodyS = {
-        'width': w, 'height': h, display: 'grid',
-        gridTemplateRows: 'repeat(10,10%)', gridTemplateColumns: 'repeat(40, 2.5%)',
-        paddingBottom: '5px', paddingTop: '5px', paddingLeft: '5px', paddingRight: '5px'
-    }
-    const Col1S = {
-        gridColumn: '1/7',
-        gridRow: '1/11',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
-    }
-    const Col2S = {
-        display: 'flex',
-        gridRow: '1/11',
-        flexFlow: 'row wrap',
-        gridColumn: '8/28',
-        alignContent: 'space-around',
-    }
-    const Col3S = {
-        display: 'flex',
-        gridRow: '1/11',
-        flexFlow: 'row wrap',
-        gridColumn: '29/35',
-        alignContent: 'space-around',
-    }
-    const Col4S = {
-        display: 'flex',
-        gridRow: '1/11',
-        flexFlow: 'row wrap',
-        gridColumn: '36/41',
-        alignContent: 'space-around',
-    }
+
     // @ts-ignore
     // @ts-ignore
-    function byte_length(str:string) {
+    function byte_length(str: string) {
         var count = 0;
         var ch = '';
         for (var i = 0; i < str.length; i++) {
@@ -65,12 +32,19 @@ const CartPart = ({keystring, cardData}:
         }
         return count;
     }
-    console.log(cardData.fn,byte_length(cardData.fn))
+
+    const router = useRouter()
+
     return (
+
         <Card key={keystring} hoverable
-              custom="ROW"
-              bodyStyle={bodyS}
-        >
+              custom="ROW" onClick={() => router.push({
+                pathname: '/detailInfo',
+                query: {idx: cardData.idx, fc: cardData.fc},
+                options: { shallow: true }
+            },
+            "/detailInfo")
+        }>
             {/*style={Col1S}*/}
             <div className={'col1'}>
                 <img alt="example" src={image_url}
@@ -100,19 +74,12 @@ const CartPart = ({keystring, cardData}:
                 {col4Data.map(
                     (val, id) => {
                         return (<Meta key={`${keystring}col4${id}`} description={val}
-                                      />)
+                        />)
                     }
                 )}
             </div>
-
-            {/*<Skeleton loading={loading} avatar active>*/}
-            {/*        <Meta*/}
-            {/*            avatar={<Avatar src="https://joeschmoe.io/api/v1/random"/>}*/}
-            {/*            title="Card title"*/}
-            {/*            description="This is the description"*/}
-            {/*        />*/}
-            {/*    </Skeleton>*/}
-        </Card>)
+        </Card>
+)
 }
 
 
@@ -120,7 +87,8 @@ const CompCardGroup = ({data, refFunc}:
                            { data: cardComp[], refFunc: Function }
 ) => {
     if (data == undefined) return;
-    function byte_length(str:string) {
+
+    function byte_length(str: string) {
         var count = 0;
         var ch = '';
         for (var i = 0; i < str.length; i++) {
@@ -132,7 +100,8 @@ const CompCardGroup = ({data, refFunc}:
         }
         return count;
     }
-    function byte_slice(str:string,target:number) {
+
+    function byte_slice(str: string, target: number) {
         var count = 0;
         var ch = '';
         for (var i = 0; i < str.length; i++) {
@@ -141,35 +110,37 @@ const CompCardGroup = ({data, refFunc}:
                 count++;
             }
             count++;
-            if (count >=target){
+            if (count >= target) {
                 return i
             }
         }
         return i;
     }
-    function moreThanFig(str:string,typ:string){
-        switch (typ){
+
+    function moreThanFig(str: string, typ: string) {
+        switch (typ) {
             case 'an':
                 var tval = 60
-                if (byte_length(str) > tval){
-                    return str.slice(0,byte_slice(str,tval-3))+"..."
+                if (byte_length(str) > tval) {
+                    return str.slice(0, byte_slice(str, tval - 3)) + "..."
                 } else {
                     return str
                 }
             case 'fn':
                 var tval = 42
-                if (byte_length(str) > tval){
-                    return str.slice(0,byte_slice(str,tval-3))+"..."
+                if (byte_length(str) > tval) {
+                    return str.slice(0, byte_slice(str, tval - 3)) + "..."
                 } else {
                     return str
                 }
         }
     }
+
     data = data.map((val) => {
-        val.fn = moreThanFig(val.fn,'fn')
-        val.an = moreThanFig(val.an,'an')
+        val.fn = moreThanFig(val.fn, 'fn')
+        val.an = moreThanFig(val.an, 'an')
         return val
-     })
+    })
     // console.log(cardData.fn,byte_length(cardData.fn))
     // console.log(cardData.an,byte_length(cardData.an))
 

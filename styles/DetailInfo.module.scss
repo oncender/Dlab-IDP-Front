@@ -1,0 +1,12 @@
+
+
+.MainBoard {
+  padding: 24px;
+  minHeight: 360px;
+  border: 3px;
+  background: #FFF;
+  .ButtonGroup {
+    padding: 24px;
+    display: flex;
+  }
+}
