@@ -3,7 +3,7 @@ import type { NextPage } from 'next';
 import tableStyles from "../styles/Table.module.scss";
 import mainStyles from "../styles/main.module.scss";
 import HashLoader from 'react-spinners/HashLoader';
-import BigSelect from '../components/partials/bigSelectMain';
+import BigSelect from '../components/partials/p1CompBigSelectMain';
 
 const Home: NextPage = () => {
   const [loanPriority, setLoanPriority] = useState('선');

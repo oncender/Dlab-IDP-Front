@@ -1,5 +1,5 @@
 import {useReducer, useEffect} from 'react';
-import {ApiFlowObj} from "../const/usertyp"
+import {ApiFlowObj} from "../const/p2Usertyp"
 
 function apiReducer(state: ApiFlowObj, action: { type: string, data: any, error: null | any, hasMore: boolean }) {
     switch (action.type) {
@@ -24,6 +24,13 @@ function apiReducer(state: ApiFlowObj, action: { type: string, data: any, error:
                 error: false,
                 hasMore: true
             }
+        case 'NOMORE':
+            return {
+                loading: false,
+                data: state.data,
+                error: false,
+                hasMore: false
+            }
         case 'ERROR':
             return {
                 loading: false,
@@ -47,26 +54,24 @@ const initialState = {
 
 function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [], start: boolean=false,setStart:Function) {
     const [apiState, apiDispatch] = useReducer(apiReducer, initialState);
-    const fetchData = async (loading: boolean,clear:boolean) => {
+    const fetchData = async (loading: boolean) => {
         if (!start) return setStart(true);
+        if (!apiState.hasMore){
+            apiDispatch({type: 'NOMORE'});
+            return
+        }
         apiDispatch({type: 'LOADING'});
         let data
         try {
             data = await callback();
             if (loading) {
-                await asyncwait(500)
-            }
-            if (clear){
-                console.log([...data.data].length)
-                apiDispatch({type: 'SUCCESS', data: [...data.data],hasMore:data.hasMore})
-            } else {
-                console.log([...apiState.data,...data.data].length)
-                apiDispatch({type: 'SUCCESS', data: [...apiState.data, ...data.data],hasMore:data.hasMore})
-            }
-        } catch (e) {
-            console.log("error", e)
-            apiDispatch({type: 'ERROR'});
-        }
+                await asyncwait(500)}
+                // console.log([...data.data].length)
+                // apiDispatch({type: 'SUCCESS', data: [...data.data],hasMore:data.hasMore})
+            console.log([...apiState.data,...data.data])
+            apiDispatch({type: 'SUCCESS', data: [...apiState.data, ...data.data],hasMore:data.hasMore})
+            } catch (e) {
+            apiDispatch({type: 'NOMORE'});}
     };
 
     // useEffect(() => {
@@ -76,7 +81,7 @@ function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [], st
     //     }, clears
     // )
     useEffect(() => {
-        fetchData(true,false);
+        fetchData(true);
         // eslint-disable-next-line
     }, deps);
 
