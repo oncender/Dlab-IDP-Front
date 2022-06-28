@@ -2,20 +2,22 @@
   @if $size == 'large' {
     $cardw: 100% !global;
     $cardh: 200px !global;
-
+    $fontS: 13px !global;
   } @else if $size == 'medium' {
     $cardw: 100% !global;
-    $cardh: 200px !global;
-
+    $cardh: 150px !global;
+    $fontS: 10px !global;
   } @else if $size == 'small' {
     $cardw: 100% !global;
-    $cardh: 200px !global;
+    $cardh: 100px !global;
+    $fontS: 8px !global;
   }
   div[custom=ROW]{
     display: flex;
     margin-top: 5px;
     margin-bottom: 5px;
     box-shadow:1px 1px 5px 0px grey;
+    font-size: $fontS;
     &:hover{
       box-shadow:2px 2px 10px 1px black;
       opacity: 0.7;
@@ -26,10 +28,11 @@
     display: grid;
     grid-template-rows: repeat(10, 10%);
     grid-template-columns: repeat(40, 2.5%);
-    padding-bottom: 5px;
-    padding-top: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
+      @if $size == 'large' {
+        padding : 5px;
+      } @else {
+        padding : 0px;
+      }
 
     & .col1 {
       grid-column: 1/8;
@@ -88,8 +91,15 @@
       display: flex;
       grid-row: 1/11;
       flex-flow: row wrap;
-      grid-column: 36/40;
-      margin-right: 5px;
+      @if $size == 'large' {
+        grid-column: 36/40;
+        margin-right: 5px;
+      } @else{
+        grid-column: 36/41;
+        margin-right: 0px;
+      }
+
+
       align-content: space-around;
       & .ant-card-meta {
         width: 100%;
@@ -117,15 +127,15 @@
   //      }
   //    }
 
-  @media screen and (min-width: 769px) {
+  @media screen and (min-width: 1080px) {
     @include scale_size('large') {
     }
   }
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1080px) {
     @include scale_size('medium')
   }
 
-  @media screen and (max-width: 640px) {
+  @media screen and (max-width: 830px) {
     @include scale_size('small')
   }

@@ -10,6 +10,7 @@ import {HTML5Backend} from 'react-dnd-html5-backend';
 import {filReducer} from "../components/reducers/FilterReducer";
 import useAsyncer from "../components/hook/useAsyncer";
 import useMoveScrool from "../components/hook/useScroll"
+import useWindowSize from "../components/hook/useWindowSize"
 // Component Import
 import {useDrag, useDrop} from 'react-dnd';
 import AsideFilters from "../components/partials/p2CompAsideFilters"
@@ -33,7 +34,6 @@ import axios from "axios";
 import CompDragDrop from "../components/partials/p2CompDragDrop";
 
 
-
 const Detail: NextPage = ({
                               chartData,
                               cardData,
@@ -43,6 +43,8 @@ const Detail: NextPage = ({
     // all category reducer def
     // @ts-ignore
     const [filterInfo, filDispat] = useReducer(filReducer, fromHomeData.filterInit);
+    // for window comp size handle
+    const windowNow = useWindowSize()
     // chartData State
     const [rowCount, setRowCount] = useState(0);
     const [chartD, setCharD] = useState(chartData);
@@ -52,6 +54,29 @@ const Detail: NextPage = ({
     const [start, setStart] = useState(false);
     const [element, onMoveToElement] = useMoveScrool()
     const [apiState, apiDispatch, _] = useAsyncer(getCardPage, [cardPage,], [], start, setStart);
+    const [cardFontRel, setcardFontRel] = useState({fn: 42, an: 56, lpcorp: 56})
+
+    useEffect(
+        () => {
+            if (typeof document != 'undefined') {
+                let cardDOM = document.querySelector("div[custom=ROW]");
+                if (cardDOM) {
+                    var cardWidth = parseFloat(window.getComputedStyle(cardDOM).width)
+                    var cardfontSize = parseInt(window.getComputedStyle(cardDOM).fontSize)
+
+                    var fnPlace = parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1
+                    var anPlace = parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
+                    var lpcorpPlace = parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
+                    if (fnPlace != cardFontRel.fn && anPlace != cardFontRel.an && lpcorpPlace != cardFontRel.lpcorp) {
+                        setcardFontRel({fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
+                        // console.log("ccc", {fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
+                    }
+                }
+            }
+        }, [windowNow]
+    )
+
+
     // sorting State
     const [selctState, setSelect] = useState(SORT_LABELS['it']);
     const [ascState, setAscState] = useState(true);
@@ -78,7 +103,7 @@ const Detail: NextPage = ({
     }
     const content_js = {
         "style": {
-            "gridColumn": '10/36',
+            "gridColumn": '11/39',
             "gridRow": "1fr"
         },
         "key": "contents_all",
@@ -86,7 +111,7 @@ const Detail: NextPage = ({
     }
     const rightBlankJs = {
         "style": {
-            "gridColumn": '36/41',
+            "gridColumn": '40/41',
             "gridRow": "1/41"
         },
         "key": "contents_all",
@@ -105,7 +130,7 @@ const Detail: NextPage = ({
     // chart component dependent param def
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]) => {
         setRowCount(data1.length)
-        console.log("length in preProcessChart",data2.length,data1.length)
+        console.log("length in preProcessChart", data2.length, data1.length)
         let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: [], two: []}
         // @ts-ignore
         alldata['one'] = data1.map((item) => {
@@ -240,8 +265,8 @@ const Detail: NextPage = ({
                 sdaterate: parseFloatDef(val.sdaterate, null),
                 duration: durationParser(parseFloatDef(val.duration, 0)),
                 img: imagePath(val.img),
-                fc : val.fc,
-                idx:val.idx,
+                fc: val.fc,
+                idx: val.idx,
             }
         })
         return {
@@ -254,9 +279,7 @@ const Detail: NextPage = ({
         // setter: State setter callback, should be given in the Hook or elsewhere,
         let params = Object.assign({}, apiParamGen(filterInfo),
             {'pageCount': cardPage});
-        console.log('cardgen', ["http://localhost:8080/", urlGen(APIURL.CARDPAGE, params)].join(""))
-        // just for mock
-        // params['pagenum'] = cardPage
+        // console.log('cardgen', ["http://localhost:8080/", urlGen(APIURL.CARDPAGE, params)].join(""))
         var cancel
         var reqConfig: {} = {
             method: "GET",
@@ -264,7 +287,6 @@ const Detail: NextPage = ({
             params: params,
             cancelToken: new axios.CancelToken(c => cancel = c)
         }
-
         let res;
         try {
             res = await axios(reqConfig);
@@ -358,38 +380,8 @@ const Detail: NextPage = ({
             </div>
         )
     }, [chartD, chartClc])
-    //
-    // const chartComps = useMemo(() => {
-    //     return (
-    //         <div className={styles.chart} ref={element}>
-    //             {
-    //                 <CompDragDrop
-    //         id={'chart1'}
-    //         index={0}
-    //         moveContentZero={marveContentZero}
-    //         someDragging={dragAside}
-    //         setsomeDragging={setDragAside}
-    //         content={chartOne}
-    //         itemType={ItemTypes.ContentS}
-    //         style={{}}
-    //     />}
-    //             {
-    //                         <CompDragDrop
-    //         id={'chart2'}
-    //         index={1}
-    //         moveContentZero={moveContentZero}
-    //         someDragging={dragAside}
-    //         setsomeDragging={setDragAside}
-    //         content={chartTwo}
-    //         itemType={ItemTypes.ContentS}
-    //         style={{}}
-    //     />
-    //                 }
-    //         </div>)
-    // }, [chartD, chartClc])
+
     const cardComps = useMemo(() => {
-            console.log(apiState.data.length)
-            onMoveToElement()
             return (
                 <div className={styles.card} style={cardcomps_js.style}>
                     <span className={styles.filter}>
@@ -401,6 +393,7 @@ const Detail: NextPage = ({
                     <span className={styles.board}>
                         <CompCardGroup data={apiState.data}
                                        refFunc={lastCardRef}
+                                       fontRel={cardFontRel}
                         />
                     <div className={styles.boardError}>
                         {apiState.loading && "로딩중입니다...."}
@@ -408,38 +401,9 @@ const Detail: NextPage = ({
                     </div>
                     </span>
                 </div>)
-        }, [apiState.data,rowCount]
+        }, [apiState.data, rowCount,cardFontRel]
     )
-
-    const DContent = (
-        <CompDragDrop
-            id={'Contents'}
-            index={1}
-            moveContentZero={moveContentZero}
-            someDragging={dragAside}
-            setsomeDragging={setDragAside}
-            content={(<>
-                {chartComps}
-                {cardComps}
-            </>)}
-            itemType={ItemTypes.ContentS}
-            style={content_js.style}
-        />
-    )
-    const DBlock = (
-        <CompDragDrop
-            id={'NullBlock'}
-            index={2}
-            moveContentZero={moveContentZero}
-            someDragging={dragAside}
-            setsomeDragging={setDragAside}
-            content={(
-                <div style={rightBlankJs.style}>
-                    only for testing
-                </div>
-            )}
-            itemType={ItemTypes.ContentS}/>
-    )
+    //cardFontRel
 
 
     // API.SCROLL CARD
@@ -449,6 +413,7 @@ const Detail: NextPage = ({
         // after filter updated, Graph should be reloaded
         getGraph();
         apiDispatch({type: 'CLEAR'})
+        onMoveToElement()
         return (() => {
             // after filter updated, CardPage should be reloaded
             setStart(true)
@@ -466,13 +431,13 @@ const Detail: NextPage = ({
         <div>
             <DndProvider backend={HTML5Backend}>
                 <div className={styles.sectionContents}>
-                    <div style={leftBlankJs.style} />
+                    <div style={leftBlankJs.style}/>
                     {asideFil}
                     <div style={content_js.style}>
                         {chartComps}
                         {cardComps}
                     </div>
-                    <div style={rightBlankJs.style} />
+                    <div style={rightBlankJs.style}/>
                     {/*{DAside}*/}
                     {/*{DContent}*/}
                     {/*{DBlock}*/}
