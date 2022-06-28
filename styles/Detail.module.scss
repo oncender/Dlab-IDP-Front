@@ -1,6 +1,6 @@
 .sectionContents{
 	display : grid;
-	grid-template-columns: repeat(40,1fr);
+	grid-template-columns: repeat(40,minmax(25px, 1fr));
 }
 .chart {
 		display : flex;

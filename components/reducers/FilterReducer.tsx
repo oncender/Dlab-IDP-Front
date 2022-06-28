@@ -1,6 +1,6 @@
 import {useReducer, createContext} from "react";
-import {FILTER_ACTION} from "../const/constant"
-import { CategoryObj, FloatObj, FilterStateObj, ActionObj} from "../const/usertyp";
+import {FILTER_ACTION} from "../const/p2Constant"
+import { CategoryObj, FloatObj, FilterStateObj, ActionObj} from "../const/p2Usertyp";
 
 const selectArr = (arrValue: Array<any>, arrTargetSelect : CategoryObj[], names: string):
     Array<boolean> => {
