@@ -116,10 +116,10 @@ const Detail: NextPage = ({
         // @ts-ignore
         alldata['one'] = data1.map((item) => {
             return {
-                "sdaterate": parseFloatDef(item.sdaterate, null),
-                "at": item.at,
-                "loandate": item.loandate,
-                "loanamt": parseFloatDef(item.loanamt, null)
+                "체결이자": parseFloatDef(item.sdaterate, null),
+                "자산 유형": item.at,
+                "대출 체결일": item.loandate,
+                "대출약정금": parseFloatDef(item.loanamt, null)
             }
         });
 

@@ -6,13 +6,15 @@ import tableStyles from "../styles/Table.module.scss";
 import mainStyles from "../styles/main.module.scss";
 import GridLoader from 'react-spinners/GridLoader';
 import BigSelect from '../components/partials/p1CompBigSelectMain';
+import useMoveScrool from "../components/hook/useScroll";
 
 
 const Home: NextPage = () => {
   const [loanPriority, setLoanPriority] = useState('선순위');
   const [loanType, setLoanType] = useState('담보대출');
   const [loading, setLoading] = useState(false);
-
+  const [start,setStart] = useState(false);
+  const [element, onMoveToElement] = useMoveScrool('end')
   const handleLoanPriority = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setLoanPriority(prioritySelectValue.filter((val)=>(val.value==event.target.value))[0].key)
   }
@@ -24,7 +26,12 @@ const Home: NextPage = () => {
     const min=1500, max=4500;
     const term = Math.floor(Math.random() * (max-min) + min) // 0.5 ~ 2.5 second
     setLoading(true)
-    setTimeout(() => {setLoading(false)}, term)
+    onMoveToElement()
+    setTimeout(() => {
+      setLoading(false)
+      setStart(true)
+    }, term)
+
   }
 
   const prioritySelectValue = [
@@ -36,6 +43,7 @@ const Home: NextPage = () => {
     { key: '담보', value : '담보대출'},
     { key: 'PF', value : 'PF대출'},
     { key: '한도', value : '한도대출'}];
+  const displayTable = start ? 'block' :'none'
 
   return (
     <div className="w-full">
@@ -79,7 +87,7 @@ const Home: NextPage = () => {
             <GridLoader loading={loading} color='#67FFBF' size={30} />
           </div>
           :
-          <div className={tableStyles.modelTable}>
+          <div className={tableStyles.modelTable} style={{display:displayTable}}>
             <table>
               <thead>
               <tr>
@@ -126,6 +134,7 @@ const Home: NextPage = () => {
           </div>
           }
         </div>
+        <div ref={element} />
       </div>
     </div>
   )
