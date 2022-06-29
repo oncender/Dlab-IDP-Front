@@ -122,11 +122,11 @@ const CompCardGroup = ({data, refFunc,fontRel}:
     // console.log(cardData.an,byte_length(cardData.an))
 
     const cardParts = newdata.map((val, idx) => {
-        const isLastElement = data.length - 1 === idx + 1;
+        const isLastElement = data.length === idx + 1;
         // keystring={val.fn + val.lpcorp}
         return (
             isLastElement ? (
-                <div ref={refFunc}>
+                <div key={'cardlast'} ref={refFunc} >
                     <CartPart key={`card${idx}`} cardData={val}/>
                 </div>
             ) : (
@@ -136,7 +136,7 @@ const CompCardGroup = ({data, refFunc,fontRel}:
     })
 
     return (
-        <div className="cardGroupWrap">
+        <div key={'cardGroup'} className="cardGroupWrap">
             {cardParts}
         </div>
     )

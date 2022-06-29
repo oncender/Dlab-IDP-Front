@@ -1,6 +1,5 @@
 import styles from "../../styles/Button.module.scss"
 import {windowContext} from "../../pages/detail"
-import {faCheckSquare, faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {faAngry} from "@fortawesome/free-regular-svg-icons";
 // import "../../styles/Button.module.scss"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -14,8 +13,11 @@ import {
     faBriefcase, faTruck, faHotel, faCartShopping, faHouseChimney, faOilWell, faBuilding,
     faBuildingCircleCheck, faHandHoldingDollar, faUsers, faMoneyCheckAlt,
     faCircleCheck, faCircleMinus, faCircleExclamation, faPercent,
-    faEllipsis, faWaveSquare
+    faEllipsis, faWaveSquare ,
+    faBuildingLock,faClipboardList,faFileInvoiceDollar,faBridge,
 } from "@fortawesome/free-solid-svg-icons";
+import { faViacoin, faEtsy
+} from "@fortawesome/free-brands-svg-icons"
 // faCircleEllipsisVertical, faWavePulse : pro
 
 
@@ -37,47 +39,55 @@ const NAME_ICON = {
     '후': faCircleExclamation,
     '고정': faPercent,
     '변동': faWaveSquare,
+    '담보':	faBuildingLock,
+    'PF':	faClipboardList,
+    '한도':	faFileInvoiceDollar,
+    '부가세':	faViacoin,
+    '브릿지'	:faBridge,
+    '기타(대출)':	faEtsy
 }
 
 //["solid", "fa-briefcase"]
-const ButtonPart = (num: number, isclicked: boolean, name: string, onClick: any) => {
-    const name_gen = () => {
-        var size,fontSize
-        if (windowStatus =='large'){
-            size = 'lg'
-            fontSize= '1em'
-        } else if (windowStatus =='medium'){
-            size = ''
-            fontSize= '1em'
-        } else{
-            size = 'xs'
-            fontSize= '1em'
+const ButtonPart = (window:string,num: number, isclicked: boolean, name: string, onClick: any) => {
+    const name_gen = (size:string,fontSize:string) => {
+        var labalName
+        if (name.includes('기타')){
+            labalName=  '기타'
+        } else {
+            labalName=  name
         }
         if (isclicked) {
             return (<><FontAwesomeIcon icon={NAME_ICON[name]} size={size} pull={'left'} inverse/>
-                <b style={{fontSize:'fontSize'}}>{name}</b></>)
+                <b style={{fontSize:fontSize}}>{labalName}</b></>)
         } else {
             return (<><FontAwesomeIcon icon={NAME_ICON[name]} size={size} pull={'left'}/>
-                <b style={{fontSize:'fontSize'}}>{name}</b></>)
+                <b style={{fontSize:fontSize}}>{labalName}</b></>)
         }
     };
-    const {windowStatus} = useContext(windowContext);
-    function styleGen(windowStatus: string) {
+
+    function styleGen(windowStatus: string|undefined) {
         switch (windowStatus) {
             case '':
-                return
+                return {styleJs:{},divJs:{},size:'',fontSize:''}
             case 'large':
-                return [{width: "100%", fontSize: '1em'},
-                    {'width': 'fit-content', 'display': 'flex', 'flexFlow':'row wrap'}]
+                return {styleJs:{width: "100%", fontSize: '1em'},
+                        divJs:{'width': 'fit-content', 'display': 'flex', 'flexFlow':'row wrap'},
+                    size:'lg',fontSize:'1em'}
             case 'medium':
-                return [{width: '100%', fontSize: '1em'},
-                    {'width': 'fit-content', 'display': 'inline-table'}]
+                return {styleJs:{width: "95%",height:'80%', fontSize: '1em'},
+                        divJs:{'width': 'fit-content', 'display': 'inline-table'},
+                        size:'',fontSize:'1em'}
             case 'small':
-                return [{width: '100%', fontSize: '1em'},
-                    {'width': 'fit-content', 'display': 'flex', 'flexFlow':'row wrap'}]
+                return {styleJs:{width: "90%",height:'80%', fontSize: '1em'},
+                        divJs:{'width': 'fit-content', 'display': 'flex', 'flexFlow':'row wrap'},
+                        size:'xs',fontSize:'1em'}
+            default:
+                return {styleJs:{},divJs:{},size:'',fontSize:''}
         }
     }
-    const [styleJs,divJs] = styleGen(windowStatus);
+    var styleJs,divJs,size,fontSize
+    const {windowStatus} = useContext(windowContext);
+    ({styleJs, divJs, size, fontSize} = styleGen(windowStatus))
     if (isclicked) {
         return (
             <div style={divJs}>
@@ -88,7 +98,7 @@ const ButtonPart = (num: number, isclicked: boolean, name: string, onClick: any)
                     // disabled = {isclicked}
                     type={'primary'}
                     shape='round' style={styleJs}>
-                    {name_gen()}
+                    {name_gen(size,fontSize)}
                 </Button>
             </div>)
     } else {
@@ -102,7 +112,7 @@ const ButtonPart = (num: number, isclicked: boolean, name: string, onClick: any)
                     // disabled = {isclicked}
                     // type = {isclicked ? 'dashed' : 'default'}
                     shape='round' style={styleJs}>
-                    {name_gen()}
+                    {name_gen(size,fontSize)}
                 </Button></div>)
     }
 
@@ -110,8 +120,9 @@ const ButtonPart = (num: number, isclicked: boolean, name: string, onClick: any)
 
 }
 
-const CompButtonGroup = ({label, buttons, isclicked, setClick, filDispat}:
-                             { label: string, buttons: Array<string>, isclicked: Array<boolean>, setClick: Function, filDispat: Function }) => {
+const CompButtonGroup = ({window,label, buttons, isclicked, setClick, filDispat}:
+                             { window: string,
+                                 label: string, buttons: Array<string>, isclicked: Array<boolean>, setClick: Function, filDispat: Function }) => {
     // @ts-ignore
     const buttonValue: ReactNode[] = [];
     console.log("buton render", label)
@@ -126,18 +137,18 @@ const CompButtonGroup = ({label, buttons, isclicked, setClick, filDispat}:
     };
 
     for (let i = 0; i < buttons.length; i++) {
-        buttonValue.push(ButtonPart(i, isclicked[i], buttons[i], onClick));
+        buttonValue.push(ButtonPart(window,i, isclicked[i], buttons[i], onClick));
     }
     ;
     return (
-        <>
-            <Row>
-                <span className="filterName">{label}</span>
+        <div key={label}>
+            <Row key = {label+'row1'}>
+                <span key = {label+'row1'+'filter'} className="filterName">{label}</span>
             </Row>
-            <Row>
+            <Row key = {label+'row1'}>
                 {buttonValue}
             </Row>
-        </>
+        </div>
     )
 };
 

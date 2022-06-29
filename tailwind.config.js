@@ -16,6 +16,7 @@ module.exports = {
       'blinker' : [ 'Blinker', 'sans-serif'],
     },
     colors: {
+      'filter-btn-clicked-bg': '#101C3BF7',
       // 'big-btn-green-bf': '#67FFBF',
       // 'big-btn-green-af': '#D0FFEB',
     },

@@ -17,7 +17,9 @@ export const INIT_FILST: FilterStateObj = {
         {'name':'at','value':'중'},
         {'name':'at','value':'오피스'},
         {'name':'at','value':'호텔'},
-        {'name':'rate','value':'고정'}
+        {'name':'rate','value':'고정'},
+        {'name':'loancls','value':'한도'},
+        {'name':'loancls','value':'담보'}
     ],
     float :[
         {'name':'debt','value':[300E8,427E8]},
@@ -27,7 +29,7 @@ export const INIT_FILST: FilterStateObj = {
 export const INIT_DEBT:[number,number] = [200E8,800E8]
 
 // need to be fixed by real min max value
-export const MM_DEBT:[number,number] = [1E8,1000E8]
+export const MM_DEBT:[number,number] = [0,5000E8]
 
 // labels for each filter (label : button1 button2 ...) | (label \n slider ---- )
 export const LABELS = {
@@ -35,7 +37,9 @@ export const LABELS = {
     'seniorstr': '대출 순위',
     'at' : '자산 유형',
     'debt' : '대출 약정금',
-    'rate': '금리 종류'
+    'rate': '금리 종류',
+    'loancls':'대출 분류',
+
 }
 // sorting params name
 export const SORT_LABELS = {
@@ -50,7 +54,9 @@ export const SORT_LABELS = {
     'loanamt':"대출약정금",
     'aum':"대출총액",
     'sdaterate':"체결이자",
-    'duration':"듀레이션"
+    'duration':"듀레이션",
+    'loancls':'대출 분류',
+
 }
 
 
@@ -61,7 +67,7 @@ export const CARD_LABELS = {
     'loanamt':"대출약정금",
     'aum':"대출총액",
     'sdaterate':"체결이자",
-    'duration':"듀레이션"
+    'duration':"듀레이션",
     }
 
 export const APIURL = {

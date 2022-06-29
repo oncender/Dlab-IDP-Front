@@ -1,5 +1,5 @@
 import styles from "../styles/Detail.module.scss"
-import {Divider} from 'antd'
+import {Divider, Layout} from 'antd'
 
 import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode, createContext} from 'react'
 import type {NextPage, GetServerSideProps, InferGetServerSidePropsType} from 'next'
@@ -32,6 +32,8 @@ import {
 } from "../components/const/p2Usertyp"
 import axios from "axios";
 import CompDragDrop from "../components/partials/p2CompDragDrop";
+import Header from '../components/Header'
+import Footer from "../components/Footer";
 
 export const windowContext = createContext({windowStatus:''});
 
@@ -249,7 +251,7 @@ const Detail: NextPage = ({
         // setter: State setter callback, should be given in the Hook or elsewhere,
         let params = Object.assign({}, apiParamGen(filterInfo),
             {'pageCount': cardPage});
-        // console.log('cardgen', ["http://localhost:8080/", urlGen(APIURL.CARDPAGE, params)].join(""))
+        console.log('cardgen', ["http://localhost:8080/", urlGen(APIURL.CARDPAGE, params)].join(""))
         var cancel
         var reqConfig: {} = {
             method: "GET",
@@ -314,7 +316,7 @@ const Detail: NextPage = ({
     const rowCountResult = useMemo(() => {
         return (
             <div className={styles.title}>
-                <span>총 대출건수는</span>
+                <span>총 대출건수는 </span>
                 <span><b>{rowCount}</b></span>
                 <span>건 입니다.</span>
             </div>
@@ -326,7 +328,7 @@ const Detail: NextPage = ({
     // level 0
     const asideFil = useMemo(() => {
         return (
-            <div className={styles.asideFiltersJs} key ="asidefilter" index={1}>
+            <div className={styles.asideFiltersJs} key ="asidefilterjs" index={1}>
                 <AsideFilters
                     fromHomeData={fromHomeData}
                     filDispat={filDispat}
@@ -403,6 +405,7 @@ const Detail: NextPage = ({
 
     return (
         <div>
+            <Header />
             <windowContext.Provider value={{windowStatus:windowContextval}}>
                 <DndProvider backend={HTML5Backend}>
                     <div className={styles.sectionContents}>
@@ -412,11 +415,12 @@ const Detail: NextPage = ({
                             {chartComps}
                             {cardComps}
                         </div>
-                        <div className={styles.rightBlankJs} key = "contents_all" index={3} />
+                        <div className={styles.rightBlankJs} key = "rightblank" index={3} />
 
                     </div>
                 </DndProvider>
             </windowContext.Provider>
+            <Footer />
         </div>
     )
 }

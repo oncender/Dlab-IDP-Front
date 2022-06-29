@@ -7,8 +7,9 @@
     $asideFilS: 2 !global;
     $asideFilE: 9 !global;
     $contentsS: 11 !global;
-    $contentsE: 39 !global;
+    $contentsE: 40 !global;
     $fontS: 15px !global;
+    $marginTop: 5% !global;
   } @else {
     $lblankS: -1 !global;
     $lblankE: -1 !global;
@@ -19,9 +20,11 @@
     $contentsS: 9 !global;
     $contentsE: 41 !global;
     $fontS: 11px !global;
+    $marginTop: 10% !global;
   } ;
   @if $size == 'small'{
     $fontS: 9px !global;
+    $marginTop: 15% !global;
   };
   .sectionContents {
     display: grid;
@@ -39,14 +42,15 @@
   .contentJs {
     grid-column-start: $contentsS;
     grid-column-end: $contentsE;
+    grid-row-start: 1;
+    margin-top: $marginTop;
+    margin-right: 5%;
   };
   .asideFiltersJs {
     grid-column-start: $asideFilS;
     grid-column-end: $asideFilE;
-  };
-  .chartCompsJs {
-    grid-column: 8/40;
-    grid-row: 1/20;
+    grid-row-start: 1;
+    margin-top: 20%;
   };
   .card {
     .filter {
@@ -64,13 +68,15 @@
         justify-content: flex-end;
       }
     }
-
     .board {
     }
-
     .board-error {
     }
   }
+  .chartCompsJs {
+    grid-column: 8/40;
+    grid-row: 1/20;
+  };
   @content
 };
 
