@@ -4,12 +4,12 @@ type Option = {
   value: string
 }
 
-export default function BigSelect(prop: any) {
+export default function BigSelect(props: any) {
   return (
-    !prop.options? null:
+    !props.options? null:
     <div>
-      <select className={styles.customSelect}>
-        {prop.options.map((option: Option) => 
+      <select className={styles.customSelect} onChange={props.handleChange}>
+        {props.options.map((option: Option) => 
           <option key={option.value} value={option.value}>
             {option.value}
           </option>

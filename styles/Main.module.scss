@@ -43,7 +43,7 @@
         weight: 300;
     }
     color: white;
-
+    text-align: center;
     @include mobile{
         font-size: 1.5rem;
     }
@@ -52,6 +52,6 @@
     }
     @include desktop{
         font-size: 3rem;
+        text-align: left;
     }
-    
 }

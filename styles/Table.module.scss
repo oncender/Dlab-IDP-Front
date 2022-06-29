@@ -1,9 +1,19 @@
+@import './util.module';
+
 .modelTable {
     margin: {
         top: 3rem;
         bottom: 3rem;
     }
-    font-size: 2.5rem;
+    @include mobile {
+        font-size: 1.25rem;
+    }
+    @include tablet {
+        font-size: 1.75rem;
+    }
+    @include desktop {
+        font-size: 2.5rem;
+    }
     font-family: 'sans';
     border-collapse: collapse;
     border-top: 3px solid #168;
@@ -26,9 +36,21 @@
         border-right: 0;
     }
     p {
-        font-size: 1.25rem;
+        // font-size: 1.115rem;
+        @include mobile {
+            font-size: 0.85rem;
+        }
+        @include tablet {
+            font-size: 1rem;
+        }
+        @include desktop {
+            font-size: 1.115rem;
+        }
         color: #4c4c4c;
-        margin-top: 1rem;
+        margin: 1rem 0.2rem 1rem 0.2rem;
         text-align: left;
+        background-color: rgb(222, 222, 222);
+        border-radius: 6px;
+        padding: 15px 20px 15px 20px
     }
 }
