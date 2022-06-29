@@ -4,13 +4,14 @@ import {Slider} from "antd";
 import {FILTER_ACTION, LABELS} from "../const/p2Constant";
 import { getKeyByValue } from "../const/p2Utils"
 
-
+// todo 반응형으로 slider 고치기
 const CompSliderfil = ({label,curntval,mmVal,setSlider,filDispat} :
     {label: string, curntval: [number,number], mmVal: [number,number], setSlider: Function, filDispat: Function}) => {
+    let v2len = `${curntval[1]/1E8}`.length
 
     const marks: SliderMarks = {
-        [curntval[0]]: {style: {paddingLeft: '20px'}, label: `${curntval[0]/1E8}억`},
-        [curntval[1]]: {style: {paddingRight: '20px'}, label: `${curntval[1]/1E8}억`},
+        [curntval[0]]: {style: {paddingLeft: '1%',fontSize:'0.9em'}, label: `${curntval[0]/1E8}억`},
+        [curntval[1]]: {style: {paddingRight: ((curntval[1]/1E8)> 4000? '20%': '0%'),fontSize:'0.9em'}, label: `${curntval[1]/1E8}억`},
         }
     let name = getKeyByValue(LABELS,label)
     const handleYearSlider = (value: [number, number]) => {

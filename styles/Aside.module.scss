@@ -1,12 +1,38 @@
+@mixin scale_size($size) {
+	@if $size == 'large' {
+		$fontS: 15px !global;
+	} @else if $size == 'medium'{
+		$fontS: 12px !global;
+	}  @else if $size == 'small'{
+		$fontS: 9px !global;
+	};
+	.aside {
+		font-size: $fontS;
+	};
+	@content
+}
+@media screen and (min-width: 1180px) {
+  @include scale_size('large') {
+  }
+}
+
+@media screen and (max-width: 1180px) {
+  @include scale_size('medium')
+}
+
+@media screen and (max-width: 830px) {
+  @include scale_size('small')
+}
 
 .aside {
 	padding-top: 0px;
 	align-self: flex-start;
 	position: sticky;
-	top:50px;
-	min-width:150px;
-	border: rgb(209,213,219) solid 2px;
+	top: 20%;
+	padding-left: 2%;
+	min-width: 108px;
+	margin-left: 2%;
+	margin-top: 1%;
+    border: rgb(209,213,219) solid 2px;
 	border-radius: 0.8rem; /* 8px */
-	padding-left: 5px;
-	//margin-left: 16px;
 }

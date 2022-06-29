@@ -1,6 +1,7 @@
 import styles from "../styles/Detail.module.scss"
+import {Divider, Layout} from 'antd'
 
-import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode} from 'react'
+import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode, createContext} from 'react'
 import type {NextPage, GetServerSideProps, InferGetServerSidePropsType} from 'next'
 import { useRouter } from 'next/router'
 import { DndProvider } from 'react-dnd';
@@ -10,6 +11,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import {filReducer} from "../components/reducers/FilterReducer";
 import useAsyncer from "../components/hook/useAsyncer";
 import useMoveScrool from "../components/hook/useScroll"
+import useWindowSize from "../components/hook/useWindowSize"
 // Component Import
 import {useDrag, useDrop} from 'react-dnd';
 import AsideFilters from "../components/partials/p2CompAsideFilters"
@@ -31,23 +33,42 @@ import {
 } from "../components/const/p2Usertyp"
 import axios from "axios";
 import CompDragDrop from "../components/partials/p2CompDragDrop";
+import Header from '../components/Header'
+import Footer from "../components/Footer";
 
+export const windowContext = createContext({windowStatus:''});
 
 const Detail: NextPage = ({
     chartData,
     cardData,
     //fromHomeData
     }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-    
+
     // Get URL parameters via next router and setting up filter states
     const router = useRouter();
     const filterInitialValues = detailQueryParser(router.query);
     const fromHomeData = {filterInit: filterInitialValues, sldrInit: INIT_DEBT}
-
+    console.log("hellow",fromHomeData)
     /* State & Reducer DEF */
     // all category reducer def
     // @ts-ignore
     const [filterInfo, filDispat] = useReducer(filReducer, fromHomeData.filterInit);
+    console.log('filterInfo',filterInfo)
+    // for window comp size handle
+    const windowNow = useWindowSize()
+    function windowSizeStr(windowNow:{width:number|undefined,height:number|undefined}):string{
+        var {width,height} = windowNow
+        if (width && (width > 1180)){
+            return 'large'
+        } else if (width && (width >830)){
+            return 'medium'
+        } else if (width){
+            return 'small'
+        } else {
+            return ''
+        }
+    }
+    const windowContextval =  windowSizeStr(windowNow)
     // chartData State
     const [rowCount, setRowCount] = useState(0);
     const [chartD, setCharD] = useState(chartData);
@@ -57,60 +78,40 @@ const Detail: NextPage = ({
     const [start, setStart] = useState(false);
     const [element, onMoveToElement] = useMoveScrool()
     const [apiState, apiDispatch, _] = useAsyncer(getCardPage, [cardPage,], [], start, setStart);
+    const [cardFontRel, setcardFontRel] = useState({fn: 42, an: 56, lpcorp: 56})
+
+    useEffect(
+        () => {
+            if (typeof document != 'undefined') {
+                let cardDOM = document.querySelector("div[custom=col21]");
+                if (cardDOM) {
+                    var cardWidth = parseFloat(window.getComputedStyle(cardDOM).width)
+                    var cardfontSize = parseInt(window.getComputedStyle(cardDOM).fontSize)
+                    console.log("cardWidth",cardWidth,cardfontSize,parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1)
+                    var fnPlace = 4*parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1
+                    var anPlace = 4*parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
+                    var lpcorpPlace = 4*parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
+                    console.log('result',{fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
+                    if (fnPlace != cardFontRel.fn && anPlace != cardFontRel.an && lpcorpPlace != cardFontRel.lpcorp) {
+                        setcardFontRel({fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
+                        // console.log("ccc", {fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
+                    }
+                }
+            }
+        }, [windowNow]
+    )
+
+
     // sorting State
     const [selctState, setSelect] = useState(SORT_LABELS['it']);
     const [ascState, setAscState] = useState(true);
     // const [slcClickState,setSlcClickState]:[ReactNode[],Function] = useState([]);
-
-    // css item for dynamic grid change
-    const leftBlankJs = {
-        "style": {
-            "gridColumn": "1/2",
-            "gridRow": "1/41"
-        },
-        "key": "leftblank",
-        "index": 0
-
-    }
-
-    const asidefilters_js = {
-        "style": {
-            "gridColumn": "2/9",
-
-        },  //4+5+3+2+2}
-        "key": "asidefilter",
-        "index": 1
-    }
-    const content_js = {
-        "style": {
-            "gridColumn": '10/36',
-            "gridRow": "1fr"
-        },
-        "key": "contents_all",
-        "index": 2
-    }
-    const rightBlankJs = {
-        "style": {
-            "gridColumn": '36/41',
-            "gridRow": "1/41"
-        },
-        "key": "contents_all",
-        "index": 3
-
-    }
-    const cardcomps_js = {
-        "style": {},
-    }
-    const chartcomps_js = {
-        "gridColumn": '8/40',
-        "gridRow": '1/20',
-    }
-
+    // chart component dependent param def
 
     // chart component dependent param def
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]) => {
         setRowCount(data1.length)
-        console.log("length in preProcessChart",data2.length,data1.length)
+        console.log("length in preProcessChart", data2.length, data1.length)
         let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: [], two: []}
         // @ts-ignore
         alldata['one'] = data1.map((item) => {
@@ -168,7 +169,6 @@ const Detail: NextPage = ({
         // console.log(alldata['one'], alldata['two'])
         return alldata
     }
-
     async function getGraph() {
         // setter: State setter callback, should be given in the Hook or elsewhere,
         let params = apiParamGen(filterInfo)
@@ -193,7 +193,7 @@ const Detail: NextPage = ({
             res1 = await axios(reqConfig1);
         } catch (e) {
             if (axios.isCancel(e)) {
-                console.log("error2", e)
+                console.log("error1", e)
             }
         }
         try {
@@ -245,8 +245,8 @@ const Detail: NextPage = ({
                 sdaterate: parseFloatDef(val.sdaterate, null),
                 duration: durationParser(parseFloatDef(val.duration, 0)),
                 img: imagePath(val.img),
-                fc : val.fc,
-                idx:val.idx,
+                fc: val.fc,
+                idx: val.idx,
             }
         })
         return {
@@ -260,8 +260,6 @@ const Detail: NextPage = ({
         let params = Object.assign({}, apiParamGen(filterInfo),
             {'pageCount': cardPage});
         console.log('cardgen', ["http://localhost:8080/", urlGen(APIURL.CARDPAGE, params)].join(""))
-        // just for mock
-        // params['pagenum'] = cardPage
         var cancel
         var reqConfig: {} = {
             method: "GET",
@@ -269,7 +267,6 @@ const Detail: NextPage = ({
             params: params,
             cancelToken: new axios.CancelToken(c => cancel = c)
         }
-
         let res;
         try {
             res = await axios(reqConfig);
@@ -326,7 +323,11 @@ const Detail: NextPage = ({
     }, [chartD.two, chartClc])
     const rowCountResult = useMemo(() => {
         return (
-            <div className={styles.title}>총 대출건수는 {rowCount}건 입니다.</div>
+            <div className={styles.title}>
+                <span>총 대출건수는 </span>
+                <span><b>{rowCount}</b></span>
+                <span>건 입니다.</span>
+            </div>
         )
     }, [rowCount])
 
@@ -335,7 +336,7 @@ const Detail: NextPage = ({
     // level 0
     const asideFil = useMemo(() => {
         return (
-            <div style={asidefilters_js.style}>
+            <div className={styles.asideFiltersJs} key ="asidefilterjs" index={1}>
                 <AsideFilters
                     fromHomeData={fromHomeData}
                     filDispat={filDispat}
@@ -363,40 +364,10 @@ const Detail: NextPage = ({
             </div>
         )
     }, [chartD, chartClc])
-    //
-    // const chartComps = useMemo(() => {
-    //     return (
-    //         <div className={styles.chart} ref={element}>
-    //             {
-    //                 <CompDragDrop
-    //         id={'chart1'}
-    //         index={0}
-    //         moveContentZero={marveContentZero}
-    //         someDragging={dragAside}
-    //         setsomeDragging={setDragAside}
-    //         content={chartOne}
-    //         itemType={ItemTypes.ContentS}
-    //         style={{}}
-    //     />}
-    //             {
-    //                         <CompDragDrop
-    //         id={'chart2'}
-    //         index={1}
-    //         moveContentZero={moveContentZero}
-    //         someDragging={dragAside}
-    //         setsomeDragging={setDragAside}
-    //         content={chartTwo}
-    //         itemType={ItemTypes.ContentS}
-    //         style={{}}
-    //     />
-    //                 }
-    //         </div>)
-    // }, [chartD, chartClc])
+
     const cardComps = useMemo(() => {
-            console.log(apiState.data.length)
-            onMoveToElement()
             return (
-                <div className={styles.card} style={cardcomps_js.style}>
+                <div className={styles.card} >
                     <span className={styles.filter}>
                         {rowCountResult}
                         <div className={styles.sort}>
@@ -406,6 +377,7 @@ const Detail: NextPage = ({
                     <span className={styles.board}>
                         <CompCardGroup data={apiState.data}
                                        refFunc={lastCardRef}
+                                       fontRel={cardFontRel}
                         />
                     <div className={styles.boardError}>
                         {apiState.loading && "로딩중입니다...."}
@@ -413,38 +385,9 @@ const Detail: NextPage = ({
                     </div>
                     </span>
                 </div>)
-        }, [apiState.data,rowCount]
+        }, [apiState.data, rowCount,cardFontRel]
     )
-
-    const DContent = (
-        <CompDragDrop
-            id={'Contents'}
-            index={1}
-            moveContentZero={moveContentZero}
-            someDragging={dragAside}
-            setsomeDragging={setDragAside}
-            content={(<>
-                {chartComps}
-                {cardComps}
-            </>)}
-            itemType={ItemTypes.ContentS}
-            style={content_js.style}
-        />
-    )
-    const DBlock = (
-        <CompDragDrop
-            id={'NullBlock'}
-            index={2}
-            moveContentZero={moveContentZero}
-            someDragging={dragAside}
-            setsomeDragging={setDragAside}
-            content={(
-                <div style={rightBlankJs.style}>
-                    only for testing
-                </div>
-            )}
-            itemType={ItemTypes.ContentS}/>
-    )
+    //cardFontRel
 
 
     // API.SCROLL CARD
@@ -454,6 +397,7 @@ const Detail: NextPage = ({
         // after filter updated, Graph should be reloaded
         getGraph();
         apiDispatch({type: 'CLEAR'})
+        onMoveToElement()
         return (() => {
             // after filter updated, CardPage should be reloaded
             setStart(true)
@@ -469,27 +413,21 @@ const Detail: NextPage = ({
 
     return (
         <div>
-            <DndProvider backend={HTML5Backend}>
-                <div className={styles.sectionContents}>
-                    <div style={leftBlankJs.style} />
-                    {asideFil}
-                    <div style={content_js.style}>
-                        {chartComps}
-                        {cardComps}
+            <Header />
+            <windowContext.Provider value={{windowStatus:windowContextval}}>
+                <DndProvider backend={HTML5Backend}>
+                    <div className={styles.sectionContents}>
+                        <div className={styles.leftBlankJs} key ='leftblank' index={0}/>
+                        {asideFil}
+                        <div className={styles.contentJs} key="contents_all" index={2}>
+                            {chartComps}
+                            {cardComps}
+                        </div>
+                        <div className={styles.rightBlankJs} key = "rightblank" index={3} />
                     </div>
-                    <div style={rightBlankJs.style} />
-                    {/*{DAside}*/}
-                    {/*{DContent}*/}
-                    {/*{DBlock}*/}
-                    {/*{asideFil}*/}
-                    {/*<div style={content_js.style}>*/}
-                    {/*    {chartComps}*/}
-                    {/*    {cardComps}*/}
-                    {/*</div>*/}
-
-
-                </div>
-            </DndProvider>
+                </DndProvider>
+            </windowContext.Provider>
+            <Footer />
         </div>
     )
 }

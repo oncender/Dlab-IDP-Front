@@ -5,7 +5,8 @@
 .ant-btn {
   &-primary {
     width:100%;
-    padding:5px;
+    padding:2px;
+    margin-inline: 2px;
     background:map-get($button, "click", "bg");//;//#{rever_color(16, 28, 59)}; // map-get($button, "click", "bg");
     color: map-get($button, "click", "text");
     border-color: map-get($button, "click", "border-color");
@@ -25,7 +26,6 @@
   &-default {
     width:100%;
     padding: 2px;
-        margin-bottom: 2px;
     margin-inline: 2px;
     background-color: map-get($button, "reset", "bg");
     color: map-get($button, "reset", "text");

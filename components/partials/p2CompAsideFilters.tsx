@@ -15,8 +15,9 @@ import CompButtonGroup from "./p2CompButtonGroup";
 import CompSliderfil from "./p2CompSliderfil";
 import { useDrag, useDrop } from 'react-dnd';
 
-const AsideFilters = ({id, index ,fromHomeData,filDispat}:
+const AsideFilters = ({id, index ,window,fromHomeData,filDispat}:
                           {   id: string, index: number,
+                              window: string,
                               fromHomeData:{filterInit:FilterStateObj,sldrInit:[number,number]},
                               filDispat:Function,styleJs:{[key:string]:string}
                           }) => {
@@ -36,12 +37,18 @@ const AsideFilters = ({id, index ,fromHomeData,filDispat}:
     const rateValue: Array<string> = ['고정', '변동'];
     const rateClicked = selectArr(rateValue, INIT_FILST.category, 'rate');
     const [clickArrRate, setClickArrRate] = useState(rateClicked);
+
+    const loanClsValue: Array<string> = ['담보', '브릿지','한도','부가세','PF','기타(대출)'];
+    const loanClsClicked = selectArr(loanClsValue, INIT_FILST.category, 'loancls');
+    const [clickLoanCls, setClickLoanCls] = useState(loanClsClicked);
+    console.log("loanClsClicked",loanClsClicked)
     // slider component dependent def
     const [sldrval, setSldrval] = useState(fromHomeData.sldrInit)
 
     // button component def
     const iTButton = useMemo(() => {
         return (<CompButtonGroup
+            window={window}
             label={LABELS['it']}
             buttons={itValue}
             isclicked={clickArrIt}
@@ -76,6 +83,16 @@ const AsideFilters = ({id, index ,fromHomeData,filDispat}:
             filDispat={filDispat}
         />)
     }, [clickArrRate])
+    const loanClsButton = useMemo(() => {
+        return (<CompButtonGroup
+            label={LABELS['loancls']}
+            buttons={loanClsValue}
+            isclicked={clickLoanCls}
+            setClick={setClickLoanCls}
+            filDispat={filDispat}
+        />)
+    }, [clickLoanCls])
+
     // slider component def
     const lamtSldr = useMemo(() => {
         return (
@@ -89,6 +106,7 @@ const AsideFilters = ({id, index ,fromHomeData,filDispat}:
     }, [sldrval])
     return (
          <aside className={styles.aside}>
+                    {loanClsButton}
                     {iTButton}
                     {aTButton}
                     {seniorstrButton}

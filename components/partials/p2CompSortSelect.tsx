@@ -1,14 +1,35 @@
 import {ReactNode, useContext, useEffect, useState} from "react";
-
 import {Select} from "antd";
 import {SORT_LABELS} from "../const/p2Constant";
 import {getKeyByValue} from "../const/p2Utils"
+import {windowContext} from "../../pages/detail";
 
 const {Option} = Select;
 const CompSortSelect = ({curntOption, desAsc, setcurntOption, setdesAsc}:
                         { curntOption: string, desAsc: boolean, setcurntOption: Function, setdesAsc: Function }) => {
 
-    // console.log(curntOption, desAsc,setcurntOption, setdesAsc)
+    function styleGen(windowStatus: string|undefined) {
+        switch (windowStatus) {
+            case '':
+                return {styleJs:{},divJs:{},size:'',fontSize:''}
+            case 'large':
+                return {styleJs:{width: "11%", fontSize: '1em'},
+                        }
+            case 'medium':
+                return {styleJs:{width: "15%",fontSize: '1em'},
+                        }
+            case 'small':
+                return {styleJs:{width: "15%", fontSize: '1em'},
+                        }
+            default:
+                return {styleJs:{}}
+        }
+    }
+    var styleJs,divJs,size,fontSize
+    const {windowStatus} = useContext(windowContext);
+    ({styleJs} = styleGen(windowStatus))
+
+
     const sortOptions = Object.keys(SORT_LABELS).map((k) => {
         // @ts-ignore
         return (<Option value={SORT_LABELS[k]}></Option>)
@@ -16,16 +37,19 @@ const CompSortSelect = ({curntOption, desAsc, setcurntOption, setdesAsc}:
     return (
         <>
             <Select
+                key ={'sort1'}
                 defaultValue={curntOption}
-                style={{width: 120}}
+                style={styleJs}
                 bordered={false}
                 onChange={(value: string) => {
                     console.log(`selected ${value}`)
                     setcurntOption(value)}}>
                 {sortOptions}
             </Select>
-            <Select defaultValue={desAsc}
-                    style={{width: 120}}
+            <Select
+                    key ={'sort2'}
+                    defaultValue={desAsc}
+                    style={styleJs}
                     bordered={false}
                     onChange={(value: string) => {
                         console.log(`selected ${value}`)
