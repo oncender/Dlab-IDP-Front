@@ -92,21 +92,21 @@ interface queryParam {
 export function detailQueryParser(q: queryParam) {
     let initialFilterState = INIT_FILST;
     let category = INIT_FILST.category;
-
+    console.log("query",q)
     if (!q || Object.keys(q).length ===0) {
         return INIT_FILST;
     } 
-    if('it' in q) {
+    if('loancls' in q) {
         category = category.filter((item)=>{
-            return item.name !== "it"
+            return item.name !== "loancls"
         });
-        category.push({'name':'it', 'value':q.it!})
+        category.push({'name':'loancls', 'value':q.loancls.replace("대출","")!})
     }
     if('seniorstr' in q) {
         category = category.filter((item)=>{
             return item.name !== "seniorstr"
         });
-        category.push({'name':'seniorstr', 'value':q.seniorstr!})
+        category.push({'name':'seniorstr', 'value':q.seniorstr.replace("순위","")!})
     }
 
     initialFilterState.category = category;

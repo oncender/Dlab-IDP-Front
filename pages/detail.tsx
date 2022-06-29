@@ -48,11 +48,12 @@ const Detail: NextPage = ({
     const router = useRouter();
     const filterInitialValues = detailQueryParser(router.query);
     const fromHomeData = {filterInit: filterInitialValues, sldrInit: INIT_DEBT}
-
+    console.log("hellow",fromHomeData)
     /* State & Reducer DEF */
     // all category reducer def
     // @ts-ignore
     const [filterInfo, filDispat] = useReducer(filReducer, fromHomeData.filterInit);
+    console.log('filterInfo',filterInfo)
     // for window comp size handle
     const windowNow = useWindowSize()
     function windowSizeStr(windowNow:{width:number|undefined,height:number|undefined}):string{
@@ -105,6 +106,8 @@ const Detail: NextPage = ({
     const [selctState, setSelect] = useState(SORT_LABELS['it']);
     const [ascState, setAscState] = useState(true);
     // const [slcClickState,setSlcClickState]:[ReactNode[],Function] = useState([]);
+    // chart component dependent param def
+
     // chart component dependent param def
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]) => {
         setRowCount(data1.length)
@@ -166,7 +169,6 @@ const Detail: NextPage = ({
         // console.log(alldata['one'], alldata['two'])
         return alldata
     }
-
     async function getGraph() {
         // setter: State setter callback, should be given in the Hook or elsewhere,
         let params = apiParamGen(filterInfo)
@@ -191,7 +193,7 @@ const Detail: NextPage = ({
             res1 = await axios(reqConfig1);
         } catch (e) {
             if (axios.isCancel(e)) {
-                console.log("error2", e)
+                console.log("error1", e)
             }
         }
         try {
@@ -422,7 +424,6 @@ const Detail: NextPage = ({
                             {cardComps}
                         </div>
                         <div className={styles.rightBlankJs} key = "rightblank" index={3} />
-
                     </div>
                 </DndProvider>
             </windowContext.Provider>

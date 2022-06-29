@@ -14,10 +14,10 @@ const Home: NextPage = () => {
   const [loading, setLoading] = useState(false);
 
   const handleLoanPriority = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setLoanPriority(event.target.value);
+    setLoanPriority(prioritySelectValue.filter((val)=>(val.value==event.target.value))[0].key)
   }
   const handleLoanType = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setLoanType(event.target.value);
+    setLoanType(loanTypeSelectValue.filter((val)=>(val.value==event.target.value))[0].key)
   }
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -116,7 +116,7 @@ const Home: NextPage = () => {
                 timing="ease-in-out"
                 iteration="infinite"
                 fillMode="none">
-                <Link href={`/detail?it=${loanType}&seniorstr=${loanPriority}`}>
+                <Link href={`/detail?loancls=${loanType}&seniorstr=${loanPriority}`} as={'/detail'}>
                   <a className="text-[#45f0a8] text-3xl underline underline-offset-4 decoration-2">
                     더 상세한 정보 확인하기 →
                   </a>

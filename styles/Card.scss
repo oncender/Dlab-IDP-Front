@@ -87,7 +87,11 @@
 
           &[custom=col20] {
             font-size: 1.5em;
-          }
+            & .ant-card-meta-description {
+            color: #1C6FBC;
+          };
+          };
+
         ;
 
           &[custom=col21] {
@@ -110,7 +114,7 @@
             font-size: 1.5em;
 
             .ant-card-meta-description {
-              color: #1C6FBC;
+              //color: #1C6FBC;
             }
           }
         }

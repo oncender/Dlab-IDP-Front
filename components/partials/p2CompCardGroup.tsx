@@ -14,8 +14,9 @@ const {Meta} = Card;
 
 const CartPart = ({keystring, cardData}:
                       { keystring: string, cardData: cardComp, }) => {
+    if (!cardData.sdaterate){
+        return};
     const image_url = cardData.img ? cardData.img : "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
-
     const col4Data = [`${cardData.loanamt}억`, `${cardData.aum}억`, `${cardData.sdaterate.toFixed(2)}%`, cardData.duration]
 
 
