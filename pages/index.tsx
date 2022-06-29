@@ -1,26 +1,32 @@
 import React, { useState } from 'react';
 import type { NextPage } from 'next';
+import Link from 'next/link';
+import MovingComponent from 'react-moving-text';
 import tableStyles from "../styles/Table.module.scss";
 import mainStyles from "../styles/main.module.scss";
-import HashLoader from 'react-spinners/HashLoader';
+import GridLoader from 'react-spinners/GridLoader';
 import BigSelect from '../components/partials/p1CompBigSelectMain';
 
+
 const Home: NextPage = () => {
-  const [loanPriority, setLoanPriority] = useState('선');
+  const [loanPriority, setLoanPriority] = useState('선순위');
   const [loanType, setLoanType] = useState('담보대출');
   const [loading, setLoading] = useState(false);
 
-  const handleLoanPriority = (value: string) => {
-    setLoanPriority(value);
+  const handleLoanPriority = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setLoanPriority(event.target.value);
+  }
+  const handleLoanType = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setLoanType(event.target.value);
   }
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     const min=1500, max=4500;
     const term = Math.floor(Math.random() * (max-min) + min) // 0.5 ~ 2.5 second
     setLoading(true)
-    console.log(term)
     setTimeout(() => {setLoading(false)}, term)
   }
+
   const prioritySelectValue = [
       { key: '선', value : '선순위'},
       { key: '중', value : '중순위'},
@@ -33,7 +39,7 @@ const Home: NextPage = () => {
 
   return (
     <div className="w-full">
-      <div className="h-screen lg:h-192 bg-blue-500">
+      <div className="h-auto lg:h-192 bg-blue-500">
         <div className="flex justify-center h-full bg-cover bg-center" 
           style={{backgroundImage: "url(background-01.png)"}}>
           <div className="lg:flex h-full w-full justify-around">
@@ -47,12 +53,15 @@ const Home: NextPage = () => {
             </div>
             <div className="flex h-1/2 justify-center items-center lg:h-full lg:items-end">
               <div className="flex-col">
-                <div className="flex mb-4">
-                  <BigSelect options={prioritySelectValue}/>
-                  <BigSelect options={loanTypeSelectValue}/>
+                <div className="flex mt-12 mb-4 justify-center lg:mt-0 lg:justify-start">
+                  <BigSelect options={prioritySelectValue} handleChange={handleLoanPriority} />
+                  <BigSelect options={loanTypeSelectValue} handleChange={handleLoanType} />
                 </div>
                 <div className={mainStyles.mainDesc2}>적정이자가 궁금하신가요?</div>
-                <button className="bg-[#67FFBF] w-full h-16 text-2xl sm:w-72 sm:h-16 sm:text-3xl sm:m-10 md:w-96 md:h-20 md:text-4xl md:mb-20 rounded-lg text-blue-900 transition hover:scale-110 hover:duration-150 hover:ease-in-out hover:bg-[#BAFBE0]"
+                <button className="bg-[#67FFBF] w-full h-12 text-2xl my-4 mb-6
+                sm:w-72 sm:h-16 sm:text-3xl sm:m-10 
+                md:w-96 md:h-20 md:text-4xl md:mb-20 
+                rounded-lg text-blue-900 transition hover:scale-110 hover:duration-150 hover:ease-in-out hover:bg-[#BAFBE0]"
                   onClick={handleClick}>
                   지금 확인해보기
                 </button>
@@ -64,12 +73,14 @@ const Home: NextPage = () => {
       </div>
 
       <div className="w-full">
-        <div className="flex justify-center content-center">
-          {/* <Spin spinning={loading} size="large">
-          어떤 컨텐츠
-          </Spin> */}
+        <div className="flex justify-center items-center">
+          {loading?
+          <div className="my-20 transition transform delay-150 duration-300">
+            <GridLoader loading={loading} color='#67FFBF' size={30} />
+          </div>
+          :
           <div className={tableStyles.modelTable}>
-            <table >
+            <table>
               <thead>
               <tr>
                 <th>구분</th>
@@ -79,20 +90,42 @@ const Home: NextPage = () => {
               </thead>
               <tbody>
               <tr>
-                <td>1.1 ~ 2.0</td>
+                <td>은행</td>
                 <td>1.1 ~ 2.0</td>
                 <td>1.1 ~ 2.0</td>
               </tr>
               <tr>
+                <td>보험</td>
                 <td>1.1 ~ 2.0</td>
+                <td>1.1 ~ 2.0</td>
+              </tr>
+              <tr>
+                <td>기타</td>
                 <td>1.1 ~ 2.0</td>
                 <td>1.1 ~ 2.0</td>
               </tr>
               </tbody>
             </table>
+            <p>⚠️ 경고문구 여기에 넣어서 잘 보이는지 확인해보기</p>
+            <div className="mt-8 text-right">
+              <MovingComponent
+                type="pulse"
+                duration="1500ms"
+                delay="1s"
+                direction="alternate"
+                timing="ease-in-out"
+                iteration="infinite"
+                fillMode="none">
+                <Link href={`/detail?it=${loanType}&seniorstr=${loanPriority}`}>
+                  <a className="text-[#45f0a8] text-3xl underline underline-offset-4 decoration-2">
+                    더 상세한 정보 확인하기 →
+                  </a>
+                </Link>
+              </MovingComponent>
+            </div>
           </div>
-          <HashLoader loading={loading} color='#67FFBF' size={100} />
-          </div>
+          }
+        </div>
       </div>
     </div>
   )

@@ -14,7 +14,7 @@ export const INIT_FILST: FilterStateObj = {
         {'name':'it','value':'실물'},
         {'name':'it','value':'대출'},
         {'name':'seniorstr','value':'선'},
-        {'name':'at','value':'중'},
+        // {'name':'at','value':'중'},
         {'name':'at','value':'오피스'},
         {'name':'at','value':'호텔'},
         {'name':'rate','value':'고정'},

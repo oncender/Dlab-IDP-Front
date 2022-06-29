@@ -1,5 +1,5 @@
 import {CategoryObj, FilterStateObj, FloatObj} from "./p2Usertyp";
-
+import { INIT_FILST, INIT_DEBT } from "./p2Constant"
 
 export function zip(a1: any, a2: any){
     return a1.map((x, i) => [x, a2[i]]);
@@ -84,3 +84,31 @@ export function urlGen(targetUrl:string,params:any):string{
              .join('&');
     return targetUrl+"?" + query;
 }
+
+interface queryParam {
+    it?: string;
+    seniorstr?: string;
+}
+export function detailQueryParser(q: queryParam) {
+    let initialFilterState = INIT_FILST;
+    let category = INIT_FILST.category;
+
+    if (!q || Object.keys(q).length ===0) {
+        return INIT_FILST;
+    } 
+    if('it' in q) {
+        category = category.filter((item)=>{
+            return item.name !== "it"
+        });
+        category.push({'name':'it', 'value':q.it!})
+    }
+    if('seniorstr' in q) {
+        category = category.filter((item)=>{
+            return item.name !== "seniorstr"
+        });
+        category.push({'name':'seniorstr', 'value':q.seniorstr!})
+    }
+
+    initialFilterState.category = category;
+    return initialFilterState;
+} 
