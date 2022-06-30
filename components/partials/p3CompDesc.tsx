@@ -17,7 +17,7 @@ const LargeFundDesc: React.FC = ({ data, display }: { data:any, display: boolean
                     <Descriptions.Item label="대주명분류" span={3}>{data.data.lpt}</Descriptions.Item>
                     <Descriptions.Item label="대출순위" span={3}>{data.data.seniorstr}</Descriptions.Item>
                     <Descriptions.Item label="대출용도" span={3}>{data.data.loanuse}</Descriptions.Item>
-                    <Descriptions.Item label="대출종류" span={3}>{data.data.loancls}</Descriptions.Item>
+                    <Descriptions.Item label="대출종류" span={3}>{data.data.loantype}</Descriptions.Item>
                     <Descriptions.Item label="대출분류" span={3}>{data.data.loancls}</Descriptions.Item>
                     <Descriptions.Item label="토지주소" span={3}>{data.data.addr}</Descriptions.Item>
                     <Descriptions.Item label="상환방식" span={3}>{data.data.loanrpy}</Descriptions.Item>
