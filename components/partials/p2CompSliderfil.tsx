@@ -4,7 +4,7 @@ import {Slider} from "antd";
 import {FILTER_ACTION, LABELS} from "../const/p2Constant";
 import { getKeyByValue } from "../const/p2Utils"
 
-// todo 반응형으로 slider 고치기
+
 const CompSliderfil = ({label,curntval,mmVal,setSlider,filDispat} :
     {label: string, curntval: [number,number], mmVal: [number,number], setSlider: Function, filDispat: Function}) => {
     let v2len = `${curntval[1]/1E8}`.length

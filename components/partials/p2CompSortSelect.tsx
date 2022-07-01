@@ -32,7 +32,7 @@ const CompSortSelect = ({curntOption, desAsc, setcurntOption, setdesAsc}:
 
     const sortOptions = Object.keys(SORT_LABELS).map((k) => {
         // @ts-ignore
-        return (<Option value={SORT_LABELS[k]}></Option>)
+        return (<Option key={"sortOptions"+SORT_LABELS[k]} value={SORT_LABELS[k]}></Option>)
     })
     return (
         <>
@@ -54,8 +54,8 @@ const CompSortSelect = ({curntOption, desAsc, setcurntOption, setdesAsc}:
                     onChange={(value: string) => {
                         console.log(`selected ${value}`)
                         setdesAsc(value)}}>
-                <Option value={true}>오름차순</Option>
-                <Option value={false}>내림차순</Option>
+                <Option key="sortOptionsAsc" value={true}>오름차순</Option>
+                <Option key="sortOptionsDesc" value={false}>내림차순</Option>
             </Select>
         </>)
 }

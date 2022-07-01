@@ -42,7 +42,7 @@ const Header = () => {
 
           {/* Header Title */}
           <div className="flex">
-            <p className="text-2xl" style={{'color':'white','font-weight':'1000'}}>IGIS Next Loan</p>
+            <p className="text-2xl" style={{'color':'white','fontWeight':'1000'}}>IGIS Next Loan</p>
           </div>
           {/* Site navigation */}
           <nav className="flex">

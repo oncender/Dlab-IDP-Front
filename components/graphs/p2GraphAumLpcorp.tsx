@@ -1,7 +1,7 @@
 import {Column, G2} from '@ant-design/plots';
 import {Button} from "antd";
 
-const AumLpcorp = ({data, chartClc, onClick}: { data: any, chartClc: boolean, onClick: Function }) => {
+const AumLpcorp = ({data, chartClc, onClick}: { data: any, chartClc: boolean, onClick: Function,noEtc: Function }) => {
     G2.registerInteraction('element-link', {
         start: [
             {
@@ -21,7 +21,7 @@ const AumLpcorp = ({data, chartClc, onClick}: { data: any, chartClc: boolean, on
         return `${(item.loanamt)}억`
     }
     const onClickF = (item) => {
-        return `${(item.loanamt * 100).toFixed(2)}%`;
+        return `${parseFloat(item.loanamt * 100).toFixed(2)}%`;
     }
     configClickData['isPercent'] = chartClc ? false : true
     configClickData['content'] = chartClc ? nonClickF : onClickF
@@ -68,6 +68,7 @@ const AumLpcorp = ({data, chartClc, onClick}: { data: any, chartClc: boolean, on
         }
     };
     let bl = !chartClc ? "-160px" : "-121px"
+    let bll = !chartClc ? "-120px" : "-120px"
     return (
         <div style={{"display": 'flex', "flexFlow": 'column nowrap', "justifyContent": "space-between"}}>
             <Button
@@ -75,9 +76,19 @@ const AumLpcorp = ({data, chartClc, onClick}: { data: any, chartClc: boolean, on
                     "alignSelf": 'flex-end', 'order': 1, "borderRadius": "0.5rem",
                     "marginBotton": '10px', 'left': `${bl}`, "bottom": '135px', "zIndex": 1
                 }}
-
                 key={'grptwoCall'}
                 onClick={() => (onClick(!chartClc))}
+                shape='default'>
+                {chartClc ? 'nominal' : '%'}
+            </Button>
+            <Button
+                style={{
+                    "alignSelf": 'flex-end', 'order': 1, "borderRadius": "0.5rem",
+                    "marginBotton": '10px', 'left': `${bll}`, "bottom": '135px', "zIndex": 1
+                }}
+
+                key={'noEtc'}
+                onClick={{}}
                 shape='default'>
                 {chartClc ? 'nominal' : '%'}
             </Button>

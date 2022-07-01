@@ -5,10 +5,27 @@ export function zip(a1: any, a2: any){
     return a1.map((x, i) => [x, a2[i]]);
 }
 
-export function parseFloatDef(val,defaultval){
-    return parseFloat(val) ? parseFloat(val) : defaultval
+export function parseFloatDef(val:string,defaultval:any){
+    let newval = val.replace(/,/g,"")
+    return parseFloat(newval) ? parseFloat(newval) : defaultval
+}
+export function parseIntDef(val:string,defaultval:any){
+    let newval = val.replace(/,/g,"")
+    return parseInt(newval) ? parseInt(newval) : defaultval
 }
 
+export function windowSizeStr(windowNow:{width:number|undefined,height:number|undefined}):string{
+        var {width,height} = windowNow
+        if (width && (width > 1180)){
+            return 'large'
+        } else if (width && (width >830)){
+            return 'medium'
+        } else if (width){
+            return 'small'
+        } else {
+            return ''
+        }
+    }
 export function groupbyCount(obArr: Array<any>, countBy: number) {
     return obArr.reduce(
         (r, o, idx) => {

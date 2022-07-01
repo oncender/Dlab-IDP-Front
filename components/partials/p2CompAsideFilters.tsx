@@ -48,7 +48,6 @@ const AsideFilters = ({id, index ,window,fromHomeData,filDispat}:
     // button component def
     const iTButton = useMemo(() => {
         return (<CompButtonGroup
-            window={window}
             label={LABELS['it']}
             buttons={itValue}
             isclicked={clickArrIt}

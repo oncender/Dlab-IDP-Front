@@ -64,9 +64,14 @@ export const CARD_LABELS = {
     'lpcorp':"대주명회사",
     'an':"자산명",
     'loanamt':"대출약정금",
-    'aum':"대출총액",
+    'loan':"대출총액",
     'sdaterate':"체결이자",
     'duration':"듀레이션",
+    'at' : '자산 유형',
+    'it' : '투자 유형',
+    'seniorstr': '대출 순위',
+    'rate': '금리 종류',
+    'loancls':'대출 분류',
     }
 
 export const APIURL = {
