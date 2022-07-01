@@ -3,9 +3,9 @@ import {Divider, Layout} from 'antd'
 
 import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode, createContext} from 'react'
 import type {NextPage, GetServerSideProps, InferGetServerSidePropsType} from 'next'
-import { useRouter } from 'next/router'
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import {useRouter} from 'next/router'
+import {DndProvider} from 'react-dnd';
+import {HTML5Backend} from 'react-dnd-html5-backend';
 
 // Hook Import
 import {filReducer} from "../components/reducers/FilterReducer";
@@ -21,7 +21,16 @@ import CompCardGroup from "../components/partials/p2CompCardGroup";
 import CompSortSelect from "../components/partials/p2CompSortSelect";
 // Component dependent Import
 import {APIURL, INIT_FILST, INIT_DEBT, LABELS, MM_DEBT, SORT_LABELS, ItemTypes} from "../components/const/p2Constant"
-import {parseFloatDef, apiParamGen, groupbyKeys, sortObjectVal, urlGen, detailQueryParser} from "../components/const/p2Utils";
+import {
+    windowSizeStr,
+    apiParamGen,
+    groupbyKeys,
+    sortObjectVal,
+    urlGen,
+    detailQueryParser,
+    parseFloatDef,
+    parseIntDef
+} from "../components/const/p2Utils";
 import {
     fromApiV1,
     rateAtData,
@@ -36,41 +45,27 @@ import CompDragDrop from "../components/partials/p2CompDragDrop";
 import Header from '../components/Header'
 import Footer from "../components/Footer";
 
-export const windowContext = createContext({windowStatus:''});
+export const windowContext = createContext({windowStatus: ''});
 
 const Detail: NextPage = ({
-    chartData,
-    cardData,
-    //fromHomeData
-    }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+                              chartData,
+                              cardData,
+                              //fromHomeData
+                          }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
 
     // Get URL parameters via next router and setting up filter states
     const router = useRouter();
     const filterInitialValues = detailQueryParser(router.query);
     const fromHomeData = {filterInit: filterInitialValues, sldrInit: INIT_DEBT}
-    console.log("hellow",fromHomeData)
+
     /* State & Reducer DEF */
     // all category reducer def
     // @ts-ignore
     const [filterInfo, filDispat] = useReducer(filReducer, fromHomeData.filterInit);
-    console.log('filterInfo',filterInfo)
     // for window comp size handle
     const windowNow = useWindowSize()
-    function windowSizeStr(windowNow:{width:number|undefined,height:number|undefined}):string{
-        var {width,height} = windowNow
-        if (width && (width > 1180)){
-            return 'large'
-        } else if (width && (width >830)){
-            return 'medium'
-        } else if (width){
-            return 'small'
-        } else {
-            return ''
-        }
-    }
-    const windowContextval =  windowSizeStr(windowNow)
+    const windowContextval = windowSizeStr(windowNow)
     // chartData State
-    const [rowCount, setRowCount] = useState(0);
     const [chartD, setCharD] = useState(chartData);
     const [chartClc, setChartClc] = useState(false);
     // cardData State
@@ -87,11 +82,11 @@ const Detail: NextPage = ({
                 if (cardDOM) {
                     var cardWidth = parseFloat(window.getComputedStyle(cardDOM).width)
                     var cardfontSize = parseInt(window.getComputedStyle(cardDOM).fontSize)
-                    console.log("cardWidth",cardWidth,cardfontSize,parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1)
-                    var fnPlace = 4*parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1
-                    var anPlace = 4*parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
-                    var lpcorpPlace = 4*parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
-                    console.log('result',{fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
+                    console.log("cardWidth", cardWidth, cardfontSize, parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1)
+                    var fnPlace = 4 * parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1
+                    var anPlace = 4 * parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
+                    var lpcorpPlace = 4 * parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
+                    console.log('result', {fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
                     if (fnPlace != cardFontRel.fn && anPlace != cardFontRel.an && lpcorpPlace != cardFontRel.lpcorp) {
                         setcardFontRel({fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
                         // console.log("ccc", {fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
@@ -101,7 +96,6 @@ const Detail: NextPage = ({
         }, [windowNow]
     )
 
-
     // sorting State
     const [selctState, setSelect] = useState(SORT_LABELS['it']);
     const [ascState, setAscState] = useState(true);
@@ -110,7 +104,6 @@ const Detail: NextPage = ({
 
     // chart component dependent param def
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]) => {
-        setRowCount(data1.length)
         console.log("length in preProcessChart", data2.length, data1.length)
         let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: [], two: []}
         // @ts-ignore
@@ -119,7 +112,7 @@ const Detail: NextPage = ({
                 "체결이자": parseFloatDef(item.sdaterate, null),
                 "자산 유형": item.at,
                 "대출 체결일": item.loandate,
-                "대출약정금": parseFloatDef(item.loanamt, null)
+                "대출약정금": parseIntDef(item.loanamt, null) / 1E8,
             }
         });
 
@@ -127,7 +120,7 @@ const Detail: NextPage = ({
             return {
                 "lpcorp": item.lpcorp,
                 "loandate": item.loandate.slice(0, 4),
-                "loanamt": parseFloatDef(item.loanamt, 0)
+                "loanamt": parseIntDef(item.loanamt, 0) / 1E8
             }
         });
 
@@ -149,9 +142,7 @@ const Detail: NextPage = ({
         // top 10 copr select
         const topn: rateAtData[] = data2.filter((val) => {
             return topNcorp.has(val["lpcorp"])
-        }).sort(
-            (a, b) => sortObjectVal(a, b, 'loandate')
-        )
+        });
         // @ts-ignore
         // non top 10 copr should be replaced to "기타"
         const nontopn: rateAtData[] = groupbyKeys(data2.filter((val) => {
@@ -159,16 +150,17 @@ const Detail: NextPage = ({
             }),
             'loanamt', ['loandate']).map((item) => {
                 return {
-                    "lpcorp": "기타", "loandate": item.loandate, "loanamt": item.loanamt
+                    "lpcorp": "기타(상위 10개 대주 제외)", "loandate": item.loandate, "loanamt": item.loanamt
                 }
             }
-        ).sort(
+        )
+        alldata['two'] = topn.concat(nontopn).sort(
             (a, b) => sortObjectVal(a, b, 'loandate')
         )
-        alldata['two'] = topn.concat(nontopn)
         // console.log(alldata['one'], alldata['two'])
         return alldata
     }
+
     async function getGraph() {
         // setter: State setter callback, should be given in the Hook or elsewhere,
         let params = apiParamGen(filterInfo)
@@ -235,24 +227,40 @@ const Detail: NextPage = ({
 
         }
 
-        const compData: cardComp[] = data.map((val) => {
+        if (data.data[0]){
+            console.log("Card Data", data.data[1].loan,parseIntDef(data.data[1].loan));
+        }
+
+        const compData: cardComp[] = data.data.map((val) => {
+            console.log('part',parseIntDef(val.loan, null));
             return {
                 fn: val.fn,
                 lpcorp: val.lpcorp,
                 an: val.an,
-                aum: parseFloatDef(val.aum, null),
-                loanamt: parseFloatDef(val.loanamt, null),
-                sdaterate: parseFloatDef(val.sdaterate, null),
-                duration: durationParser(parseFloatDef(val.duration, 0)),
+                loan: parseInt(parseIntDef(val.loan, null) / 1E8),
+                loanamt: parseInt(parseIntDef(val.loanamt, null) / 1E8),
+                sdaterate: parseIntDef(val.sdaterate, null),
+                duration: durationParser(parseIntDef(val.duration, 0)),
                 img: imagePath(val.img),
                 fc: val.fc,
                 idx: val.idx,
+                loancls: val.loancls,
+                seniorstr: val.seniorstr,
+                it: val.it,
+                at: val.at,
+                rate: val.rate,
             }
         })
+        if (compData[0]){
+            console.log("Card Data Prepro", compData[0].loanamt);
+        }
+
         return {
             data: compData,
-            hasMore: true
+            hasMore: (data.rC > cardPage * 10) ? true : false,
+            rcn: data.rC
         }
+
     }
 
     async function getCardPage(ret: boolean = true) {
@@ -276,11 +284,12 @@ const Detail: NextPage = ({
             }
         }
         // @ts-ignore
-        res = preProcessCard(res.data.data as fromApiV1[])
+        res = preProcessCard(res.data)
+
         if (ret) {
             return res;
         } else {
-            apiDispatch({type: 'SUCCESS', data: [...res.data], hasMore: res.hasMore})
+            apiDispatch({type: 'SUCCESS', data: [...res.data], hasMore: res.hasMore, rcn: res.rcn})
         }
     }
 
@@ -321,22 +330,12 @@ const Detail: NextPage = ({
                            onClick={setChartClc}
         />)
     }, [chartD.two, chartClc])
-    const rowCountResult = useMemo(() => {
-        return (
-            <div className={styles.title}>
-                <span>총 대출건수는 </span>
-                <span><b>{rowCount}</b></span>
-                <span>건 입니다.</span>
-            </div>
-        )
-    }, [rowCount])
-
     const solSect = (<CompSortSelect curntOption={selctState} desAsc={ascState}
                                      setcurntOption={setSelect} setdesAsc={setAscState}/>)
     // level 0
     const asideFil = useMemo(() => {
         return (
-            <div className={styles.asideFiltersJs} key ="asidefilterjs" index={1}>
+            <div className={styles.asideFiltersJs} key="asidefilterjs" index={1}>
                 <AsideFilters
                     fromHomeData={fromHomeData}
                     filDispat={filDispat}
@@ -367,9 +366,13 @@ const Detail: NextPage = ({
 
     const cardComps = useMemo(() => {
             return (
-                <div className={styles.card} >
+                <div className={styles.card}>
                     <span className={styles.filter}>
-                        {rowCountResult}
+                        <div className={styles.title}>
+                            <span>총 대출건수는 </span>
+                            <span><b>{apiState.rcn}</b></span>
+                            <span>건 입니다.</span>
+                        </div>
                         <div className={styles.sort}>
                             {solSect}
                         </div>
@@ -385,7 +388,7 @@ const Detail: NextPage = ({
                     </div>
                     </span>
                 </div>)
-        }, [apiState.data, rowCount,cardFontRel]
+        }, [apiState.data, cardFontRel]
     )
     //cardFontRel
 
@@ -396,38 +399,37 @@ const Detail: NextPage = ({
     useEffect(() => {
         // after filter updated, Graph should be reloaded
         getGraph();
-        apiDispatch({type: 'CLEAR'})
+        setStart(true)
+        if (cardPage != 1) {
+            setCardPage(1)
+        } else {
+            getCardPage(false)
+        }
+
         onMoveToElement()
         return (() => {
             // after filter updated, CardPage should be reloaded
-            setStart(true)
-            if (cardPage != 1) {
-                setCardPage(1)
-            } else {
-                getCardPage(false)
-            }
-
         })
     }, [filterInfo])
 
 
     return (
         <div>
-            <Header />
-            <windowContext.Provider value={{windowStatus:windowContextval}}>
+            <Header/>
+            <windowContext.Provider value={{windowStatus: windowContextval}}>
                 <DndProvider backend={HTML5Backend}>
                     <div className={styles.sectionContents}>
-                        <div className={styles.leftBlankJs} key ='leftblank' index={0}/>
+                        <div className={styles.leftBlankJs} key='leftblank' index={0}/>
                         {asideFil}
                         <div className={styles.contentJs} key="contents_all" index={2}>
                             {chartComps}
                             {cardComps}
                         </div>
-                        <div className={styles.rightBlankJs} key = "rightblank" index={3} />
+                        <div className={styles.rightBlankJs} key="rightblank" index={3}/>
                     </div>
                 </DndProvider>
             </windowContext.Provider>
-            <Footer />
+            <Footer/>
         </div>
     )
 }

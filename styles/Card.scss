@@ -95,7 +95,7 @@
         ;
 
           &[custom=col21] {
-            font-size: 2em;
+            font-size: 1.5em;
             font-weight: 1000;
             @if $size == 'large' {
               margin-bottom: 10px
@@ -105,7 +105,8 @@
             overflow-x: hidden;
 
             .ant-card-meta-description {
-              color: #3F3F3F;
+              //color: #3F3F3F;
+              color: #1C6FBC;
             }
           }
         ;

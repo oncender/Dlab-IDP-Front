@@ -18,6 +18,7 @@ interface ApiFlowObj{
     loading: boolean
     data: any
     error: boolean
+    rcn: number
   }
 interface ActionObj{
     typ : string,
@@ -53,17 +54,23 @@ interface cardComp{
     fn:string
     lpcorp:string
     an:string
-    aum:number
+    loan:number
     sdaterate:number
     duration:string
     loanamt:number
     idx: string
-    fc:string
+    fc:string,
+    loancls:string,
+    seniorstr: string,
+    it:string,
+    at:string,
+    rate:string,
 }
 
 interface pageCountTyp{
     data:cardComp[],
-    hasMore:boolean
+    hasMore:boolean,
+    rcn:number
 }
 
 
