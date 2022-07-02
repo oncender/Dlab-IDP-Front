@@ -41,7 +41,7 @@ const AsideFilters = ({id, index ,window,fromHomeData,filDispat}:
     const loanClsValue: Array<string> = ['담보', '브릿지','한도','부가세','PF','기타(대출)'];
     const loanClsClicked = selectArr(loanClsValue, INIT_FILST.category, 'loancls');
     const [clickLoanCls, setClickLoanCls] = useState(loanClsClicked);
-    console.log("loanClsClicked",loanClsClicked)
+
     // slider component dependent def
     const [sldrval, setSldrval] = useState(fromHomeData.sldrInit)
 

@@ -38,7 +38,7 @@ import {
     cardComp,
     pageCountTyp,
     ApiFlowObj,
-    FilterStateObj
+    FilterStateObj, chartTyp
 } from "../components/const/p2Usertyp"
 import axios from "axios";
 import CompDragDrop from "../components/partials/p2CompDragDrop";
@@ -47,11 +47,7 @@ import Footer from "../components/Footer";
 
 export const windowContext = createContext({windowStatus: ''});
 
-const Detail: NextPage = ({
-                              chartData,
-                              cardData,
-                              //fromHomeData
-                          }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Detail: NextPage = () => {
 
     // Get URL parameters via next router and setting up filter states
     const router = useRouter();
@@ -59,20 +55,34 @@ const Detail: NextPage = ({
     const fromHomeData = {filterInit: filterInitialValues, sldrInit: INIT_DEBT}
 
     /* State & Reducer DEF */
-    // all category reducer def
     // @ts-ignore
-    const [filterInfo, filDispat] = useReducer(filReducer, fromHomeData.filterInit);
-    // for window comp size handle
-    const windowNow = useWindowSize()
-    const windowContextval = windowSizeStr(windowNow)
-    // chartData State
-    const [chartD, setCharD] = useState(chartData);
-    const [chartClc, setChartClc] = useState(false);
-    // cardData State
-    const [cardPage, setCardPage] = useState(1);
+    const [filterInfo, filDispat] = useReducer(filReducer, fromHomeData.filterInit); // all filter variable controller def
+    // Because of async, api request needed to handled with wait logic (filterInfo being updated.)
     const [start, setStart] = useState(false);
-    const [element, onMoveToElement] = useMoveScrool()
-    const [apiState, apiDispatch, _] = useAsyncer(getCardPage, [cardPage,], [], start, setStart);
+
+    // window size getter
+    const windowNow = useWindowSize() // for body window component size handle different card layout
+    const windowContextval = windowSizeStr(windowNow)
+
+    // chartData State
+    const [chartD, setCharD] = useState({one:[],two:[]});  // api request data result
+    const [chartClc, setChartClc] = useState(false);  // chart y data type -> % scale ~ raw numeric value
+    const [chartClcNoEtc, setChartClcNoEtc] = useState(false);  // include '기타' or not
+    const [chartApiState, chartApiDispatch, _, chartclearData] = useAsyncer(getGraph, [], [filterInfo],start, setStart);  // After filterInfo updated, chart data is updated.
+
+    // cardData State
+    const [cardPage, setCardPage] = useState(1);  // used in infinitie scrolling
+    const [scrollTop, onScrollTop] = useMoveScrool()  // after filter is updated, scroll should go to top
+    const [cardApiState, cardApiDispatch, cardfetchData,cardclearData] = useAsyncer(getCardPage, [cardPage,], [filterInfo], start, setStart);  // After cardPage updated, Card data is updated.
+    /*
+    Card data updated when,
+    1. cardPage is updated
+        after infinity scroll event occurs, value of cardpage increased by 1.
+    2. filterInfo is updated(category button selected or float slider value set).
+        if card page is not 1, --> card page setter callback is enough.
+        else
+
+    * */
     const [cardFontRel, setcardFontRel] = useState({fn: 42, an: 56, lpcorp: 56})
 
     useEffect(
@@ -103,7 +113,7 @@ const Detail: NextPage = ({
     // chart component dependent param def
 
     // chart component dependent param def
-    const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]) => {
+    const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]):chartTyp => {
         console.log("length in preProcessChart", data2.length, data1.length)
         let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: [], two: []}
         // @ts-ignore
@@ -157,11 +167,11 @@ const Detail: NextPage = ({
         alldata['two'] = topn.concat(nontopn).sort(
             (a, b) => sortObjectVal(a, b, 'loandate')
         )
-        // console.log(alldata['one'], alldata['two'])
-        return alldata
+        console.log("chartData Prepro:",alldata['one'], alldata['two'])
+        return {data:[alldata],hasMore:false,rcn:0}
     }
 
-    async function getGraph() {
+    async function getGraph(){
         // setter: State setter callback, should be given in the Hook or elsewhere,
         let params = apiParamGen(filterInfo)
         let cancel
@@ -197,7 +207,7 @@ const Detail: NextPage = ({
         }
 
         // @ts-ignore
-        setCharD(preProcessChart(res1.data['datag1'], res2.data['datag2']))
+        return preProcessChart(res1.data['datag1'], res2.data['datag2'])
     }
 
     // card component dependent param def
@@ -226,13 +236,7 @@ const Detail: NextPage = ({
             }
 
         }
-
-        if (data.data[0]){
-            console.log("Card Data", data.data[1].loan,parseIntDef(data.data[1].loan));
-        }
-
         const compData: cardComp[] = data.data.map((val) => {
-            console.log('part',parseIntDef(val.loan, null));
             return {
                 fn: val.fn,
                 lpcorp: val.lpcorp,
@@ -251,9 +255,6 @@ const Detail: NextPage = ({
                 rate: val.rate,
             }
         })
-        if (compData[0]){
-            console.log("Card Data Prepro", compData[0].loanamt);
-        }
 
         return {
             data: compData,
@@ -263,10 +264,11 @@ const Detail: NextPage = ({
 
     }
 
-    async function getCardPage(ret: boolean = true) {
+    async function getCardPage() {
         // setter: State setter callback, should be given in the Hook or elsewhere,
+
         let params = Object.assign({}, apiParamGen(filterInfo),
-            {'pageCount': cardPage});
+            {'pageCount': cardApiState.pagecnt});
         console.log('cardgen', ["http://localhost:8080/", urlGen(APIURL.CARDPAGE, params)].join(""))
         var cancel
         var reqConfig: {} = {
@@ -285,12 +287,7 @@ const Detail: NextPage = ({
         }
         // @ts-ignore
         res = preProcessCard(res.data)
-
-        if (ret) {
-            return res;
-        } else {
-            apiDispatch({type: 'SUCCESS', data: [...res.data], hasMore: res.hasMore, rcn: res.rcn})
-        }
+        return res;
     }
 
     // infinite scroll ref
@@ -299,7 +296,7 @@ const Detail: NextPage = ({
     const lastCardRef = useCallback(
         // observer always refer last card div component
         (node: any) => {
-            if (apiState.loading) return;
+            if (cardApiState.loading) return;
             //
             if (observer.current) { // @ts-ignore
                 observer.current.disconnect();
@@ -307,8 +304,9 @@ const Detail: NextPage = ({
             // if need to more load (hasMore == true), observer redefine & cardPage +1
             // @ts-ignore
             observer.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting && apiState.hasMore) {
-                    setCardPage((prev) => prev + 1);
+                if (entries[0].isIntersecting && cardApiState.hasMore) {
+                    cardfetchData()
+                    // setCardPage((prev) => prev + 1);
                 }
             });
             if (node) {
@@ -316,20 +314,21 @@ const Detail: NextPage = ({
                 observer.current.observe(node);
             }
         },
-        [apiState.loading, apiState.hasMore]
+        [cardApiState.loading, cardApiState.hasMore]
     );
 
     /* Component DEF */
     // level 1
     const chartOne = useMemo(() => {
-        return (<RateAtPlot data={chartD.one}/>)
-    }, [chartD.one])
+        console.log('chartApiState',chartApiState)
+        return (chartApiState.data[0] && <RateAtPlot data={chartApiState.data[0].one}/>)
+    }, [chartApiState.data])
     const chartTwo = useMemo(() => {
-        return (<AumLpcorp data={chartD.two}
+        return (chartApiState.data[0] && <AumLpcorp data={chartApiState.data[0].two}
                            chartClc={chartClc}
                            onClick={setChartClc}
         />)
-    }, [chartD.two, chartClc])
+    }, [chartApiState.data, chartClc])
     const solSect = (<CompSortSelect curntOption={selctState} desAsc={ascState}
                                      setcurntOption={setSelect} setdesAsc={setAscState}/>)
     // level 0
@@ -344,25 +343,12 @@ const Detail: NextPage = ({
         )
     }, [])
 
-    // dnd zero layour def
-    const [zeroArr, setZeroArr] = useState(['chart1', 'chart2']);
-    const [dragAside, setDragAside] = useState(false);
-    const moveContentZero = (contentID: string, toIndex: number) => {
-        const index = zeroArr.indexOf(contentID);
-        let newOrder = [...zeroArr];
-        newOrder.splice(index, 1);
-        newOrder.splice(toIndex, 0, contentID);
-        setZeroArr(newOrder)
-    };
-
-    const chartComps = useMemo(() => {
-        return (
-            <div className={styles.chart} ref={element}>
+    const chartComps =  (
+            <div className={styles.chart} ref={scrollTop}>
                 {chartOne}
                 {chartTwo}
             </div>
         )
-    }, [chartD, chartClc])
 
     const cardComps = useMemo(() => {
             return (
@@ -370,7 +356,7 @@ const Detail: NextPage = ({
                     <span className={styles.filter}>
                         <div className={styles.title}>
                             <span>총 대출건수는 </span>
-                            <span><b>{apiState.rcn}</b></span>
+                            <span><b>{cardApiState.rcn}</b></span>
                             <span>건 입니다.</span>
                         </div>
                         <div className={styles.sort}>
@@ -378,17 +364,17 @@ const Detail: NextPage = ({
                         </div>
                     </span>
                     <span className={styles.board}>
-                        <CompCardGroup data={apiState.data}
+                        <CompCardGroup data={cardApiState.data}
                                        refFunc={lastCardRef}
                                        fontRel={cardFontRel}
                         />
                     <div className={styles.boardError}>
-                        {apiState.loading && "로딩중입니다...."}
-                        {apiState.error && "에러발생XXXX"}
+                        {cardApiState.loading && "로딩중입니다...."}
+                        {cardApiState.error && "에러발생XXXX"}
                     </div>
                     </span>
                 </div>)
-        }, [apiState.data, cardFontRel]
+        }, [cardApiState.data, cardFontRel]
     )
     //cardFontRel
 
@@ -398,15 +384,8 @@ const Detail: NextPage = ({
     // filter to api query
     useEffect(() => {
         // after filter updated, Graph should be reloaded
-        getGraph();
         setStart(true)
-        if (cardPage != 1) {
-            setCardPage(1)
-        } else {
-            getCardPage(false)
-        }
-
-        onMoveToElement()
+        onScrollTop()
         return (() => {
             // after filter updated, CardPage should be reloaded
         })
@@ -434,24 +413,24 @@ const Detail: NextPage = ({
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-    // 더미 데이터
-    const chartData: { one: rateAtData[], two: aumLpcorp[] } = {one: [], two: []}
-    // chartData.one = await fetch('https://gw.alipayobjects.com/os/bmw-prod/0b37279d-1674-42b4-b285-29683747ad9a.json')
-    //     .then((response) => response.json())
-    // chartData.two = await fetch(
-    //     'https://gw.alipayobjects.com/os/antfincdn/jSRiL%26YNql/percent-column.json')
-    //     .then((response) => response.json())
-    // const cardData = {"name": "1", "aum": "2"}
-    const cardData: { [key: number]: cardComp[] } = {}
-
-    return {
-        props: {
-            chartData,
-            cardData,
-        }
-    }
-}
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//     // 더미 데이터
+//     const chartData: { one: rateAtData[], two: aumLpcorp[] } = {one: [], two: []}
+//     // chartData.one = await fetch('https://gw.alipayobjects.com/os/bmw-prod/0b37279d-1674-42b4-b285-29683747ad9a.json')
+//     //     .then((response) => response.json())
+//     // chartData.two = await fetch(
+//     //     'https://gw.alipayobjects.com/os/antfincdn/jSRiL%26YNql/percent-column.json')
+//     //     .then((response) => response.json())
+//     // const cardData = {"name": "1", "aum": "2"}
+//     const cardData: { [key: number]: cardComp[] } = {}
+//
+//     return {
+//         props: {
+//             chartData,
+//             cardData,
+//         }
+//     }
+// }
 
 
 export default Detail

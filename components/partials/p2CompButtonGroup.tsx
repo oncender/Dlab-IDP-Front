@@ -123,7 +123,7 @@ const CompButtonGroup = ({label, buttons, isclicked, setClick, filDispat}:
                              { label: string, buttons: Array<string>, isclicked: Array<boolean>, setClick: Function, filDispat: Function }) => {
     // @ts-ignore
     const buttonValue: ReactNode[] = [];
-    console.log("buton render", label)
+    // console.log("buton render", label)
     let name = getKeyByValue(LABELS, label)
     const onClick = (e: MouseEvent, num: number) => {
         num = Number(num)
