@@ -11,21 +11,12 @@ export const FILTER_ACTION = {
 // Filter Default action
 export const INIT_FILST: FilterStateObj = {
     category: [
-        // {'name':'it','value':'실물'},
-        // {'name':'it','value':'대출'},
-        // {'name':'seniorstr','value':'선'},
-        // {'name':'at','value':'오피스'},
-        // {'name':'at','value':'호텔'},
-        // {'name':'rate','value':'고정'},
-        // {'name':'loancls','value':'한도'},
-        // {'name':'loancls','value':'담보'}
+
     ],
     float :[
-        {'name':'debt','value':[0,1000E8]},
+        {'name':'debt','value':[200E8,800E8]},
     ]
 };
-
-export const INIT_DEBT:[number,number] = [200E8,800E8]
 
 // need to be fixed by real min max value
 export const MM_DEBT:[number,number] = [0,5000E8]

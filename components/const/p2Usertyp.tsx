@@ -18,7 +18,8 @@ interface ApiFlowObj{
     loading: boolean
     data: any
     error: boolean
-    rcn: number
+    rcn: number,
+    pagecnt:number
   }
 interface ActionObj{
     typ : string,
@@ -73,6 +74,11 @@ interface pageCountTyp{
     rcn:number
 }
 
+interface chartTyp{
+    data:{one: fromApiV1[], two: fromApiV1[]}[],
+    hasMore:boolean,
+    rcn:number,
+}
 
 export type {ActionObj, FilterStateObj, FloatObj, CategoryObj, ApiFlowObj,
-    fromApiV1,rateAtData,aumLpcorp,cardComp,pageCountTyp}
+    fromApiV1,rateAtData,aumLpcorp,cardComp,pageCountTyp,chartTyp}
