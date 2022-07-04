@@ -1,11 +1,12 @@
 import styles from "../styles/Detail.module.scss"
-import {Divider, Layout} from 'antd'
 
 import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode, createContext} from 'react'
-import type {NextPage, GetServerSideProps, InferGetServerSidePropsType} from 'next'
+import type {NextPage} from 'next'
+// , GetServerSideProps, InferGetServerSidePropsType
 import {useRouter} from 'next/router'
-import {DndProvider} from 'react-dnd';
-import {HTML5Backend} from 'react-dnd-html5-backend';
+// import {DndProvider} from 'react-dnd';
+// import {HTML5Backend} from 'react-dnd-html5-backend';
+//<DndProvider backend={HTML5Backend}>
 
 // Hook Import
 import {filReducer} from "../components/reducers/FilterReducer";
@@ -13,14 +14,14 @@ import useAsyncer from "../components/hook/useAsyncer";
 import useMoveScrool from "../components/hook/useScroll"
 import useWindowSize from "../components/hook/useWindowSize"
 // Component Import
-import {useDrag, useDrop} from 'react-dnd';
+
 import AsideFilters from "../components/partials/p2CompAsideFilters"
 import RateAtPlot from "../components/graphs/p2GraphRateAtPlot";
 import AumLpcorp from "../components/graphs/p2GraphAumLpcorp";
 import CompCardGroup from "../components/partials/p2CompCardGroup";
 import CompSortSelect from "../components/partials/p2CompSortSelect";
 // Component dependent Import
-import {APIURL, INIT_FILST, INIT_DEBT, LABELS, MM_DEBT, SORT_LABELS, ItemTypes} from "../components/const/p2Constant"
+import {APIURL, SORT_LABELS} from "../components/const/p2Constant"
 import {
     windowSizeStr,
     apiParamGen,
@@ -37,11 +38,9 @@ import {
     aumLpcorp,
     cardComp,
     pageCountTyp,
-    ApiFlowObj,
-    FilterStateObj, chartTyp
+    chartTyp, FilterStateObj
 } from "../components/const/p2Usertyp"
 import axios from "axios";
-import CompDragDrop from "../components/partials/p2CompDragDrop";
 import Header from '../components/Header'
 import Footer from "../components/Footer";
 
@@ -51,12 +50,18 @@ const Detail: NextPage = () => {
 
     // Get URL parameters via next router and setting up filter states
     const router = useRouter();
-    const filterInitialValues = detailQueryParser(router.query);
-    const fromHomeData = {filterInit: filterInitialValues, sldrInit: INIT_DEBT}
-
+    var filterInitialValues:FilterStateObj
+    if (router.query){
+        filterInitialValues = detailQueryParser(router.query);
+    } else {
+        filterInitialValues = JSON.parse(document.cookie)
+    }
     /* State & Reducer DEF */
     // @ts-ignore
-    const [filterInfo, filDispat] = useReducer(filReducer, fromHomeData.filterInit); // all filter variable controller def
+    const [filterInfo, filDispat] = useReducer(filReducer, filterInitialValues); // all filter variable controller def
+    if (document != undefined){
+        console.log("document cookies",filterInfo,document.cookie)
+    }
     // Because of async, api request needed to handled with wait logic (filterInfo being updated.)
     const [start, setStart] = useState(false);
 
@@ -65,7 +70,6 @@ const Detail: NextPage = () => {
     const windowContextval = windowSizeStr(windowNow)
 
     // chartData State
-    const [chartD, setCharD] = useState({one:[],two:[]});  // api request data result
     const [chartClc, setChartClc] = useState(false);  // chart y data type -> % scale ~ raw numeric value
     const [chartClcNoEtc, setChartClcNoEtc] = useState(false);  // include '기타' or not
     const [chartApiState, chartApiDispatch, _, chartclearData] = useAsyncer(getGraph, [], [filterInfo],start, setStart);  // After filterInfo updated, chart data is updated.
@@ -336,7 +340,7 @@ const Detail: NextPage = () => {
         return (
             <div className={styles.asideFiltersJs} key="asidefilterjs" index={1}>
                 <AsideFilters
-                    fromHomeData={fromHomeData}
+                    fromHomeData={filterInitialValues}
                     filDispat={filDispat}
                 />
             </div>
@@ -384,6 +388,7 @@ const Detail: NextPage = () => {
     // filter to api query
     useEffect(() => {
         // after filter updated, Graph should be reloaded
+        document.cookie = `filterInfo:${JSON.stringify(filterInfo)}`;
         setStart(true)
         onScrollTop()
         return (() => {
@@ -396,17 +401,15 @@ const Detail: NextPage = () => {
         <div>
             <Header/>
             <windowContext.Provider value={{windowStatus: windowContextval}}>
-                <DndProvider backend={HTML5Backend}>
-                    <div className={styles.sectionContents}>
-                        <div className={styles.leftBlankJs} key='leftblank' index={0}/>
-                        {asideFil}
-                        <div className={styles.contentJs} key="contents_all" index={2}>
-                            {chartComps}
-                            {cardComps}
-                        </div>
-                        <div className={styles.rightBlankJs} key="rightblank" index={3}/>
+                <div className={styles.sectionContents}>
+                    <div className={styles.leftBlankJs} key='leftblank' index={0}/>
+                    {asideFil}
+                    <div className={styles.contentJs} key="contents_all" index={2}>
+                        {chartComps}
+                        {cardComps}
                     </div>
-                </DndProvider>
+                    <div className={styles.rightBlankJs} key="rightblank" index={3}/>
+                </div>
             </windowContext.Provider>
             <Footer/>
         </div>

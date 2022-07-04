@@ -18,7 +18,7 @@ import { useDrag, useDrop } from 'react-dnd';
 const AsideFilters = ({id, index ,window,fromHomeData,filDispat}:
                           {   id: string, index: number,
                               window: string,
-                              fromHomeData:{filterInit:FilterStateObj,sldrInit:[number,number]},
+                              fromHomeData:FilterStateObj,
                               filDispat:Function,styleJs:{[key:string]:string}
                           }) => {
     // button component dependent param def
@@ -43,7 +43,7 @@ const AsideFilters = ({id, index ,window,fromHomeData,filDispat}:
     const [clickLoanCls, setClickLoanCls] = useState(loanClsClicked);
 
     // slider component dependent def
-    const [sldrval, setSldrval] = useState(fromHomeData.sldrInit)
+    const [sldrval, setSldrval] = useState(fromHomeData.float)
 
     // button component def
     const iTButton = useMemo(() => {
