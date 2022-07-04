@@ -11,7 +11,7 @@ export default function BigSelect(props: any) {
     <div>
       <select className={styles.customSelect} onChange={props.handleChange}>
         {props.options.map((option: Option) => 
-          <option value={option.key}>
+          <option key={option.key} value={option.key}>
             {option.value}
           </option>
         )}

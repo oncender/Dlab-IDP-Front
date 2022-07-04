@@ -5,10 +5,27 @@ export function zip(a1: any, a2: any){
     return a1.map((x, i) => [x, a2[i]]);
 }
 
-export function parseFloatDef(val,defaultval){
-    return parseFloat(val) ? parseFloat(val) : defaultval
+export function parseFloatDef(val:string,defaultval:any){
+    let newval = val.replace(/,/g,"")
+    return parseFloat(newval) ? parseFloat(newval) : defaultval
+}
+export function parseIntDef(val:string,defaultval:any){
+    let newval = val.replace(/,/g,"")
+    return parseInt(newval) ? parseInt(newval) : defaultval
 }
 
+export function windowSizeStr(windowNow:{width:number|undefined,height:number|undefined}):string{
+        var {width,height} = windowNow
+        if (width && (width > 1180)){
+            return 'large'
+        } else if (width && (width >830)){
+            return 'medium'
+        } else if (width){
+            return 'small'
+        } else {
+            return ''
+        }
+    }
 export function groupbyCount(obArr: Array<any>, countBy: number) {
     return obArr.reduce(
         (r, o, idx) => {
@@ -86,27 +103,27 @@ export function urlGen(targetUrl:string,params:any):string{
 }
 
 interface queryParam {
-    it?: string;
+    loancls?: string;
     seniorstr?: string;
 }
 export function detailQueryParser(q: queryParam) {
     let initialFilterState = INIT_FILST;
     let category = INIT_FILST.category;
-
+    console.log("query",q)
     if (!q || Object.keys(q).length ===0) {
         return INIT_FILST;
     } 
-    if('it' in q) {
+    if('loancls' in q) {
         category = category.filter((item)=>{
-            return item.name !== "it"
+            return item.name !== "loancls"
         });
-        category.push({'name':'it', 'value':q.it!})
+        category.push({'name':'loancls', 'value':q.loancls!.replace("대출","")!})
     }
     if('seniorstr' in q) {
         category = category.filter((item)=>{
             return item.name !== "seniorstr"
         });
-        category.push({'name':'seniorstr', 'value':q.seniorstr!})
+        category.push({'name':'seniorstr', 'value':q.seniorstr!.replace("순위","")!})
     }
 
     initialFilterState.category = category;

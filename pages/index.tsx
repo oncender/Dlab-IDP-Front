@@ -7,6 +7,8 @@ import BigSelect from '../components/partials/p1CompBigSelectMain';
 import ResultContents from '../components/partials/p1CompResultContents';
 import HowItWorksContents from '../components/partials/p1CompHowItWorksContents';
 import axios from "axios";
+import useMoveScrool from "../components/hook/useScroll";
+
 
 
 const Home: NextPage = () => {
@@ -19,10 +21,10 @@ const Home: NextPage = () => {
   const API_URL="/api/v1/model/pred";
 
   const handleLoanPriority = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setLoanPriority(event.target.value);
+    setLoanPriority(event.target.value)
   }
   const handleLoanType = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setLoanType(event.target.value);
+    setLoanType(event.target.value)
   }
 
   const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -30,6 +32,7 @@ const Home: NextPage = () => {
     const min=1200, max=4000;
     const term = Math.floor(Math.random() * (max-min) + min) // 0.5 ~ 2.5 second
     setLoading(true)
+
     setTimeout(() => {setLoading(false)}, term)
     focusRef.current!.scrollIntoView();
   }

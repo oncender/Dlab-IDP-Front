@@ -2,130 +2,198 @@
   @if $size == 'large' {
     $cardw: 100% !global;
     $cardh: 200px !global;
-
+    $fontS: 13px !global;
   } @else if $size == 'medium' {
-    $cardw: 100% !global;
-    $cardh: 200px !global;
-
+    $cardw: 48% !global;
+    $cardh: 300px !global;
+    $fontS: 10px !global;
   } @else if $size == 'small' {
-    $cardw: 100% !global;
-    $cardh: 200px !global;
+    $cardw: 48% !global;
+    $cardh: 150px !global;
+    $fontS: 8px !global;
   }
-  div[custom=ROW]{
-    display: flex;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    box-shadow:1px 1px 5px 0px grey;
-    &:hover{
-      box-shadow:2px 2px 10px 1px black;
-      opacity: 0.7;
+  .cardGroupWrap {
+    @if $size != 'large' {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: space-between;
+      margin-right: 10px;
     }
-    & .ant-card-body {
+  }
+  div[custom=ROW] {
+    display: flex;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    box-shadow: 1px 1px 5px 0px grey;
+    font-size: $fontS;
     width: $cardw;
     height: $cardh;
-    display: grid;
-    grid-template-rows: repeat(10, 10%);
-    grid-template-columns: repeat(40, 2.5%);
-    padding-bottom: 5px;
-    padding-top: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
-
-    & .col1 {
-      grid-column: 1/8;
-      grid-row: 1/11;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
+    @if $size != 'large' {
+      margin: 1%;
     }
 
-    & .col2 {
-      display: flex;
-      grid-row: 1/11;
-      flex-flow: row wrap;
-      grid-column: 9/31;
-      align-content: space-around;
-      & .ant-card-meta {
+    &:hover {
+      box-shadow: 2px 2px 10px 1px black;
+      opacity: 0.7;
+    }
+
+    & .ant-card-body {
+      display: grid;
+      grid-template-rows: repeat(10, 10%);
+      grid-template-columns: repeat(40, 2.5%);
+      @if $size == 'large' {
+        padding: 5px;
+      } @else {
+        padding: 0px;
+      }
+
+      .col1 {
+        @if $size == 'large' {
+          grid-column: 1/8;
+          grid-row: 1/11;
+        } @else if $size == 'medium' {
+          grid-column: 1/21;
+          grid-row: 1/8;
+        } @else if $size == 'small' {
+          grid-column: -1;
+          grid-row: -1;
+        };
+        display: flex;
+        align-items: center;
+        justify-content: center;
         width: 100%;
-        text-align: left;
-        &[custom=col20] {
+        height: 100%;
+      }
+
+      .col2 {
+        display: flex;
+        @if $size == 'large' {
+          grid-row: 1/11;
+          grid-column: 9/31;
+          align-content: space-around;
+        } @else if $size == 'medium' {
+          grid-row: 8/11;
+          grid-column: 1/41;
+          align-content: space-evenly;
+        } @else if $size == 'small' {
+          grid-column: 3/41;
+          grid-row: 1/6;
+        };
+        flex-flow: row wrap;
+
+        & .ant-card-meta {
+          width: 100%;
+          text-align: left;
+
+          &[custom=col20] {
             font-size: 1.5em;
+            & .ant-card-meta-description {
+            color: #1C6FBC;
           };
-        &[custom=col21] {
-            font-size: 2em;
+          };
+
+        ;
+
+          &[custom=col21] {
+            font-size: 1.5em;
             font-weight: 1000;
-            margin-bottom: 10px;
+            @if $size == 'large' {
+              margin-bottom: 10px
+            };
             display: flex;
             flex-wrap: nowrap;
             overflow-x: hidden;
+
             .ant-card-meta-description {
-              color: #3F3F3F;
+              //color: #3F3F3F;
+              color: #1C6FBC;
             }
-          };
-        &[custom=col22] {
-          font-size: 1.5em;
-          .ant-card-meta-description {
-          color: #1C6FBC;
+          }
+        ;
+
+          &[custom=col22] {
+            font-size: 1.5em;
+
+            .ant-card-meta-description {
+              //color: #1C6FBC;
+            }
           }
         }
       }
-    };
-    & .col3 {
-      display: flex;
-      grid-row: 1/11;
-      flex-flow: row wrap;
-      grid-column: 32/36;
-      align-content: space-around;
-      & .ant-card-meta {
-        font-size: 1.3em;
-        width: 100%;
-        text-align: left;
-      }
-    };
-    & .col4 {
-      display: flex;
-      grid-row: 1/11;
-      flex-flow: row wrap;
-      grid-column: 36/40;
-      margin-right: 5px;
-      align-content: space-around;
-      & .ant-card-meta {
-        width: 100%;
-        text-align: right;
-        font-weight: 700;
-        font-size: 1.3em;
-        .ant-card-meta-description {
-          color: #3F3F3F;
+    ;
 
+      .col3 {
+        display: flex;
+        flex-flow: row wrap;
+        @if $size == 'large' {
+          grid-row: 1/11;
+          grid-column: 32/36;
+        } @else if $size == 'medium' {
+          grid-column: 22/31;
+          grid-row: 1/8;
+        } @else if $size == 'small' {
+          grid-column: 3/21;
+          grid-row: 6/11;
+        };
+
+        align-content: space-around;
+
+        & .ant-card-meta {
+          font-size: 1.3em;
+          width: 100%;
+          text-align: left;
         }
-      };
-    }
+      }
+    ;
 
-    @content
-  }
+      .col4 {
+        display: flex;
+        grid-row: 1/11;
+        flex-flow: row wrap;
+        @if $size == 'large' {
+          grid-column: 36/40;
+          margin-right: 5px;
+        } @else if $size == 'medium' {
+          grid-column: 31/40;
+          grid-row: 1/8;
+          margin-right: 0px;
+        } @else if $size == 'small' {
+          grid-column: 31/39;
+          grid-row: 6/11;
+          margin-right: 5px;
+        };;
+        align-content: space-around;
+
+        & .ant-card-meta {
+          width: 100%;
+          text-align: right;
+          font-weight: 700;
+          font-size: 1.3em;
+
+          .ant-card-meta-description {
+            color: #3F3F3F;
+
+          }
+        }
+      ;
+      }
+
+      @content
+    }
   }
 
 
 }
 
-  //@if ($size == 'large') or ($size == 'medium') {
-  //      &:hover {
-  //        cursor: pointer;
-  //        font-weight: 600;
-  //      }
-  //    }
-
-  @media screen and (min-width: 769px) {
-    @include scale_size('large') {
-    }
+@media screen and (min-width: 1180px) {
+  @include scale_size('large') {
   }
+}
 
-  @media screen and (max-width: 768px) {
-    @include scale_size('medium')
-  }
+@media screen and (max-width: 1180px) {
+  @include scale_size('medium')
+}
 
-  @media screen and (max-width: 640px) {
-    @include scale_size('small')
-  }
+@media screen and (max-width: 830px) {
+  @include scale_size('small')
+}

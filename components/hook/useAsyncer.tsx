@@ -1,42 +1,47 @@
 import {useReducer, useEffect} from 'react';
 import {ApiFlowObj} from "../const/p2Usertyp"
 
-function apiReducer(state: ApiFlowObj, action: { type: string, data: any, error: null | any, hasMore: boolean }) {
+function apiReducer(state: ApiFlowObj, action: { type: string, data: any, error: null | any, hasMore: boolean , rcn:number}) {
     switch (action.type) {
         case 'LOADING':
             return {
                 loading: true,
                 data: state.data,
                 error: null,
-                hasMore: true
+                hasMore: true,
+                rcn: state.rcn
             };
         case 'SUCCESS':
             return {
                 loading: false,
                 data: action.data,
                 error: null,
-                hasMore: action.hasMore
+                hasMore: action.hasMore,
+                rcn: action.rcn
             };
         case 'CLEAR':
             return {
                 loading: false,
                 data: [],
                 error: false,
-                hasMore: true
+                hasMore: true,
+                rcn: 0
             }
         case 'NOMORE':
             return {
                 loading: false,
                 data: state.data,
                 error: false,
-                hasMore: false
+                hasMore: false,
+                rcn: state.rcn
             }
         case 'ERROR':
             return {
                 loading: false,
                 data: [],
                 error: action.error,
-                hasMore: true
+                hasMore: true,
+                rcn: state.rcn
             };
         default:
             throw new Error(`Unhandled action type: ${action.type}`);
@@ -49,7 +54,8 @@ const initialState = {
     loading: false,
     data: [],
     error: false,
-    hasMore: true
+    hasMore: true,
+    rcn: 0,
 }
 
 function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [], start: boolean=false,setStart:Function) {
@@ -68,8 +74,7 @@ function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [], st
                 await asyncwait(500)}
                 // console.log([...data.data].length)
                 // apiDispatch({type: 'SUCCESS', data: [...data.data],hasMore:data.hasMore})
-            console.log([...apiState.data,...data.data])
-            apiDispatch({type: 'SUCCESS', data: [...apiState.data, ...data.data],hasMore:data.hasMore})
+            apiDispatch({type: 'SUCCESS', data: [...apiState.data, ...data.data],hasMore:data.hasMore,rcn:data.rcn})
             } catch (e) {
             apiDispatch({type: 'NOMORE'});}
     };

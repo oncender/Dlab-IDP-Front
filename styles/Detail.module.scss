@@ -1,43 +1,114 @@
-.sectionContents{
-	display : grid;
-	grid-template-columns: repeat(40,minmax(10px, 1fr));
+@mixin scale_size($size) {
+  @if $size == 'large' {
+    $lblankS: 1 !global;
+    $lblankE: 2 !global;
+    $rblankS: 40 !global;
+    $rblankE: 41 !global;
+    $asideFilS: 2 !global;
+    $asideFilE: 9 !global;
+    $contentsS: 11 !global;
+    $contentsE: 40 !global;
+    $fontS: 15px !global;
+    $marginTop: 5% !global;
+  } @else {
+    $lblankS: -1 !global;
+    $lblankE: -1 !global;
+    $rblankS: -1 !global;
+    $rblankE: -1 !global;
+    $asideFilS: 1 !global;
+    $asideFilE: 8 !global;
+    $contentsS: 9 !global;
+    $contentsE: 41 !global;
+    $fontS: 11px !global;
+    $marginTop: 10% !global;
+  } ;
+  @if $size == 'small'{
+    $fontS: 9px !global;
+    $marginTop: 15% !global;
+  };
+  .sectionContents {
+    display: grid;
+    grid-template-columns: repeat(40, minmax(10px, 1fr));
+    font-size: $fontS;
+  };
+  .leftBlankJs {
+    grid-column-start: $lblankS;
+    grid-column-end: $lblankE;
+  };
+  .rightBlankJs {
+    grid-column-start: $rblankS;
+    grid-column-end: $rblankE;
+  };
+  .contentJs {
+    grid-column-start: $contentsS;
+    grid-column-end: $contentsE;
+    grid-row-start: 1;
+    margin-top: $marginTop;
+    margin-right: 5%;
+  };
+  .asideFiltersJs {
+    grid-column-start: $asideFilS;
+    grid-column-end: $asideFilE;
+    grid-row-start: 1;
+    margin-top: 10%;
+  };
+  .card {
+    .filter {
+      .title {
+        font-size: 1.3em;
+        font-weight: 400;
+        width: 50%;
+        border-bottom-width: 2px;
+        border-color: gray;
+        border-bottom-color: gray;
+        //rgba(16, 28, 59, 0.97);
+      };
+      .sort {
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+    .board {
+    }
+    .board-error {
+    }
+  }
+  .chartCompsJs {
+    grid-column: 8/40;
+    grid-row: 1/20;
+  };
+  @content
+};
+
+
+@media screen and (min-width: 1180px) {
+  @include scale_size('large') {
+  }
 }
+
+@media screen and (max-width: 1180px) {
+  @include scale_size('medium')
+}
+
+@media screen and (max-width: 830px) {
+  @include scale_size('small')
+}
+
+
+
+;
+
 .chart {
-		display : flex;
-		flex-direction: column;
-		& .one{
-		};
-		& .two{
+  display: flex;
+  flex-direction: column;
 
-		};
-	}
-.card {
-	//display : flex;
-	//flex-direction: column;
-	//justify-content: flex-end;
-	.filter {
-		.title {
-			font-size: 1.3em;
-			font-weight: 500;
-			width:50%;
-			border-bottom-width: 2px;
-			border-color: gray;
-			border-bottom-color: gray;
-			//rgba(16, 28, 59, 0.97);
-		}
-		.sort {
-			display:flex;
-			justify-content:flex-end;
-		}
+  & .one {
+  }
+;
 
-
-	}
-	.board {
-
-	}
-	.board-error{
-
-	}
+  & .two {
+  }
+;
 }
 
 
