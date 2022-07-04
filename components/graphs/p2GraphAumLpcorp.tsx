@@ -1,7 +1,9 @@
 import {Column, G2} from '@ant-design/plots';
 import {Button} from "antd";
 
-const AumLpcorp = ({data, chartClc, onClick}: { data: any, chartClc: boolean, onClick: Function,noEtc: Function }) => {
+const AumLpcorp = ({data, chartClc, chartClcNoEtc, onClick, onchartClcNoEtc}:
+                       { data: any, chartClc: boolean, chartClcNoEtc: boolean, onClick: Function,
+                         onchartClcNoEtc: Function }) => {
     G2.registerInteraction('element-link', {
         start: [
             {
@@ -16,18 +18,24 @@ const AumLpcorp = ({data, chartClc, onClick}: { data: any, chartClc: boolean, on
             },
         ],
     });
-    const configClickData = {}
+    const configClickData :{isPercent:boolean,content:Function,meta:any} = {}
     const nonClickF = (item) => {
         return `${(item.loanamt)}억`
     }
     const onClickF = (item) => {
         return `${parseFloat(item.loanamt * 100).toFixed(2)}%`;
     }
-    configClickData['isPercent'] = chartClc ? false : true
+    configClickData['isPercent'] = !chartClc
     configClickData['content'] = chartClc ? nonClickF : onClickF
     configClickData['meta'] = chartClc ? {} : {value: {min: 0, max: 1,}}
+    var newD
+    if (chartClcNoEtc) {
+        newD = data
+    } else {
+        newD = data
+    }
     const config = {
-        data,
+        newD,
         appendPadding: 30,
         xField: 'loandate',
         yField: 'loanamt',
@@ -86,14 +94,12 @@ const AumLpcorp = ({data, chartClc, onClick}: { data: any, chartClc: boolean, on
                     "alignSelf": 'flex-end', 'order': 1, "borderRadius": "0.5rem",
                     "marginBotton": '10px', 'left': `${bll}`, "bottom": '135px', "zIndex": 1
                 }}
-
                 key={'noEtc'}
-                onClick={{}}
+                onClick={() => (onchartClcNoEtc(!chartClcNoEtc))}
                 shape='default'>
-                {chartClc ? 'nominal' : '%'}
+                {chartClcNoEtc ? 'etc포함O' : 'etc포함X'}
             </Button>
-            <Column {...config} />
-
+            {/*<Column {...config} />*/}
         </div>)
 };
 

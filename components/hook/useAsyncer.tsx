@@ -2,7 +2,7 @@ import {useReducer, useEffect} from 'react';
 import {ApiFlowObj} from "../const/p2Usertyp"
 
 function apiReducer(state: ApiFlowObj,
-                    action: { type: string, data: any, error: null | any, hasMore: boolean , rcn:number, pagecnt:number}) {
+                    action: { type: string, data: any, error: null | any, hasMore: boolean, rcn: number, pagecnt: number }) {
     switch (action.type) {
         case 'LOADING':
             return {
@@ -11,7 +11,7 @@ function apiReducer(state: ApiFlowObj,
                 error: null,
                 hasMore: true,
                 rcn: state.rcn,
-                pagecnt:state.pagecnt
+                pagecnt: state.pagecnt
             };
         case 'SUCCESS':
             return {
@@ -20,16 +20,16 @@ function apiReducer(state: ApiFlowObj,
                 error: null,
                 hasMore: action.hasMore,
                 rcn: action.rcn,
-                pagecnt:action.pagecnt
+                pagecnt: action.pagecnt
             };
         case 'CLEAR':
             return {
                 loading: false,
-                data: [],
+                data: state.data,
                 error: false,
                 hasMore: true,
                 rcn: 0,
-                pagecnt:1
+                pagecnt: 1
             }
         case 'NOMORE':
             return {
@@ -38,7 +38,7 @@ function apiReducer(state: ApiFlowObj,
                 error: false,
                 hasMore: false,
                 rcn: state.rcn,
-                pagecnt:state.pagecnt
+                pagecnt: state.pagecnt
             }
         case 'ERROR':
             return {
@@ -47,7 +47,7 @@ function apiReducer(state: ApiFlowObj,
                 error: action.error,
                 hasMore: true,
                 rcn: state.rcn,
-                pagecnt:state.pagecnt
+                pagecnt: state.pagecnt
             };
         default:
             throw new Error(`Unhandled action type: ${action.type}`);
@@ -62,14 +62,21 @@ const initialState = {
     error: false,
     hasMore: true,
     rcn: 0,
-    pagecnt:1
+    pagecnt: 1
 }
 
-function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [], start: boolean=false,setStart:Function) {
-    const [apiState, apiDispatch] = useReducer(apiReducer, initialState);
+function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [],
+                    start: boolean = false, setStart: Function,dataInit?:undefined) {
+    var initials
+    if (dataInit){
+        initials = dataInit
+    } else {
+        initials = initialState
+    }
+    const [apiState, apiDispatch] = useReducer(apiReducer, initials);
     const fetchData = async (loading: boolean) => {
         if (!start) return setStart(true);
-        if (!apiState.hasMore){
+        if (!apiState.hasMore) {
             apiDispatch({type: 'NOMORE'});
             return
         }
@@ -77,37 +84,44 @@ function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [], st
         let data
         try {
             data = await callback();
-            console.log('delay 1000')
-            await asyncwait(1000)
-            apiDispatch({type: 'SUCCESS',
+            if (loading) {
+                console.log('delay 1000')
+                await asyncwait(1000)
+            }
+            apiDispatch({
+                type: 'SUCCESS',
                 data: [...apiState.data, ...data.data],
-                hasMore:data.hasMore,
-                rcn:data.rcn,
-                pagecnt:apiState.pagecnt+1})
-            } catch (e) {
-            apiDispatch({type: 'NOMORE'});}
+                hasMore: data.hasMore,
+                rcn: data.rcn,
+                pagecnt: apiState.pagecnt + 1
+            })
+        } catch (e) {
+            apiDispatch({type: 'NOMORE'});
+        }
     };
     const clearData = async () => {
-        console.log('dispatch clear call',apiState.data)
+        console.log('dispatch clear call', apiState.data)
         if (!start) return setStart(true);
         apiDispatch({type: 'LOADING'});
         let data
         try {
-            data = await callback();
-            apiDispatch({type: 'SUCCESS',
+            data = await callback({pagecount:1});
+            apiDispatch({
+                type: 'SUCCESS',
                 data: [...data.data],
-                hasMore:data.hasMore,
-                rcn:data.rcn,
-                pagecnt:1
+                hasMore: data.hasMore,
+                rcn: data.rcn,
+                pagecnt: 2
             })
-            } catch (e) {
-            console.log('error in dispatch',e)
-            apiDispatch({type: 'NOMORE'});}
-        console.log(data.data)
+        } catch (e) {
+            console.log('error in dispatch', e)
+            apiDispatch({type: 'NOMORE'});
+        }
+        // console.log(data.data)
     };
     useEffect(() => {
-        console.log('dispatch clear start',clears,start)
-        clearData();
+            console.log('dispatch clear start', clears, start)
+            clearData();
         }, clears
     );
 
@@ -116,7 +130,7 @@ function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [], st
         // eslint-disable-next-line
     }, deps);
 
-    return [apiState, apiDispatch,fetchData,clearData];
+    return [apiState, apiDispatch, fetchData, clearData];
 }
 
 export default useAsyncer;

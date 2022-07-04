@@ -33,7 +33,7 @@ const NAME_ICON = {
     '실물': faBuildingCircleCheck,
     '대출': faHandHoldingDollar,
     '개발(펀드)': faUsers,
-    '개발(PF)': faMoneyCheckAlt, //faMoneyCheckPen
+    '개발(PFV)': faMoneyCheckAlt, //faMoneyCheckPen
     '선': faCircleCheck,
     '중': faCircleMinus,
     '후': faCircleExclamation,
