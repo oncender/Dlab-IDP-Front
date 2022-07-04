@@ -106,7 +106,7 @@ export function urlGen(targetUrl: string, params: any): string {
 }
 
 interface queryParam {
-    it?: string;
+    loancls?: string;
     seniorstr?: string;
 }
 
@@ -121,13 +121,13 @@ export function detailQueryParser(q: queryParam) {
         category = category.filter((item) => {
             return item.name !== "loancls"
         });
-        category.push({'name': 'loancls', 'value': q.loancls.replace("대출", "")!})
+        category.push({'name':'loancls', 'value':q.loancls!.replace("대출","")!})
     }
     if ('seniorstr' in q) {
         category = category.filter((item) => {
             return item.name !== "seniorstr"
         });
-        category.push({'name': 'seniorstr', 'value': q.seniorstr.replace("순위", "")!})
+        category.push({'name':'seniorstr', 'value':q.seniorstr!.replace("순위","")!})
     }
 
     initialFilterState.category = category;

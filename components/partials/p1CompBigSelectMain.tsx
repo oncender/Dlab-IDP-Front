@@ -1,7 +1,8 @@
 import styles from "../../styles/Select.module.scss"
 
 type Option = {
-  value: string
+  key: string;
+  value: string;
 }
 
 export default function BigSelect(props: any) {
@@ -10,7 +11,7 @@ export default function BigSelect(props: any) {
     <div>
       <select className={styles.customSelect} onChange={props.handleChange}>
         {props.options.map((option: Option) => 
-          <option key={option.value} value={option.value}>
+          <option key={option.key} value={option.key}>
             {option.value}
           </option>
         )}
