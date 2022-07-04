@@ -1,0 +1,149 @@
+@import './util.module';
+
+.resultContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.resultTitle {
+    display: flex;
+    flex-direction: column;
+    // align-items: center;
+    color:rgb(0, 95, 132);
+    width: 100%;
+    
+    @include mobile { margin-top: 2rem; }
+    @include tablet { margin-top: 2.3rem; }
+    @include desktop { margin-top: 3rem; }
+    .titlePhrase {
+        align-self: center;
+        font-weight: 700;
+        margin-right: 0.2rem;
+        @include mobile { font-size: 1.5rem; }
+        @include tablet { font-size: 2rem; }
+        @include desktop { font-size: 3rem; }
+    }
+    .titleDate {
+        font-family: 'blinker';
+        font-weight: 300;
+        align-self: flex-end;
+        @include mobile { font-size: 1.2rem; }
+        @include tablet { font-size: 1.7rem; }
+        @include desktop { font-size: 1.5rem; }
+    }
+}
+
+.modelTable {
+    margin: {
+        top: 0.2rem;
+        bottom: 3rem;
+    }
+    
+    font-family: 'sans';
+    border-collapse: collapse;
+    border-top: 3px solid #168;
+    text-align: center;
+    th {
+        color: #168;
+        background: #f0f6f9;
+        width: 18rem;
+        padding: 10px;
+        border: 1px solid #ddd;
+        @include mobile {
+            font-size: 1.3rem;
+        }
+        @include tablet {
+            font-size: 1.7rem;
+        }
+        @include desktop {
+            font-size: 2rem;
+        }
+    }
+    td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        color:rgb(88, 88, 88);
+        @include mobile {
+            font-size: 1.25rem;
+        }
+        @include tablet {
+            font-size: 1.75rem;
+        }
+        @include desktop {
+            font-size: 2.1rem;
+        }
+    }
+    th:first-child, td:first-child {
+        border-left: 0;
+    }
+    th:last-child, td:last-child {
+        border-right: 0;
+    }
+    p {
+        @include mobile {
+            font-size: 0.85rem;
+        }
+        @include tablet {
+            font-size: 1rem;
+        }
+        @include desktop {
+            font-size: 1.115rem;
+        }
+        color: #4c4c4c;
+        margin: 1rem 0.2rem 1rem 0.2rem;
+        text-align: left;
+        background-color: rgb(222, 222, 222);
+        border-radius: 6px;
+        padding: 15px 20px 15px 20px
+    }
+}
+
+.introduction {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    padding: 20px 10px 10px 10px;
+    p {
+        text-align: center;
+        font-family: blinker;
+        @include mobile {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        @include tablet {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+        @include desktop {
+            margin-top: 40px;
+            font-size: 4rem;
+        }
+    }
+}
+.contentsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: end;
+        
+        @include mobile {
+            margin: 0px 30px;
+            width: calc(100% - 60px);
+        }
+        @include desktop {
+            margin: 0px 30px;
+            width: calc(33% - 60px);
+            margin-bottom: 5rem;
+        }
+        p {
+            font-size: 2rem;
+            font-family: blinker;
+        }
+    }
+    
+}
