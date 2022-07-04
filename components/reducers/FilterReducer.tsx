@@ -43,13 +43,15 @@ function filReducer(state : FilterStateObj,action: ActionObj) {
             return {
                 category: state.category,
                 float: newFloat
-            }
+            };
+        case FILTER_ACTION.REPLACE:
+            console.log("filter replace",state, 'to',action.value)
+            return action.value;
         default:
             return state
     }
 }
-const FilContext = createContext([]);
-export {filReducer, selectArr, FilContext}
+export {filReducer, selectArr}
 
 
 

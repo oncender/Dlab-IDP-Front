@@ -6,6 +6,7 @@ export const FILTER_ACTION = {
     'CATEGORY_DEL':'categoryDel',
     'FLOAT_ADD':'floatAdd',
     'FLOAT_UPDATE':'floatUpdate',
+    'REPLACE':'replaceDispatch'
 };
 
 // Filter Default action

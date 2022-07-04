@@ -23,7 +23,7 @@ interface ApiFlowObj{
   }
 interface ActionObj{
     typ : string,
-    value : CategoryObj | FloatObj
+    value : CategoryObj | FloatObj | FilterStateObj
 }
 
 // for chart Data
