@@ -1,7 +1,6 @@
 import {Scatter} from '@ant-design/plots';
 
 const RateAtPlot = ({data}: { data: any }) => {
-            var delkey = ['loandate','sdaterate','loanamt','at']
     const config = {
         data,
         appendPadding: 30,
@@ -74,6 +73,9 @@ const RateAtPlot = ({data}: { data: any }) => {
         //   ],
         // },
     };
+    if (data.length === 0) {
+        return
+    }
     return <Scatter {...config} />;
 };
 

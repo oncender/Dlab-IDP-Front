@@ -1,16 +1,17 @@
 import styles from "../../styles/Aside.module.scss"
 import {selectArr} from "../reducers/FilterReducer";
 import {LABELS, MM_DEBT} from "../const/p2Constant";
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {
     FilterStateObj
 } from "../const/p2Usertyp"
 import CompButtonGroup from "./p2CompButtonGroup";
 import CompSliderfil from "./p2CompSliderfil";
 
-const AsideFilters = ({fromHomeData,filDispat}:
+const AsideFilters = ({fromHomeData,filDispat, start}:
                           {   fromHomeData:FilterStateObj,
                               filDispat:Function,styleJs:{[key:string]:string}
+                              start:boolean
                           }) => {
     // button component dependent param def
     const itValue: Array<string> = ['실물', '대출', '개발(펀드)', '개발(PFV)'];
@@ -32,9 +33,18 @@ const AsideFilters = ({fromHomeData,filDispat}:
     const loanClsValue: Array<string> = ['담보', '브릿지','한도','부가세','PF','기타(대출)'];
     const loanClsClicked = selectArr(loanClsValue, fromHomeData.category, 'loancls');
     const [clickLoanCls, setClickLoanCls] = useState(loanClsClicked);
-
+    console.log("Aside rendered!!!")
     // slider component dependent def
     const [sldrval, setSldrval] = useState(fromHomeData.float.filter((val)=> val.name==='debt')[0].value)
+    useEffect(() => {
+        // if (!start) return
+        setClickArrIt(itClicked)
+        setClickArrSeniorstr(seniorstrClicked)
+        setClickArrAt(atClicked)
+        setClickArrRate(rateClicked)
+        setClickLoanCls(loanClsClicked)
+        setSldrval(fromHomeData.float.filter((val)=> val.name==='debt')[0].value)
+    },[fromHomeData])
 
     // button component def
     const iTButton = useMemo(() => {

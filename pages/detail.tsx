@@ -1,6 +1,16 @@
 import styles from "../styles/Detail.module.scss"
 
-import React, {useEffect, useReducer, useMemo, useState, useRef, useCallback, ReactNode, createContext} from 'react'
+import React, {
+    useEffect,
+    useReducer,
+    useMemo,
+    useState,
+    useRef,
+    useCallback,
+    ReactNode,
+    createContext,
+    useLayoutEffect
+} from 'react'
 import type {NextPage} from 'next'
 // , GetServerSideProps, InferGetServerSidePropsType
 import {useRouter} from 'next/router'
@@ -21,7 +31,7 @@ import AumLpcorp from "../components/graphs/p2GraphAumLpcorp";
 import CompCardGroup from "../components/partials/p2CompCardGroup";
 import CompSortSelect from "../components/partials/p2CompSortSelect";
 // Component dependent Import
-import {APIURL, INIT_FILST, SORT_LABELS,} from "../components/const/p2Constant"
+import {APIURL, FILTER_ACTION, INIT_FILST, SORT_LABELS,} from "../components/const/p2Constant"
 import {
     windowSizeStr,
     apiParamGen,
@@ -50,9 +60,12 @@ const Detail: NextPage = () => {
 
     // Get URL parameters via next router and setting up filter states
     const router = useRouter();
-    const [filterInitialValues, setFilterInitialValues]: FilterStateObj = useState(INIT_FILST)
-    useEffect(() => {
-        var filterI
+    /* State & Reducer DEF */
+    // @ts-ignore
+    const [filterInfo, filDispat] = useReducer(filReducer, INIT_FILST); // all filter variable controller def
+    const [asideFil, setAsideFil] = useState<HTMLElement | null>(null);
+        useLayoutEffect(() => {
+        var filterI:FilterStateObj
         if (Object.keys(router.query).length !== 0) {
             filterI = detailQueryParser(router.query);
         } else {
@@ -63,13 +76,18 @@ const Detail: NextPage = () => {
                 filterI = INIT_FILST
             }
         }
-
-        setFilterInitialValues(filterI)
+        var newaction = {typ: FILTER_ACTION.REPLACE, value: filterI}
+        filDispat(newaction)
+        return ( () => {
+            setAsideFil(
+            <div className={styles.asideFiltersJs} key="asidefilterjs" index={1}>
+                <AsideFilters
+                    fromHomeData={filterI}
+                    filDispat={filDispat}
+                />
+            </div>)
+        })
     }, [])
-
-    /* State & Reducer DEF */
-    // @ts-ignore
-    const [filterInfo, filDispat] = useReducer(filReducer, filterInitialValues); // all filter variable controller def
     // Because of async, api request needed to handled with wait logic (filterInfo being updated.)
     const [start, setStart] = useState(true);
 
@@ -138,6 +156,7 @@ const Detail: NextPage = () => {
                 "자산 유형": item.at,
                 "대출 체결일": item.loandate,
                 "대출약정금": parseIntDef(item.loanamt, null) / 1E8,
+                "자산명": item.an,
             }
         });
 
@@ -274,7 +293,7 @@ const Detail: NextPage = () => {
 
         return {
             data: compData,
-            hasMore: (data.rC > (chartApiState.pagecnt + 1) * 10) ? true : false,// check next page is available
+            hasMore: (data.rC > (cardApiState.pagecnt + 1) * 10) ? true : false,// check next page is available
             rcn: data.rC
         }
 
@@ -352,26 +371,17 @@ const Detail: NextPage = () => {
         return (chartApiState.data[0] && <RateAtPlot data={chartApiState.data[0].one}/>)
     }, [chartApiState.data[0].one])
 
-    const [chartTwo,setChartTwo] = useState<HTMLElement | null>(null);
+    const [chartTwo, setChartTwo] = useState<HTMLElement | null>(null);
     useEffect(() => {
         setChartTwo(chartApiState.data[0] && <AumLpcorp data={chartApiState.data[0].two}
-                           chartClc={chartClc}
-                           onClick={setChartClc}
+                                                        chartClc={chartClc}
+                                                        onClick={setChartClc}
         />)
-    },[chartApiState.data[0].two, chartClc, chartClcNoEtc])
+    }, [chartApiState.data[0].two, chartClc, chartClcNoEtc])
     const solSect = (<CompSortSelect curntOption={selctState} desAsc={ascState}
                                      setcurntOption={setSelect} setdesAsc={setAscState}/>)
     // level 0
-    const [asideFil, setAsideFil] = useState<HTMLElement | null>(null);
-    useEffect(() => {
-        setAsideFil(
-            <div className={styles.asideFiltersJs} key="asidefilterjs" index={1}>
-                <AsideFilters
-                    fromHomeData={filterInitialValues}
-                    filDispat={filDispat}
-                />
-            </div>)
-    }, [])
+
     const [chartComps, setChartComps] = useState<HTMLElement | null>(null);
     useEffect(() => {
         setChartComps(

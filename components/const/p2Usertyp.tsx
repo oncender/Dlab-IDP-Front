@@ -23,7 +23,7 @@ interface ApiFlowObj{
   }
 interface ActionObj{
     typ : string,
-    value : CategoryObj | FloatObj
+    value : CategoryObj | FloatObj | FilterStateObj
 }
 
 // for chart Data
@@ -38,15 +38,16 @@ interface fromApiV1{
     [key:string]:string
 }
 
-interface rateAtData{
+interface aumLpcorp{
     sdaterate:number
     at:string
     loandate:string
     loanamt:number
+    an:string
 }
-interface aumLpcorp{
+interface rateAtData{
     lpcorp:string
-    loandate:string
+    loandate:number
     loanamt:number
 }
 

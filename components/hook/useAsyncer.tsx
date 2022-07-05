@@ -75,7 +75,8 @@ function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [],
     }
     const [apiState, apiDispatch] = useReducer(apiReducer, initials);
     const fetchData = async (loading: boolean) => {
-        if (!start) return setStart(true);
+        console.log('dispatch fetch call', apiState.data,start)
+        if (!start) return ;
         if (!apiState.hasMore) {
             apiDispatch({type: 'NOMORE'});
             return
@@ -100,8 +101,8 @@ function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [],
         }
     };
     const clearData = async () => {
-        console.log('dispatch clear call', apiState.data)
-        if (!start) return setStart(true);
+        console.log('dispatch clear call', apiState.data,start)
+        if (!start) return ;
         apiDispatch({type: 'LOADING'});
         let data
         try {
@@ -120,7 +121,6 @@ function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [],
         // console.log(data.data)
     };
     useEffect(() => {
-            console.log('dispatch clear start', clears, start)
             clearData();
         }, clears
     );
