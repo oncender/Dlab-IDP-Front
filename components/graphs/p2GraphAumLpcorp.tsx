@@ -1,9 +1,9 @@
 import {Column, G2} from '@ant-design/plots';
 import {Button} from "antd";
 
-const AumLpcorp = ({data, chartClc, chartClcNoEtc, onClick, onchartClcNoEtc}:
-                       { data: any, chartClc: boolean, chartClcNoEtc: boolean, onClick: Function,
-                         onchartClcNoEtc: Function }) => {
+const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
+                       { data: any, chartClc: boolean,  onClick: Function,
+                         chartClcNoEtc: boolean, onchartClcNoEtc: Function }) => {
     G2.registerInteraction('element-link', {
         start: [
             {
@@ -30,12 +30,15 @@ const AumLpcorp = ({data, chartClc, chartClcNoEtc, onClick, onchartClcNoEtc}:
     configClickData['meta'] = chartClc ? {} : {value: {min: 0, max: 1,}}
     var newD
     if (chartClcNoEtc) {
-        newD = data
+        newD = data.filter((val) => val.lpcorp != "기타(상위 10개 대주 제외)")
     } else {
         newD = data
     }
+    if (typeof newD == undefined || newD.length ===0){
+        return
+    }
     const config = {
-        newD,
+        data:newD,
         appendPadding: 30,
         xField: 'loandate',
         yField: 'loanamt',
@@ -99,7 +102,7 @@ const AumLpcorp = ({data, chartClc, chartClcNoEtc, onClick, onchartClcNoEtc}:
                 shape='default'>
                 {chartClcNoEtc ? 'etc포함O' : 'etc포함X'}
             </Button>
-            {/*<Column {...config} />*/}
+            <Column {...config} />
         </div>)
 };
 

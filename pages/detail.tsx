@@ -156,6 +156,7 @@ const Detail: NextPage = () => {
                 "자산 유형": item.at,
                 "대출 체결일": item.loandate,
                 "대출약정금": parseIntDef(item.loanamt, null) / 1E8,
+                "자산명": item.an,
             }
         });
 

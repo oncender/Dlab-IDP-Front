@@ -2,7 +2,7 @@
 const path = require('path')
 
 module.exports = {
-    reactStrictMode: true,
+    reactStrictMode: false, //true
     sassOptions : {
         includePaths: [path.join(__dirname,'styles')]
     },

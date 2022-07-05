@@ -74,6 +74,21 @@ export function sortObjectVal(a: any, b: any, targetKey: string) {
     return 0;
 }
 
+export function sortForChartOnly(a: any, b: any, targetKey: string) {
+    if (a[targetKey] == b[targetKey]) {
+        if (a['lpcorp'] === "기타(상위 10개 대주 제외)" && b['lpcorp'] !== "기타(상위 10개 대주 제외)") {
+            return 1
+        } else if (b['lpcorp'] === "기타(상위 10개 대주 제외)" && a['lpcorp'] !== "기타(상위 10개 대주 제외)") {
+            return -1
+        } else {
+            return 0
+        }
+    } else {
+        return a[targetKey] - b[targetKey];
+    }
+}
+
+
 export function objectMap(object: any, mapFn: Function) {
     return Object.keys(object).reduce(function (result, key) {
         result[key] = mapFn(object[key])
@@ -121,52 +136,56 @@ export function detailQueryParser(q: queryParam) {
         category = category.filter((item) => {
             return item.name !== "loancls"
         });
-        category.push({'name':'loancls', 'value':q.loancls!.replace("대출","")!})
+        category.push({'name': 'loancls', 'value': q.loancls!.replace("대출", "")!})
     }
     if ('seniorstr' in q) {
         category = category.filter((item) => {
             return item.name !== "seniorstr"
         });
-        category.push({'name':'seniorstr', 'value':q.seniorstr!.replace("순위","")!})
+        category.push({'name': 'seniorstr', 'value': q.seniorstr!.replace("순위", "")!})
     }
 
     initialFilterState.category = category;
     return initialFilterState;
 }
-export function setCookie(name:string, value:any, options:any = {}) {
-  options = {
-    path: '/',
-    // 필요한 경우, 옵션 기본값을 설정할 수도 있습니다.
-    ...options
-  };
-  if (options.expires instanceof Date) {
-    options.expires = options.expires.toUTCString();
-  }
-  let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
-  for (let optionKey in options) {
-    updatedCookie += "; " + optionKey;
-    let optionValue = options[optionKey];
-    if (optionValue !== true) {
-      updatedCookie += "=" + optionValue;
+
+export function setCookie(name: string, value: any, options: any = {}) {
+    options = {
+        path: '/',
+        // 필요한 경우, 옵션 기본값을 설정할 수도 있습니다.
+        ...options
+    };
+    if (options.expires instanceof Date) {
+        options.expires = options.expires.toUTCString();
     }
-  }
-  if (typeof document != 'undefined'){
-    document.cookie = updatedCookie;}
+    let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+    for (let optionKey in options) {
+        updatedCookie += "; " + optionKey;
+        let optionValue = options[optionKey];
+        if (optionValue !== true) {
+            updatedCookie += "=" + optionValue;
+        }
+    }
+    if (typeof document != 'undefined') {
+        document.cookie = updatedCookie;
+    }
 }
-export function getCookie(name:string) {
-  if (typeof document != 'undefined'){
+
+export function getCookie(name: string) {
+    if (typeof document != 'undefined') {
         let matches = document.cookie.match(new RegExp(
-    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-  ));
-    return matches ? decodeURIComponent(matches[1]) : undefined;
-  } else {
-      return undefined
-  }
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    } else {
+        return undefined
+    }
 }
-export function deleteCookie(name:string) {
-  setCookie(name, "", {
-    'max-age': -1
-  });
+
+export function deleteCookie(name: string) {
+    setCookie(name, "", {
+        'max-age': -1
+    });
 }
 
 
