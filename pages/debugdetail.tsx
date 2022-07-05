@@ -14,6 +14,7 @@ import React, {
 import type {NextPage} from 'next'
 // , GetServerSideProps, InferGetServerSidePropsType
 import {useRouter} from 'next/router'
+import {Button} from "antd";
 // import {DndProvider} from 'react-dnd';
 // import {HTML5Backend} from 'react-dnd-html5-backend';
 //<DndProvider backend={HTML5Backend}>
@@ -54,6 +55,7 @@ import axios from "axios";
 import Header from '../components/Header'
 import Footer from "../components/Footer";
 import Detail from "./detail";
+import CompDataTable from "../components/partials/p2CompTable";
 
 export const windowContext = createContext({windowStatus: ''});
 
@@ -62,6 +64,7 @@ const DEBUGDetail: NextPage = () => {
     // Get URL parameters via next router and setting up filter states
     const router = useRouter();
     const [start, setStart] = useState(false);
+    const [contentType, setContentType] = useState(false);
     /* State & Reducer DEF */
     // @ts-ignore
     const [filterInfo, filDispat] = useReducer(filReducer, INIT_FILST); // all filter variable controller def
@@ -242,32 +245,41 @@ const DEBUGDetail: NextPage = () => {
     )
 
     const sortSelect = (<CompSortSelect curntOption={selctState} desAsc={ascState}
-                                     setcurntOption={setSelect} setdesAsc={setAscState}/>)
+                                        setcurntOption={setSelect} setdesAsc={setAscState}/>)
     const cardComps = useMemo(() => {
             return (
-                <div className={styles.card}>
-                    <span className={styles.filter}>
-                        <div className={styles.title}>
-                            <span>총 대출건수는 </span>
-                            <span><b>{cardApiState.rcn}</b></span>
-                            <span>건 입니다.</span>
-                        </div>
-                        <div className={styles.sort}>
-                            {sortSelect}
-                        </div>
-                    </span>
-                    <span className={styles.board}>
-                        <CompCardGroup data={cardApiState.data}
-                                       refFunc={lastCardRef}
-                                       fontRel={cardFontRel}
-                        />
+            <div className={styles.card}>
+                <span className={styles.filter}>
+                    <div className={styles.title}>
+                        <span>총 대출건수는 </span>
+                        <span><b>{cardApiState.rcn}</b></span>
+                        <span>건 입니다.</span>
+                    </div>
+                    <div className={styles.sort}>
+                        {sortSelect}
+                    </div>
+                    <Button onClick={() => (setContentType(!contentType))} >
+                        {contentType ? '카드보기' : '테이블 보기'}
+                    </Button>
+                </span>
+                {contentType ? (
+                <div>
+                    <CompDataTable data={cardApiState.data}/>
+                </div>
+                ) : (
+                <span className={styles.board}>
+                    <CompCardGroup data={cardApiState.data}
+                                   refFunc={lastCardRef}
+                                   fontRel={cardFontRel}/>
                     <div className={styles.boardError}>
                         {cardApiState.loading && "로딩중입니다...."}
                         {cardApiState.error && "에러발생XXXX"}
                     </div>
-                    </span>
-                </div>)
-        }, [cardApiState.data, cardFontRel]
+                </span>
+                )}
+            </div>)
+        }
+        , [cardApiState.data, cardFontRel, contentType]
     )
 
     ///////////////////////////////////  chart //////////////////////////
@@ -284,7 +296,7 @@ const DEBUGDetail: NextPage = () => {
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]): chartTyp => {
         let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: [], two: []}
         // @ts-ignore
-        console.log("data1",data1)
+        console.log("data1", data1)
         alldata['one'] = data1.map((item) => {
             return {
                 "자산명": item.an,
