@@ -1,11 +1,13 @@
 import {Scatter} from '@ant-design/plots';
+import { AutoComplete } from 'antd';
 import { tupleNum } from 'antd/lib/_util/type';
 import { start } from 'repl';
 
 const RateAtPlot = ({data}: { data: any }) => {
     const config = {
         data,
-        appendPadding: 30,
+        padding: 'Auto',
+        appendPadding: [30,70,0,15],
         xField: '대출 체결일',
         yField: '체결이자',
         sizeField: '대출약정금',
@@ -84,12 +86,17 @@ const RateAtPlot = ({data}: { data: any }) => {
         legend: {
             layout: 'vertical',
             position: 'right',
+            offsetX: -50,
         }
     };
     if (data.length === 0) {
         return
     }
-    return <Scatter {...config} />;
+    return (
+    <div className="mt-8">
+        <p className="pl-4 mb-4 text-3xl font-blinker">Debt Rate Bubble Chart</p>
+        <Scatter {...config} />
+    </div>);
 };
 
 export default RateAtPlot

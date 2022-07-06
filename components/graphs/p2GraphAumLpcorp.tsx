@@ -18,6 +18,7 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
             },
         ],
     });
+    console.log(data)
     const configClickData :{isPercent:boolean,content:Function,meta:any} = {}
     const nonClickF = (item) => {
         return `${(item.loanamt)}억`
@@ -73,6 +74,14 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
         legend: {
             position: 'right-top',
             offsetY: 30,
+            itemName: {
+                formatter: (val) => {
+                    if (val === '기타(상위 10개 대주 제외)') {
+                        return '기타(Top10 제외)'
+                    }
+                    return val.replace('주식회사', '').trim()
+                }
+            }
         },
         style: {
             position: 'relative',
@@ -82,14 +91,15 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
             // width: '70vw'
         }
     };
-    let bl = !chartClc ? "-160px" : "-121px"
-    let bll = !chartClc ? "-120px" : "-120px"
+    let bl = !chartClc ? "-92px" : "-55px"
+    let bll = !chartClc ? "-52px" : "-52px"
     return (
-        <div style={{"display": 'flex', "flexFlow": 'column nowrap', "justifyContent": "space-between"}}>
+        <div style={{"display": 'flex', "flexFlow": 'column nowrap', "justifyContent": "space-between", "marginTop": "4rem"}}>
+            <p className="pl-4 mb-4 text-3xl font-blinker">Percent-Column Plot by Lenders</p>
             <Button
                 style={{
                     "alignSelf": 'flex-end', 'order': 1, "borderRadius": "0.5rem",
-                    "marginBotton": '10px', 'left': `${bl}`, "bottom": '135px', "zIndex": 1
+                    "marginBotton": '10px', 'left': `${bl}`, "bottom": '105px', "zIndex": 1
                 }}
                 key={'grptwoCall'}
                 onClick={() => (onClick(!chartClc))}
@@ -99,7 +109,7 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
             <Button
                 style={{
                     "alignSelf": 'flex-end', 'order': 1, "borderRadius": "0.5rem",
-                    "marginBotton": '10px', 'left': `${bll}`, "bottom": '135px', "zIndex": 1
+                    "marginBotton": '10px', 'left': `${bll}`, "bottom": '105px', "zIndex": 1
                 }}
                 key={'noEtc'}
                 onClick={() => (onchartClcNoEtc(!chartClcNoEtc))}
