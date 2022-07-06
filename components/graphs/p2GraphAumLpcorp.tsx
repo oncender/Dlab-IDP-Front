@@ -59,6 +59,10 @@ const AumLpcorp = ({data, chartClc, onClick}: { data: any, chartClc: boolean, on
                 cfg: {start: [{trigger: 'element:click', action: 'tooltip:show'}]}
             }
         ],
+        legend: {
+            position: 'right-top',
+            offsetY: 30,
+        },
         style: {
             position: 'relative',
             order: 0,
