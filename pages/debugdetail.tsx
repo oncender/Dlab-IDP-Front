@@ -68,13 +68,13 @@ const DEBUGDetail: NextPage = () => {
     /* State & Reducer DEF */
     // @ts-ignore
     const [filterInfo, filDispat] = useReducer(filReducer, INIT_FILST); // all filter variable controller def
-    const [asideFil, setAsideFil] = useState<HTMLElement | null>(<div className={styles.asideFiltersJs}
-                                                                      key="asidefilterjs" index={1}>
-        <AsideFilters
-            fromHomeData={filterInfo}
-            filDispat={filDispat}
-        />
-    </div>);
+    const [asideFil, setAsideFil] = useState<HTMLElement | null>(
+        <div className={styles.asideFiltersJs}
+            key="asidefilterjs" index={1}>
+            <AsideFilters
+                fromHomeData={filterInfo}
+                filDispat={filDispat}/>
+        </div>);
     useLayoutEffect(() => {
         var filterI: FilterStateObj
         if (Object.keys(router.query).length !== 0) {

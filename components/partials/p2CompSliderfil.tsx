@@ -42,7 +42,7 @@ const CompSliderfil = ({label,curntval,mmVal,setSlider,filDispat} :
     },[curntval]);
 
     return (
-        <div key ={label}>
+        <div key={label} className="mt-8">
             <span className="filterName">
                 {label}
             </span>

@@ -18,10 +18,8 @@ const Header = () => {
     <header className={`fixed w-full z-30 bg-filter-btn-clicked-bg bg-opacity-90 transition duration-300 ease-in-out ${!top && 'bg-filter-btn-clicked-bg backdrop-blur-sm shadow-lg'}`}
       style = {{opacity:top ? 1 : 0.7}}
     >
-      <div className="max-w-6xl mx-auto px-5 sm:px-6">
-        <div className="flex items-center justify-between h-16">
-
-          {/* Site branding */}
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center h-16">
           <div className="flex-shrink-0 mr-4" >
             {/* Logo */}
             <Link href="/">
@@ -40,25 +38,9 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Header Title */}
           <div className="flex">
-            <p className="text-2xl" style={{'color':'white','fontWeight':'1000'}}>IGIS Next Loan</p>
+            <p className="text-4xl text-[#FFFFFF] font-semibold font-blinker">IGIS Next Loan</p>
           </div>
-          {/* Site navigation */}
-          <nav className="flex">
-            <ul className="flex flex-grow justify-end flex-wrap items-center">
-              <li>
-                <div className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out"
-                     style={{'color':'white'}}>Sign in</div>
-              </li>
-              <li>
-                <div className="btn-sm text-gray-200 bg-gray-900 hover:bg-gray-800 ml-3"
-                style={{'color':'white'}}>Sign Up</div>
-              </li>
-            </ul>
-
-          </nav>
-
         </div>
       </div>
     </header>

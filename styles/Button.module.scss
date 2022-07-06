@@ -6,6 +6,7 @@
   &-primary {
     width:100%;
     padding:2px;
+    margin: 3px;
     margin-inline: 2px;
     background:map-get($button, "click", "bg");//;//#{rever_color(16, 28, 59)}; // map-get($button, "click", "bg");
     color: map-get($button, "click", "text");
@@ -26,6 +27,7 @@
   &-default {
     width:100%;
     padding: 2px;
+    margin: 3px;
     margin-inline: 2px;
     background-color: map-get($button, "reset", "bg");
     color: map-get($button, "reset", "text");

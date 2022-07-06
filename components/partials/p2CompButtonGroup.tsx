@@ -140,10 +140,10 @@ const CompButtonGroup = ({label, buttons, isclicked, setClick, filDispat}:
     ;
     return (
         <div key={label}>
-            <Row key = {label+'row1'}>
-                <span key = {label+'row1'+'filter'} className="filterName">{label}</span>
+            <Row key={label + 'row1'}>
+                <span key={label + 'row1' + 'filter'} className="filterName">{label}</span>
             </Row>
-            <Row key = {label+'row2'}>
+            <Row key={label + 'row2'} className="mb-2 md:mb-5">
                 {buttonValue}
             </Row>
         </div>
