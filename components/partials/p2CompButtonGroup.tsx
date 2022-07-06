@@ -33,7 +33,7 @@ const NAME_ICON = {
     '실물': faBuildingCircleCheck,
     '대출': faHandHoldingDollar,
     '개발(펀드)': faUsers,
-    '개발(PF)': faMoneyCheckAlt, //faMoneyCheckPen
+    '개발(PFV)': faMoneyCheckAlt, //faMoneyCheckPen
     '선': faCircleCheck,
     '중': faCircleMinus,
     '후': faCircleExclamation,
@@ -123,7 +123,7 @@ const CompButtonGroup = ({label, buttons, isclicked, setClick, filDispat}:
                              { label: string, buttons: Array<string>, isclicked: Array<boolean>, setClick: Function, filDispat: Function }) => {
     // @ts-ignore
     const buttonValue: ReactNode[] = [];
-    console.log("buton render", label)
+    // console.log("buton render", label)
     let name = getKeyByValue(LABELS, label)
     const onClick = (e: MouseEvent, num: number) => {
         num = Number(num)

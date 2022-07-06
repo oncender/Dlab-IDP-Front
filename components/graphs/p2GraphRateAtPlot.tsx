@@ -3,8 +3,6 @@ import { tupleNum } from 'antd/lib/_util/type';
 import { start } from 'repl';
 
 const RateAtPlot = ({data}: { data: any }) => {
-    console.log(data)
-    var delkey = ['loandate','sdaterate','loanamt','at']
     const config = {
         data,
         appendPadding: 30,
@@ -88,6 +86,9 @@ const RateAtPlot = ({data}: { data: any }) => {
             position: 'right',
         }
     };
+    if (data.length === 0) {
+        return
+    }
     return <Scatter {...config} />;
 };
 

@@ -1,49 +1,50 @@
 import styles from "../../styles/Aside.module.scss"
 import {selectArr} from "../reducers/FilterReducer";
-import {INIT_FILST, ItemTypes, LABELS, MM_DEBT} from "../const/p2Constant";
-import React, {useMemo, useState, useEffect} from "react";
+import {LABELS, MM_DEBT} from "../const/p2Constant";
+import React, {useEffect, useMemo, useState} from "react";
 import {
-    fromApiV1,
-    rateAtData,
-    aumLpcorp,
-    cardComp,
-    pageCountTyp,
-    ApiFlowObj,
     FilterStateObj
 } from "../const/p2Usertyp"
 import CompButtonGroup from "./p2CompButtonGroup";
 import CompSliderfil from "./p2CompSliderfil";
-import { useDrag, useDrop } from 'react-dnd';
 
-const AsideFilters = ({id, index ,window,fromHomeData,filDispat}:
-                          {   id: string, index: number,
-                              window: string,
-                              fromHomeData:{filterInit:FilterStateObj,sldrInit:[number,number]},
+const AsideFilters = ({fromHomeData,filDispat, start}:
+                          {   fromHomeData:FilterStateObj,
                               filDispat:Function,styleJs:{[key:string]:string}
+                              start:boolean
                           }) => {
     // button component dependent param def
-    const itValue: Array<string> = ['실물', '대출', '개발(펀드)', '개발(PF)'];
-    const itClicked = selectArr(itValue, INIT_FILST.category, 'it');
+    const itValue: Array<string> = ['실물', '대출', '개발(펀드)', '개발(PFV)'];
+    const itClicked = selectArr(itValue, fromHomeData.category, 'it');
     const [clickArrIt, setClickArrIt] = useState(itClicked);
 
     const seniorstrValue: Array<string> = ['선', '중', '후'];
-    const seniorstrClicked = selectArr(seniorstrValue, INIT_FILST.category, 'seniorstr');
+    const seniorstrClicked = selectArr(seniorstrValue, fromHomeData.category, 'seniorstr');
     const [clickArrSeniorstr, setClickArrSeniorstr] = useState(seniorstrClicked);
 
     const atValue: Array<string> = ['오피스', '물류', '호텔', '리테일', '복합', '주거', '특별자산', '기타'];
-    const atClicked = selectArr(atValue, INIT_FILST.category, 'at');
+    const atClicked = selectArr(atValue, fromHomeData.category, 'at');
     const [clickArrAt, setClickArrAt] = useState(atClicked);
 
     const rateValue: Array<string> = ['고정', '변동'];
-    const rateClicked = selectArr(rateValue, INIT_FILST.category, 'rate');
+    const rateClicked = selectArr(rateValue, fromHomeData.category, 'rate');
     const [clickArrRate, setClickArrRate] = useState(rateClicked);
 
     const loanClsValue: Array<string> = ['담보', '브릿지','한도','부가세','PF','기타(대출)'];
-    const loanClsClicked = selectArr(loanClsValue, INIT_FILST.category, 'loancls');
+    const loanClsClicked = selectArr(loanClsValue, fromHomeData.category, 'loancls');
     const [clickLoanCls, setClickLoanCls] = useState(loanClsClicked);
-    console.log("loanClsClicked",loanClsClicked)
+    console.log("Aside rendered!!!")
     // slider component dependent def
-    const [sldrval, setSldrval] = useState(fromHomeData.sldrInit)
+    const [sldrval, setSldrval] = useState(fromHomeData.float.filter((val)=> val.name==='debt')[0].value)
+    useEffect(() => {
+        // if (!start) return
+        setClickArrIt(itClicked)
+        setClickArrSeniorstr(seniorstrClicked)
+        setClickArrAt(atClicked)
+        setClickArrRate(rateClicked)
+        setClickLoanCls(loanClsClicked)
+        setSldrval(fromHomeData.float.filter((val)=> val.name==='debt')[0].value)
+    },[fromHomeData])
 
     // button component def
     const iTButton = useMemo(() => {
