@@ -21,7 +21,7 @@ const CartPart = ({keystring, cardData}:
         cardData.loandate
     ] //cardData.it,cardData.at,cardData.seniorstr
     const router = useRouter()
-    const getIcon = (id) => <FontAwesomeIcon icon={NAME_ICON[id]} style={{'marginLeft':"2%"}} title={
+    const getIcon = (id) => <FontAwesomeIcon icon={NAME_ICON[id]} style={{'marginLeft':"2%",'zIndex':"30"}} title={
         `${cardData.it}  ${cardData.at}  ${cardData.seniorstr}  ${cardData.rate}`
     } />
     const getCol20 = () => {

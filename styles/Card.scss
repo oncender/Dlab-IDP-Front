@@ -98,7 +98,7 @@
             font-size: 1.5em;
             font-weight: 1000;
             @if $size == 'large' {
-              margin-bottom: 10px
+              //margin-bottom: 10px
             };
             display: flex;
             flex-wrap: nowrap;
@@ -106,7 +106,7 @@
 
             .ant-card-meta-description {
               //color: #3F3F3F;
-              color: #1C6FBC;
+              //color: #1C6FBC;
             }
           }
         ;
@@ -115,6 +115,8 @@
             font-size: 1.5em;
 
             .ant-card-meta-description {
+              color: #3F3F3F;
+              font-weight: 800;
               //color: #1C6FBC;
             }
           }

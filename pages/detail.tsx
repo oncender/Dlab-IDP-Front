@@ -125,13 +125,14 @@ const Detail: NextPage = () => {
                 durStr += year == 0 ? "" : " "
                 durStr += `${month}개월`
             }
-            return durStr;
+            return durStr ? durStr : "데이터 없음";
         }
 
-        function imagePath(img: string): string {
+        function imagePath(img: string,at:string): string {
             if (!parseInt(img)) {
                 // after mock image file added.
-                return ''  //e.g. mock_pic/{img}.png
+                // SET no PIC building TYPE : 1 or 2
+                return `no_pic_building/${at}1.png`  //e.g. mock_pic/{img}.png
             } else {
                 return `building_pic/${img}.png` // only {number} returned in api
             }
@@ -149,7 +150,7 @@ const Detail: NextPage = () => {
                     loanamt: parseInt(parseIntDef(val.loanamt, null) / 1E8),
                     sdaterate: parseFloatDef(val.sdaterate, null),
                     duration: durationParser(parseIntDef(val.duration, 0)),
-                    img: imagePath(val.img),
+                    img: imagePath(val.img,val.at),
                     fc: val.fc,
                     idx: val.idx,
                     loancls: val.loancls,
