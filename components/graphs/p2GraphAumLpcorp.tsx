@@ -44,6 +44,8 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
         xField: 'loandate',
         yField: 'loanamt',
         seriesField: 'lpcorp',
+        colorField: 'lpcorp',
+        color: ['#f96900','#ffd500', '#82cab2', '#193442', '#d18768', '#9a1b7a', '#3c82a5', '#e728a7', '#0093ff', '#96959c','#786E96','C8C5C0'],
         isPercent: configClickData['isPercent'],
         isStack: true,
         meta: configClickData['meta'],
@@ -53,10 +55,6 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
             style: {
                 fill: '#fff',
             },
-        },
-        title: {
-            text: "대출약정금",
-            position: "end"
         },
         tooltip: true,
         interactions: [
@@ -93,9 +91,10 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
     };
     let bl = !chartClc ? "-92px" : "-55px"
     let bll = !chartClc ? "-52px" : "-52px"
+
     return (
         <div style={{"display": 'flex', "flexFlow": 'column nowrap', "justifyContent": "space-between", "marginTop": "4rem"}}>
-            <p className="pl-4 mb-4 text-3xl font-blinker">Percent-Column Plot by Lenders</p>
+            <p className="pl-4 mb-4 text-3xl font-blinker">{!chartClc ? "Percent-Column Plot by Lenders" : "Raw Value Sum-Column Plot by Lenders"}</p>
             <Button
                 style={{
                     "alignSelf": 'flex-end', 'order': 1, "borderRadius": "0.5rem",
