@@ -1,5 +1,15 @@
 import {FilterStateObj, FundDataType} from "./p2Usertyp";
 import type { ColumnsType } from "antd/lib/table"
+import {
+    faBriefcase, faTruck, faHotel, faCartShopping, faHouseChimney, faOilWell, faBuilding,
+    faBuildingCircleCheck, faHandHoldingDollar, faUsers, faMoneyCheckAlt,
+    faCircleCheck, faCircleMinus, faCircleExclamation, faPercent,
+    faEllipsis, faWaveSquare ,
+    faBuildingLock,faClipboardList,faFileInvoiceDollar,faBridge,
+} from "@fortawesome/free-solid-svg-icons";
+import { faViacoin, faEtsy
+} from "@fortawesome/free-brands-svg-icons"
+// faCircleEllipsisVertical, faWavePulse : pro
 
 // Filter Default action
 export const FILTER_ACTION = {
@@ -65,6 +75,7 @@ export const CARD_LABELS = {
     'seniorstr': '대출 순위',
     'rate': '금리 종류',
     'loancls':'대출 분류',
+    'loandate':'대출 체결일'
     }
 
 export const APIURL = {
@@ -91,6 +102,34 @@ export const TEMPCSS = {
 export const ItemTypes = {
     ContentS : 'ContentS',
 
+}
+
+
+
+export const NAME_ICON = {
+    '오피스': faBriefcase,
+    '물류': faTruck,
+    '호텔': faHotel,
+    '리테일': faCartShopping,
+    '복합': faBuilding,
+    '주거': faHouseChimney,
+    '특별자산': faOilWell,
+    '기타': faEllipsis,
+    '실물': faBuildingCircleCheck,
+    '대출': faHandHoldingDollar,
+    '개발(펀드)': faUsers,
+    '개발(PFV)': faMoneyCheckAlt, //faMoneyCheckPen
+    '선': faCircleCheck,
+    '중': faCircleMinus,
+    '후': faCircleExclamation,
+    '고정': faPercent,
+    '변동': faWaveSquare,
+    '담보':	faBuildingLock,
+    'PF':	faClipboardList,
+    '한도':	faFileInvoiceDollar,
+    '부가세':	faViacoin,
+    '브릿지'	:faBridge,
+    '기타(대출)':	faEtsy
 }
 
 

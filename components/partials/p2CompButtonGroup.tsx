@@ -6,46 +6,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ReactNode, useContext} from 'react'
 
 import {Button, Row} from 'antd'
-import {FILTER_ACTION, LABELS} from "../const/p2Constant"
+import {FILTER_ACTION, LABELS,NAME_ICON} from "../const/p2Constant"
 import {getKeyByValue} from "../const/p2Utils"
 
-import {
-    faBriefcase, faTruck, faHotel, faCartShopping, faHouseChimney, faOilWell, faBuilding,
-    faBuildingCircleCheck, faHandHoldingDollar, faUsers, faMoneyCheckAlt,
-    faCircleCheck, faCircleMinus, faCircleExclamation, faPercent,
-    faEllipsis, faWaveSquare ,
-    faBuildingLock,faClipboardList,faFileInvoiceDollar,faBridge,
-} from "@fortawesome/free-solid-svg-icons";
-import { faViacoin, faEtsy
-} from "@fortawesome/free-brands-svg-icons"
-// faCircleEllipsisVertical, faWavePulse : pro
-
-
-const NAME_ICON = {
-    '오피스': faBriefcase,
-    '물류': faTruck,
-    '호텔': faHotel,
-    '리테일': faCartShopping,
-    '복합': faBuilding,
-    '주거': faHouseChimney,
-    '특별자산': faOilWell,
-    '기타': faEllipsis,
-    '실물': faBuildingCircleCheck,
-    '대출': faHandHoldingDollar,
-    '개발(펀드)': faUsers,
-    '개발(PFV)': faMoneyCheckAlt, //faMoneyCheckPen
-    '선': faCircleCheck,
-    '중': faCircleMinus,
-    '후': faCircleExclamation,
-    '고정': faPercent,
-    '변동': faWaveSquare,
-    '담보':	faBuildingLock,
-    'PF':	faClipboardList,
-    '한도':	faFileInvoiceDollar,
-    '부가세':	faViacoin,
-    '브릿지'	:faBridge,
-    '기타(대출)':	faEtsy
-}
 
 //["solid", "fa-briefcase"]
 const ButtonPart = (num: number, isclicked: boolean, name: string, onClick: any) => {

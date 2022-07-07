@@ -70,6 +70,7 @@ interface cardComp {
     it: string,
     at: string,
     rate: string,
+    loandate:string,
 }
 
 interface pageCountTyp {

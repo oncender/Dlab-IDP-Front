@@ -64,6 +64,27 @@ export function groupbyKeys(obArr: Array<any>, targetKey: string, keys: string[]
     }, new Map).values()];
 }
 
+// export function groupbyKeysObject(obArr: Array<any>,keys: string[]) {
+//     return [...obArr.reduce((r, o) => {
+//         const key = keys.map((k) => o[k]).join("-")
+//         if (r.has(key)){
+//             var item = r.get(key)
+//             item = Object.keys(item).map((k)=>{
+//                 if (item[k] === o[k]){
+//                     return item[k]
+//                 } else {
+//                     return [...item[k],o[k]]
+//                 }
+//             })
+//             return r.set(key, item)
+//             } else {
+//             const item = Object.assign({}, o);
+//             return r.set(key, item);
+//         }
+//     }, new Map).values()];
+// }
+
+
 export function sortObjectVal(a: any, b: any, targetKey: string) {
     if (a[targetKey] < b[targetKey]) {
         return -1;

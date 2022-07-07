@@ -157,6 +157,7 @@ const Detail: NextPage = () => {
                     it: val.it,
                     at: val.at,
                     rate: val.rate,
+                    loandate:val.loandate.replace(/-/g,".")
                 }
             })
         } else {
