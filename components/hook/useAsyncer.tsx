@@ -87,7 +87,7 @@ function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [],
             data = await callback();
             if (loading) {
                 console.log('delay 1000')
-                await asyncwait(1000)
+                await asyncwait(400)
             }
             apiDispatch({
                 type: 'SUCCESS',

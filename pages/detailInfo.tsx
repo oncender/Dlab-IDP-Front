@@ -1,8 +1,9 @@
 import Buttonstyles from "../styles/Button.module.scss"
 import Layoutstyles from "../styles/DetailInfo.module.scss"
 import {useRouter} from 'next/router'
-import React, {useEffect, useMemo, useState} from 'react';
-import {InferGetServerSidePropsType} from 'next';
+import Header from '../components/Header'
+import Footer from "../components/Footer";
+import React, {useLayoutEffect, useMemo, useState} from 'react';
 
 // page layout
 import {Layout, Button} from 'antd';
@@ -14,9 +15,11 @@ import LargeFundDesc from "../components/partials/p3CompDesc"
 import AssetDescSummary from "../components/partials/p3CompSumm"
 import PDFViewer from "../components/partials/p3CompPdf"
 import axios from "axios";
+import {getCookie, setCookie} from "../components/const/p2Utils";
+import {ParsedUrlQuery} from "querystring";
 
 
-const {Header, Content} = Layout;
+const {_, Content} = Layout;
 
 const Home = () => {
     async function DataFetch(fc: string, idx: string) {
@@ -43,9 +46,6 @@ const Home = () => {
     const [showDesc, setShowDesc] = useState(true);
     const [showPDF, setShowPDF] = useState(false);
 
-
-    console.log('router', router.query)
-    console.log('data', fundData)
     const handleClickDesc = (e: MouseEvent) => {
         setShowDesc(true)
         setShowPDF(false)
@@ -56,8 +56,20 @@ const Home = () => {
     }
 
 
-    useEffect(() => {
-        DataFetch(router.query.fc, router.query.idx);
+    useLayoutEffect(() => {
+        var querydetail : ParsedUrlQuery
+        if (Object.keys(router.query).length !== 0) {
+            querydetail = router.query;
+            setCookie('detailInfoCookie',JSON.stringify(querydetail), {secure: true, 'max-age': 3600})
+        } else {
+            var cookietemp = getCookie('detailInfoCookie')
+            if (cookietemp) {
+                querydetail = JSON.parse(cookietemp)
+            } else {
+                querydetail = {fc:'',idx:''}
+            }
+        }
+        DataFetch(querydetail.fc as string, querydetail.idx as string);
     }, [])
 
     const ADS = useMemo(() => {
@@ -89,15 +101,16 @@ const Home = () => {
         )
     }, [showDesc])
     const PDF = useMemo(() => {
-        var contractFile = "/pdfs/test.pdf"
-        return (<PDFViewer fileLoc={contractFile} display={showPDF}/>)
+        if (!fundData) return;
+        return (<PDFViewer fileLoc={`/pdf/${fundData.data.fc}/${fundData.data.file}.pdf`} display={showPDF}/>)
     }, [fundData,showPDF])
 
     return (
+
         <div
             style={{display: 'flex', flexDirection: 'row'}}>
             <Layout>
-                <Header></Header>
+                <Header link = {"/detail"} />
                 <Content
                     style={{margin: '24px 290px 24px'}}
                 >
@@ -109,7 +122,9 @@ const Home = () => {
                         {PDF}
                     </div>
                 </Content>
+                <Footer/>
             </Layout>
+
         </div>
     )
 };
