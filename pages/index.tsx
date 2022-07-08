@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { NextPage } from 'next';
 import MovingComponent from 'react-moving-text';
-import mainStyles from "../styles/main.module.scss";
+import mainStyles from "../styles/Main.module.scss";
 import GridLoader from 'react-spinners/GridLoader';
 import BigSelect from '../components/partials/p1CompBigSelectMain';
 import ResultContents from '../components/partials/p1CompResultContents';
@@ -19,7 +19,7 @@ const Home: NextPage = () => {
   const [modelResult, setModelResult] = useState()
   const focusRef = useRef<HTMLDivElement>(null);
   const goToDetailStr = "";
-  const API_URL="/api/v1/model/pred";
+  const API_URL = "/api/v1/model/pred";
 
   const handleLoanPriority = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setLoanPriority(event.target.value)
