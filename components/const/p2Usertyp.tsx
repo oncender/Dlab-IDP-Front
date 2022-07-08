@@ -33,7 +33,7 @@ interface rateAtData {
     sdaterate: string
     at: string
     loandate: string
-    loanamt: string
+    loanamt: number
 }
 
 interface fromApiV1 {
@@ -50,7 +50,7 @@ interface aumLpcorp {
 
 interface rateAtData {
     lpcorp: string
-    loandate: number
+    loandate: string
     loanamt: number
 }
 

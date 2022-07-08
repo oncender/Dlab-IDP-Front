@@ -7,15 +7,18 @@ module.exports = {
         includePaths: [path.join(__dirname,'styles')]
     },
     async rewrites() {
-        if (process.env.NODE_ENV !== 'production') {
+        // if (process.env.NODE_ENV !== 'production') {
             return [
                 {
                     destination: process.env.DESTINATION,
                     source: process.env.SOURCE,
                 },
-            ];
-        }
+            ]
+        // }
     },
+    typescript: {
+        ignoreBuildErrors: true,
+    }
 }
 
 // module.exports = nextConfig

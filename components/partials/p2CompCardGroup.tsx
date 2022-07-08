@@ -12,20 +12,24 @@ import {CARD_LABELS, TEMPCSS} from "../const/p2Constant"
 
 const {Meta} = Card;
 
-const CartPart = ({keystring, cardData}:
-                      { keystring: string, cardData: cardComp, }) => {
-    if (!cardData.sdaterate){
-        return};
+const CartPart = (  {keystring, cardData}:
+                    { keystring: string, cardData: cardComp, }) => {
+    const router = useRouter()
+    if (!cardData.sdaterate) {
+        return
+    };
     const image_url = cardData.img ? cardData.img : "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
-    const col4Data = [`${cardData.loanamt}억`, `${cardData.loan}억`, `${cardData.sdaterate.toFixed(2)}%`, cardData.duration,
-            cardData.it,cardData.at,cardData.seniorstr
+    const col4Data = [
+        `${cardData.loanamt}억`, 
+        `${cardData.loan}억`, 
+        `${cardData.sdaterate.toFixed(2)}%`, 
+        cardData.duration,
+        cardData.it,
+        cardData.at,
+        cardData.seniorstr
     ]
 
-
-    const router = useRouter()
-
     return (
-
         <Card key={keystring} hoverable
               custom="ROW" onClick={() => router.push({
                 pathname: '/detailInfo',
@@ -39,22 +43,22 @@ const CartPart = ({keystring, cardData}:
                 <img
                     key = {keystring+'col1'+'img'}
                     alt="example" src={image_url}
-                     style={{
-                         width: '100%',
-                         height: '100%'
-                     }}/>
+                    style={{
+                        width: '100%',
+                        height: '100%'
+                    }}/>
             </div>
             <div key = {keystring+'col2'} className='col2'>
                 <Meta description={cardData.loancls} key={`${keystring}col20`}
-                      custom={'col20'}
+                    custom={'col20'}
                 />
                 <Meta description={cardData.an} key={`${keystring}col21`}
-                      custom={'col21'}
+                    custom={'col21'}
                 />
                 <Meta description={cardData.fn} key={`${keystring}col22`}
-                      custom={'col22'} style={{color: '#1C6FBC'}}/>
+                    custom={'col22'} style={{color: '#1C6FBC'}}/>
                 <Meta description={cardData.lpcorp} key={`${keystring}col23`}
-                      custom={'col23'} style={{color: '#1C6FBC'}}/>
+                    custom={'col23'} style={{color: '#1C6FBC'}}/>
             </div>
             <div key = {keystring+'col3'} className='col3'>
                 {[CARD_LABELS.loanamt, CARD_LABELS.loan, CARD_LABELS.sdaterate, CARD_LABELS.duration,
@@ -78,8 +82,9 @@ const CartPart = ({keystring, cardData}:
 }
 
 
-const CompCardGroup = ({data, refFunc,fontRel}:
-                           { data: cardComp[], refFunc: Function,fontRel:{[key:string]:number}}
+const CompCardGroup = (
+        {data, refFunc,fontRel}:
+        { data: cardComp[], refFunc: Function,fontRel:{[key:string]:number}}
 ) => {
     if (data == undefined) return;
 

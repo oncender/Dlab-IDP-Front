@@ -2,7 +2,7 @@ import {CategoryObj, FilterStateObj, FloatObj} from "./p2Usertyp";
 import {INIT_FILST} from "./p2Constant"
 
 export function zip(a1: any, a2: any) {
-    return a1.map((x, i) => [x, a2[i]]);
+    return a1.map((x:any, i:any) => [x, a2[i]]);
 }
 
 export function parseFloatDef(val: string, defaultval: any) {
@@ -88,9 +88,12 @@ export function sortForChartOnly(a: any, b: any, targetKey: string) {
     }
 }
 
+interface ObjType {
+    [index: string]: string
+}
 
 export function objectMap(object: any, mapFn: Function) {
-    return Object.keys(object).reduce(function (result, key) {
+    return Object.keys(object).reduce(function (result: ObjType, key) {
         result[key] = mapFn(object[key])
         return result
     }, {})

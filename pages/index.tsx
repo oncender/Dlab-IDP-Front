@@ -5,6 +5,7 @@ import mainStyles from "../styles/main.module.scss";
 import GridLoader from 'react-spinners/GridLoader';
 import BigSelect from '../components/partials/p1CompBigSelectMain';
 import ResultContents from '../components/partials/p1CompResultContents';
+import MacroContents from '../components/partials/p1CompMacroContents';
 import HowItWorksContents from '../components/partials/p1CompHowItWorksContents';
 import axios from "axios";
 import useMoveScrool from "../components/hook/useScroll";
@@ -111,10 +112,16 @@ const Home: NextPage = () => {
               <GridLoader loading={loading} color='#67FFBF' size={30} />
             </div>
             :
-            <ResultContents 
-              loanType={loanType} 
-              loanPriority={loanPriority} 
-              modelPredict={modelResult!}/>
+            <div>
+              <ResultContents 
+                loanType={loanType} 
+                loanPriority={loanPriority}
+                modelPredict={modelResult!}/>
+              <MacroContents 
+                loanType={loanType} 
+                loanPriority={loanPriority} 
+                modelPredict={modelResult!}/>
+              </div>
             }
           </div>
         </div>

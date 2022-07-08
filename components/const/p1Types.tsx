@@ -13,4 +13,10 @@ interface resultProp {
     modelPredict: modelPredictType;
 }
 
-export type { modelPredictType, resultProp }
+interface macroProp {
+    loanType: string;
+    loanPriority: string;
+    modelPredict: modelPredictType;
+}
+
+export type { modelPredictType, resultProp, macroProp }
