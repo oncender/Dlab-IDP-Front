@@ -49,7 +49,9 @@ export default function ResultContents(props: resultProp) {
         </table>
         {/* <p>⚠️ 표본수가 적은 경우 금리 모델링 값의 정확도가 떨어질 수 있습니다. (예: 후순위, 브릿지)</p> */}
         <div className="mt-8 text-right">
-            <Link href={`/debugdetail?loancls=${props.loanType}&seniorstr=${props.loanPriority}`} as={'/detail'} >
+            <Link href={`/detail?loancls=${props.loanType}&seniorstr=${props.loanPriority}`}
+                  // as={'/detail'}
+            >
               <a className="text-[#45f0a8] text-xl md:text-3xl underline underline-offset-4 decoration-2 mr-10">
                 더 상세한 정보 확인하기 →
               </a>

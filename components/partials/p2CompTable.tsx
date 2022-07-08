@@ -6,6 +6,7 @@ const CompDataTable: React.FC = ({ data, display }: { data: any, display: boolea
 
     return (
         <Table
+            key = 'TableAll'
             columns={FundColumns}
             dataSource={data}
             size="small"

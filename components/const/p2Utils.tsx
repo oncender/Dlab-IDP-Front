@@ -74,6 +74,17 @@ export function sortObjectVal(a: any, b: any, targetKey: string) {
     return 0;
 }
 
+export function to_date(date_str:string){
+    // date_str : yyyy-mm-dd
+    var yyyyMMdd = String(date_str);
+    var sYear = yyyyMMdd.substring(0,4);
+    var sMonth = yyyyMMdd.substring(5,7);
+    var sDate = yyyyMMdd.substring(8,10);
+
+    //alert("sYear :"+sYear +"   sMonth :"+sMonth + "   sDate :"+sDate);
+    return new Date(Number(sYear), Number(sMonth)-1, Number(sDate));
+}
+
 export function sortForChartOnly(a: any, b: any, targetKey: string) {
     if (a[targetKey] == b[targetKey]) {
         if (a['lpcorp'] === "기타(상위 10개 대주 제외)" && b['lpcorp'] !== "기타(상위 10개 대주 제외)") {

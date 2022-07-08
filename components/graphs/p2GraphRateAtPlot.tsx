@@ -2,10 +2,15 @@ import {Scatter} from '@ant-design/plots';
 import { AutoComplete } from 'antd';
 import { tupleNum } from 'antd/lib/_util/type';
 import { start } from 'repl';
-
+import { to_date} from "../const/p2Utils"
 const RateAtPlot = ({data}: { data: any }) => {
+    console.log('rateAtplot',data?.[0],to_date("2022-02-01"))
+    const newData = data.map((val) => {
+        val['대출 체결일'] = to_date(val['대출 체결일'])
+        return val
+    })
     const config = {
-        data,
+        data: newData,
         padding: 'Auto',
         appendPadding: [30,70,0,15],
         xField: '대출 체결일',
@@ -19,29 +24,28 @@ const RateAtPlot = ({data}: { data: any }) => {
             fillOpacity: 0.8,
             stroke: '#bbb',
         },
-        tooltip: {
-            customContent: (title, items) => {
-                const formatter = {
-                    '대출 체결일': (val) => val.replace(/-/g, '.'),
-                    '체결이자': (val) => Number(val).toFixed(2) + '%',
-                    '대출약정금': (val) => val + '억원',
-                    '자산 유형': (val) => val,
+        meta: {
+            '대출 체결일' : {
+                alias :'대출 체결일',
+                formatter : (v) => {
+                 let d1 = new Date(v).toISOString()
+                    return `${d1.substring(0, 10).replace(/-/g,".")}`
                 }
-                let htmlStr = `<div style="margin:10px 0;font-weight:700;"><div class="g2-tooltip-items">`;
-                items.forEach((item) => {
-                htmlStr += `<div class="g2-tooltip-item" style="margin-bottom:8px;display:flex;justify-content:space-between;">
-                        <span class="g2-tooltip-item-label" style="margin-right: 12px;">${
-                        item.name
-                        }</span>
-                        <span class="g2-tooltip-item-value">${
-                        formatter[item.name](item.value)
-                        }</span>
-                    </div>`;
-                });
-                htmlStr += '</div>';
-                return htmlStr;
             },
-        
+            '체결이자' : {
+                alias : '체결이자',
+                formatter: (v) => `${Number(v).toFixed(2)}'%`,
+            },
+            '대출약정금' : {
+                alias : '대출약정금',
+                formatter: (v) => `${v}억원`,
+            },
+            '자산명' : {
+                alias : '자산명'
+            }
+        },
+        tooltip: {
+            fields : ['대출 체결일','체결이자','대출약정금','자산명']
         },
         title: {
             text: "이자율",
@@ -49,7 +53,10 @@ const RateAtPlot = ({data}: { data: any }) => {
         },
         xAxis: {
             label: {
-                formatter: (v) => `${v.split('-').splice(0, 2).join("/")}`,
+                formatter: (v) => {
+                    return `${v.split('.').splice(0, 2).join("/")}`
+                },
+            // .split('-').splice(0, 2).join("/")
             },
             grid: {
                 line: {
