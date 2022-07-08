@@ -11,7 +11,7 @@ const CompDataTable: React.FC = ({ data, display }: { data: any, display: boolea
             dataSource={data}
             size="small"
             scroll={{ x: 2000, y: 1000 }}
-            pagination={{ pageSize: 10 }}
+            pagination={{ pageSize: 10,size:"small", showSizeChanger:false, showQuickJumper:true}}
         />
     );
 }
