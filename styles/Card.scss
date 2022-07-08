@@ -19,7 +19,7 @@
       justify-content: space-between;
       margin-right: 10px;
     }
-  }
+  };
   div[custom=ROW] {
     display: flex;
     margin-top: 1%;
@@ -129,7 +129,7 @@
         flex-flow: row wrap;
         @if $size == 'large' {
           grid-row: 1/11;
-          grid-column: 32/36;
+          grid-column: 31/36;
         } @else if $size == 'medium' {
           grid-column: 22/31;
           grid-row: 1/8;
@@ -180,10 +180,13 @@
       ;
       }
 
-      @content
-    }
-  }
 
+    }
+  @content
+  };
+  div[role=presentation] {
+    width:100%
+  };
 
 }
 

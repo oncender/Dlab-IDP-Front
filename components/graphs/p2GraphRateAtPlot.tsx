@@ -4,7 +4,6 @@ import { tupleNum } from 'antd/lib/_util/type';
 import { start } from 'repl';
 import { to_date} from "../const/p2Utils"
 const RateAtPlot = ({data}: { data: any }) => {
-    console.log('rateAtplot',data?.[0],to_date("2022-02-01"))
     const newData = data.map((val) => {
         val['대출 체결일'] = to_date(val['대출 체결일'])
         return val

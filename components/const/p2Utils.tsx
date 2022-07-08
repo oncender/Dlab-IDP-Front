@@ -120,6 +120,37 @@ export function sortForChartOnly(a: any, b: any, targetKey: string) {
     }
 }
 
+export function sortFloat(a: any, b: any, targetKey: string,asc=true) {
+    var fa = parseFloatDef(a[targetKey],-1e5);
+    var fb = parseFloatDef(b[targetKey],-1e5);
+    if (asc){
+        return fa - fb
+    } else {
+        return fb - fa
+    }
+}
+
+export function sortString(a: any, b: any, targetKey: string,asc=true) {
+    var fa = a[targetKey].toLowerCase();
+    var fb = b[targetKey].toLowerCase();
+    var backvalue:number
+    var frontvalue:number
+    if (asc){
+        frontvalue = 1
+        backvalue = -1
+    } else {
+        frontvalue = -1
+        backvalue = 1
+    }
+    if (fa < fb) {
+        return backvalue;
+    }
+    if (fa > fb) {
+        return frontvalue;
+    }
+    return 0;
+}
+
 export function objectMap(object: any, mapFn: Function) {
     return Object.keys(object).reduce(function (result, key) {
         result[key] = mapFn(object[key])
@@ -159,7 +190,6 @@ interface queryParam {
 export function detailQueryParser(q: queryParam) {
     let initialFilterState = INIT_FILST;
     let category = INIT_FILST.category;
-    console.log("query", q)
     if (!q || Object.keys(q).length === 0) {
         return INIT_FILST;
     }

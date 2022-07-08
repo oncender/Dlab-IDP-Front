@@ -1,13 +1,13 @@
 import {SliderMarks} from "antd/lib/slider";
 import {ReactNode, useContext, useEffect, useMemo, useState} from "react";
 import {Slider} from "antd";
-import {FILTER_ACTION, LABELS} from "../const/p2Constant";
+import {FILTER_ACTION, ALL_LABEL} from "../const/p2Constant";
 import { getKeyByValue } from "../const/p2Utils"
 
 
 const CompSliderfil = ({label,curntval,mmVal,setSlider,filDispat} :
     {label: string, curntval: [number,number], mmVal: [number,number], setSlider: Function, filDispat: Function}) => {
-    let name = getKeyByValue(LABELS,label)
+    let name = getKeyByValue(ALL_LABEL,label)
     const handleYearSlider = (value: [number, number]) => {
         let actionType = FILTER_ACTION.FLOAT_UPDATE
         setSlider(value)

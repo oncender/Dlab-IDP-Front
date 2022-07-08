@@ -8,7 +8,7 @@ import {useRouter} from "next/router";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {getTempRem} from "../const/p2Utils"
 import {cardComp} from "../const/p2Usertyp";
-import {CARD_LABELS, NAME_ICON} from "../const/p2Constant"
+import {ALL_LABEL, NAME_ICON} from "../const/p2Constant"
 
 const {Meta} = Card;
 
@@ -65,14 +65,14 @@ const CartPart = ({keystring, cardData}:
                       custom={'col23'} style={{color: '#1C6FBC'}}/>
             </div>
             <div key = {keystring+'col3'} className='col3'>
-                {[CARD_LABELS.loanamt, CARD_LABELS.loan, CARD_LABELS.sdaterate, CARD_LABELS.duration,
-                    CARD_LABELS.loandate
+                {[ALL_LABEL.loanamt, ALL_LABEL.loan, ALL_LABEL.sdaterate, ALL_LABEL.duration,
+                    ALL_LABEL.loandate
                 ].map(
                     (val, id) => {
                         return (<Meta key={`${keystring}col3${id}`} description={val}/>)
                     }
                 )}
-                {/*CARD_LABELS.it,CARD_LABELS.at,CARD_LABELS.seniorstr*/}
+                {/*ALL_LABEL.it,ALL_LABEL.at,ALL_LABEL.seniorstr*/}
             </div>
             <div key = {keystring+'col4'} className='col4'>
                 {col4Data.map(
@@ -137,9 +137,6 @@ const CompCardGroup = ({data, refFunc,fontRel}:
         val.lpcorp = moreThanFig(val.lpcorp, fontRel.lpcorp)
         return val
     })
-    // console.log(cardData.fn,byte_length(cardData.fn))
-    // console.log(cardData.an,byte_length(cardData.an))
-
     const cardParts = newdata.map((val, idx) => {
         const isLastElement = data.length === idx + 1;
         // keystring={val.fn + val.lpcorp}

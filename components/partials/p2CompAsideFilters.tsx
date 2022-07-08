@@ -33,7 +33,6 @@ const AsideFilters = ({fromHomeData,filDispat, start}:
     const loanClsValue: Array<string> = ['담보', '브릿지','한도','부가세','PF','기타(대출)'];
     const loanClsClicked = selectArr(loanClsValue, fromHomeData.category, 'loancls');
     const [clickLoanCls, setClickLoanCls] = useState(loanClsClicked);
-    console.log("Aside rendered!!!")
     // slider component dependent def
     const [sldrval, setSldrval] = useState(fromHomeData.float.filter((val)=> val.name==='debt')[0].value)
     useEffect(() => {
