@@ -122,6 +122,7 @@ export function sortForChartOnly(a: any, b: any, targetKey: string) {
 
 interface ObjType {
     [index: string]: string
+}
 export function sortFloat(a: any, b: any, targetKey: string,asc=true) {
     var fa = parseFloatDef(a[targetKey],-1e5);
     var fb = parseFloatDef(b[targetKey],-1e5);

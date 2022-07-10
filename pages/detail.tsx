@@ -12,12 +12,9 @@ import React, {
     useLayoutEffect
 } from 'react'
 import type {NextPage} from 'next'
-// , GetServerSideProps, InferGetServerSidePropsType
 import {useRouter} from 'next/router'
 import {Button} from "antd";
-// import {DndProvider} from 'react-dnd';
-// import {HTML5Backend} from 'react-dnd-html5-backend';
-//<DndProvider backend={HTML5Backend}>
+
 
 // Hook Import
 import {filReducer} from "../components/reducers/FilterReducer";
@@ -32,7 +29,7 @@ import AumLpcorp from "../components/graphs/p2GraphAumLpcorp";
 import CompCardGroup from "../components/partials/p2CompCardGroup";
 import CompSortSelect from "../components/partials/p2CompSortSelect";
 // Component dependent Import
-import {APIURL, FILTER_ACTION, INIT_FILST, SORT_LABELS,} from "../components/const/p2Constant"
+import {APIURL, FILTER_ACTION, INIT_FILST, ALL_LABEL} from "../components/const/p2Constant"
 import {
     windowSizeStr,
     apiParamGen,
@@ -63,7 +60,7 @@ const Detail: NextPage = () => {
     // Get URL parameters via next router and setting up filter states
     const router = useRouter();
     const [start, setStart] = useState(false);
-    const [contentType, setContentType] = useState(false); // if true talbe will be viewed.
+    const [contentType, setContentType] = useState(true); // if true talbe will be viewed.
     /* State & Reducer DEF */
     // @ts-ignore
     const [filterInfo, filDispat] = useReducer(filReducer, INIT_FILST); // all filter variable controller def
@@ -80,11 +77,9 @@ const Detail: NextPage = () => {
                 filterI = INIT_FILST
             }
         }
-        console.log('router: ', router.query, 'filterI: ', filterI, "filterInfo: ", filterInfo)
         var newaction = {typ: FILTER_ACTION.REPLACE, value: filterI}
         setStart(true)
         filDispat(newaction)
-        console.log("filterInfo: ", filterInfo)
         setAsideFil(
             <div className={styles.asideFiltersJs} key="asidefilterjs" index={1}>
                 <AsideFilters
@@ -97,19 +92,18 @@ const Detail: NextPage = () => {
     // window size getter
     const windowNow = useWindowSize() // for body window component size handle different card layout
     const windowContextval = windowSizeStr(windowNow)
-    const [scrollTop, onScrollTop] = useMoveScrool()  // after filter is updated, scroll should go to top
+    const [scrollTop, onScrollTop] = useMoveScrool('center')  // after filter is updated, scroll should go to top
     useEffect(() => {
         // after filter updated, Graph should be reloaded
         setCookie('filterInfoCookie', JSON.stringify(filterInfo), {secure: true, 'max-age': 3600})
         onScrollTop()
-        console.log('cookietemp after: ', getCookie('filterInfoCookie'))
         cardclearData()
     }, [filterInfo])
 
     const [cardApiState, cardApiDispatch, cardfetchData, cardclearData] = useAsyncer(getCardPage, [], [contentType], start, setStart);  // After cardPage updated, Card data is updated.
     const [cardFontRel, setcardFontRel] = useState({fn: 42, an: 56, lpcorp: 56})
     // sorting State
-    const [selctState, setSelect] = useState(SORT_LABELS['it']);
+    const [selctState, setSelect] = useState(ALL_LABEL['it']);
     const [ascState, setAscState] = useState(true);
     // card component dependent param def
     const preProcessCard = (data: fromApiV1[],pageNow:string): pageCountTyp => {
@@ -181,7 +175,6 @@ const Detail: NextPage = () => {
         } else {
             params = apiParamGen(filterInfo)
         }
-        console.log('cardgen', ["http://localhost:8080/", urlGen(APIURL.CARDPAGE, params)].join(""))
         var cancel
         var reqConfig: {} = {
             method: "GET",
@@ -199,7 +192,6 @@ const Detail: NextPage = () => {
         }
         // @ts-ignore
         res = preProcessCard(res.data,pageNow)
-        console.log("data card", res)
         return res;
     }
 
@@ -251,6 +243,12 @@ const Detail: NextPage = () => {
     const sortSelect = (<CompSortSelect curntOption={selctState} desAsc={ascState}
                                         setcurntOption={setSelect} setdesAsc={setAscState}/>)
     const cardComps = useMemo(() => {
+            if (!cardApiState.data.length) return
+            const headers :{label:string,key:string}[] = Object.keys(cardApiState.data[0]).map((val) => {return {label:ALL_LABEL[val],key:val}})
+            var name = filterInfo.category.map((val) => val.value).join("_")
+            if (filterInfo.float.length){
+                name += "__"+filterInfo.float[0].value.map((val)=> val.toString()).join("_")
+            }
             return (
                 <div className={styles.card}>
                 <span className={styles.filter}>
@@ -267,13 +265,8 @@ const Detail: NextPage = () => {
                     </div>)}
                 </span>
                     {contentType ? (
-                        <div style={{justifyContent:'end',display:'flex',flexFlow:'row wrap'}}>
-                            <CompDataTable data={cardApiState.data}/>
-                            <Button
-                                style={{marginTop:"-1.5%",marginBottom:"20%"}}
-                                onClick={() => (setContentType(!contentType))}>
-                            <span>다운로드</span>
-                            </Button>
+                        <div style={{justifyContent:'end',display:'flex',flexFlow:'row wrap',overflowX:'scroll'}}>
+                            <CompDataTable data={cardApiState.data} headers={headers} exportFileName={`${name}.csv`} />
                         </div>
 
                     ) : (

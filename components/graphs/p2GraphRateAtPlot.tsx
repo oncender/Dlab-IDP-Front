@@ -1,17 +1,20 @@
 import {Scatter} from '@ant-design/plots';
-import { AutoComplete } from 'antd';
-import { tupleNum } from 'antd/lib/_util/type';
-import { start } from 'repl';
-import { to_date} from "../const/p2Utils"
+import {AutoComplete} from 'antd';
+import {tupleNum} from 'antd/lib/_util/type';
+import {start} from 'repl';
+import {to_date} from "../const/p2Utils"
+
 const RateAtPlot = ({data}: { data: any }) => {
     const newData = data.map((val) => {
         val['대출 체결일'] = to_date(val['대출 체결일'])
         return val
     })
+
+
     const config = {
         data: newData,
         padding: 'Auto',
-        appendPadding: [30,70,0,15],
+        appendPadding: [30, 70, 0, 15],
         xField: '대출 체결일',
         yField: '체결이자',
         sizeField: '대출약정금',
@@ -24,27 +27,27 @@ const RateAtPlot = ({data}: { data: any }) => {
             stroke: '#bbb',
         },
         meta: {
-            '대출 체결일' : {
-                alias :'대출 체결일',
-                formatter : (v) => {
-                 let d1 = new Date(v).toISOString()
-                    return `${d1.substring(0, 10).replace(/-/g,".")}`
+            '대출 체결일': {
+                alias: '대출 체결일',
+                formatter: (v) => {
+                    let d1 = new Date(v).toISOString()
+                    return `${d1.substring(0, 10).replace(/-/g, ".")}`
                 }
             },
-            '체결이자' : {
-                alias : '체결이자',
+            '체결이자': {
+                alias: '체결이자',
                 formatter: (v) => `${Number(v).toFixed(2)}'%`,
             },
-            '대출약정금' : {
-                alias : '대출약정금',
+            '대출약정금': {
+                alias: '대출약정금',
                 formatter: (v) => `${v}억원`,
             },
-            '자산명' : {
-                alias : '자산명'
+            '자산명': {
+                alias: '자산명'
             }
         },
         tooltip: {
-            fields : ['대출 체결일','체결이자','대출약정금','자산명']
+            fields: ['대출 체결일', '체결이자', '대출약정금', '자산명']
         },
         title: {
             text: "이자율",
@@ -55,7 +58,7 @@ const RateAtPlot = ({data}: { data: any }) => {
                 formatter: (v) => {
                     return `${v.split('.').splice(0, 2).join("/")}`
                 },
-            // .split('-').splice(0, 2).join("/")
+                // .split('-').splice(0, 2).join("/")
             },
             grid: {
                 line: {
@@ -93,16 +96,29 @@ const RateAtPlot = ({data}: { data: any }) => {
             layout: 'vertical',
             position: 'right',
             offsetX: -50,
-        }
-    };
+        },
+        interactions: [
+          {
+            type: 'element-selected',
+          },
+          {
+            type: 'element-active',
+          },
+        ],
+        onReady: (plot) => {
+          plot.on('element:click', (...vars) => {
+            console.log(vars);
+          });
+        },
+    }
     if (data.length === 0) {
         return
     }
     return (
-    <div className="mt-8">
-        <p className="pl-4 mb-4 text-3xl font-blinker">Debt Rate Bubble Chart</p>
-        <Scatter {...config} />
-    </div>);
+        <div className="mt-8">
+            <p className="pl-4 mb-4 text-3xl font-blinker">Debt Rate Bubble Chart</p>
+            <Scatter {...config} />
+        </div>);
 };
 
 export default RateAtPlot
