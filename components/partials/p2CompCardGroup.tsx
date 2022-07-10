@@ -14,6 +14,8 @@ const {Meta} = Card;
 
 const CartPart = (  {keystring, cardData}:
                     { keystring: string, cardData: cardComp, }) => {
+    const router = useRouter()
+
     if (!cardData.sdaterate) {
         return
     };
@@ -21,7 +23,7 @@ const CartPart = (  {keystring, cardData}:
     const col4Data = [`${cardData.loanamt}억`, `${cardData.loan}억`, `${cardData.sdaterate.toFixed(2)}%`, cardData.duration,
         cardData.loandate
     ] //cardData.it,cardData.at,cardData.seniorstr
-    const router = useRouter()
+    
     const getIcon = (id) => <FontAwesomeIcon icon={NAME_ICON[id]} style={{'marginLeft':"2%",'zIndex':"30"}} title={
         `${cardData.it}  ${cardData.at}  ${cardData.seniorstr}  ${cardData.rate}`
     } />
