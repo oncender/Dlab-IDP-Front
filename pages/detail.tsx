@@ -14,7 +14,7 @@ import React, {
 import type {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {Button} from "antd";
-import { CSVLink } from "react-csv";
+
 
 // Hook Import
 import {filReducer} from "../components/reducers/FilterReducer";
@@ -92,7 +92,7 @@ const Detail: NextPage = () => {
     // window size getter
     const windowNow = useWindowSize() // for body window component size handle different card layout
     const windowContextval = windowSizeStr(windowNow)
-    const [scrollTop, onScrollTop] = useMoveScrool()  // after filter is updated, scroll should go to top
+    const [scrollTop, onScrollTop] = useMoveScrool('center')  // after filter is updated, scroll should go to top
     useEffect(() => {
         // after filter updated, Graph should be reloaded
         setCookie('filterInfoCookie', JSON.stringify(filterInfo), {secure: true, 'max-age': 3600})
@@ -266,21 +266,7 @@ const Detail: NextPage = () => {
                 </span>
                     {contentType ? (
                         <div style={{justifyContent:'end',display:'flex',flexFlow:'row wrap',overflowX:'scroll'}}>
-                            <CompDataTable data={cardApiState.data}/>
-                            <Button
-                                style={{marginTop:"-1.5%",marginBottom:"20%"}}
-                                // onClick={() => (setContentType(!contentType))}
-                                type={'primary'}
-                            >
-                            <CSVLink
-                                headers={headers}
-                                data={cardApiState.data}
-                                filename={`${name}.csv`}
-                                target="_blank"
-                              >
-                                <span style={{fontWeight:800,color:'black'}}>다운로드</span>
-                              </CSVLink>
-                            </Button>
+                            <CompDataTable data={cardApiState.data} headers={headers} exportFileName={`${name}.csv`} />
                         </div>
 
                     ) : (

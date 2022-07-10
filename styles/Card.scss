@@ -19,7 +19,8 @@
       justify-content: space-between;
       margin-right: 10px;
     }
-  };
+  }
+;
   div[custom=ROW] {
     display: flex;
     margin-top: 1%;
@@ -87,12 +88,13 @@
 
           &[custom=col20] {
             font-size: 1.5em;
-            & .ant-card-meta-description {
-            color: #1C6FBC;
-          };
-          };
 
-        ;
+            & .ant-card-meta-description {
+              color: #1C6FBC;
+            }
+          ;
+          }
+        ;;
 
           &[custom=col21] {
             font-size: 1.5em;
@@ -179,14 +181,27 @@
         }
       ;
       }
-
-
     }
-  @content
-  };
+
+  }
+;
   div[role=presentation] {
-    width:100%
-  };
+    width: 100%
+  }
+;
+  .ant-table-filter-trigger .anticon {
+    left: 80%;
+  }
+;
+  .ant-table-cell-ellipsis.ant-table-cell-fix-left-last .ant-table-cell-content, .ant-table-cell-ellipsis.ant-table-cell-fix-right-first .ant-table-cell-content {
+    text-align: center;
+    & .ant-table-filter-column{
+      margin:0px;
+      justify-content: center;
+    }
+  }
+;
+  @content
 
 }
 

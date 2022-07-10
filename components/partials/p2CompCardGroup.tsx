@@ -14,7 +14,6 @@ const {Meta} = Card;
 
 const CartPart = (  {keystring, cardData}:
                     { keystring: string, cardData: cardComp, }) => {
-    const router = useRouter()
     if (!cardData.sdaterate) {
         return
     };
