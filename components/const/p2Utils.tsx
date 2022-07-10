@@ -64,6 +64,27 @@ export function groupbyKeys(obArr: Array<any>, targetKey: string, keys: string[]
     }, new Map).values()];
 }
 
+// export function groupbyKeysObject(obArr: Array<any>,keys: string[]) {
+//     return [...obArr.reduce((r, o) => {
+//         const key = keys.map((k) => o[k]).join("-")
+//         if (r.has(key)){
+//             var item = r.get(key)
+//             item = Object.keys(item).map((k)=>{
+//                 if (item[k] === o[k]){
+//                     return item[k]
+//                 } else {
+//                     return [...item[k],o[k]]
+//                 }
+//             })
+//             return r.set(key, item)
+//             } else {
+//             const item = Object.assign({}, o);
+//             return r.set(key, item);
+//         }
+//     }, new Map).values()];
+// }
+
+
 export function sortObjectVal(a: any, b: any, targetKey: string) {
     if (a[targetKey] < b[targetKey]) {
         return -1;
@@ -101,6 +122,35 @@ export function sortForChartOnly(a: any, b: any, targetKey: string) {
 
 interface ObjType {
     [index: string]: string
+export function sortFloat(a: any, b: any, targetKey: string,asc=true) {
+    var fa = parseFloatDef(a[targetKey],-1e5);
+    var fb = parseFloatDef(b[targetKey],-1e5);
+    if (asc){
+        return fa - fb
+    } else {
+        return fb - fa
+    }
+}
+
+export function sortString(a: any, b: any, targetKey: string,asc=true) {
+    var fa = a[targetKey].toLowerCase();
+    var fb = b[targetKey].toLowerCase();
+    var backvalue:number
+    var frontvalue:number
+    if (asc){
+        frontvalue = 1
+        backvalue = -1
+    } else {
+        frontvalue = -1
+        backvalue = 1
+    }
+    if (fa < fb) {
+        return backvalue;
+    }
+    if (fa > fb) {
+        return frontvalue;
+    }
+    return 0;
 }
 
 export function objectMap(object: any, mapFn: Function) {
@@ -142,7 +192,6 @@ interface queryParam {
 export function detailQueryParser(q: queryParam) {
     let initialFilterState = INIT_FILST;
     let category = INIT_FILST.category;
-    console.log("query", q)
     if (!q || Object.keys(q).length === 0) {
         return INIT_FILST;
     }
@@ -202,4 +251,52 @@ export function deleteCookie(name: string) {
     });
 }
 
+export function downloadExcel(title:string, dataJsonArray:Object[], orderedColumnArray:{NAME:string,CODE:string}[]) {
 
+    var columnCodeArray = [];
+    var columnNameArray = [];
+    orderedColumnArray.forEach(function (orderedColumn) {
+        columnCodeArray.push(orderedColumn.CODE);
+        columnNameArray.push(orderedColumn.NAME);
+    });
+
+    var wb = XLSX.utils.book_new();
+    var arrJSON = JSON.parse(JSON.stringify(dataJsonArray));
+    var dataJsonKeyLength = dataJsonArray.length > 0 && Object.keys(dataJsonArray[0]).length;
+    var returnColumnCount = columnNameArray.length;
+
+    //열순서 및 시트화
+    var ws = XLSX.utils.json_to_sheet(arrJSON, {header: columnCodeArray});
+
+    //엑셀파일정보
+    wb.Props = {
+        Title: title,
+        Subject: "Excel",
+        Author: "Master",
+        CreatedDate: new Date()
+    };
+    //엑셀 첫번째 시트네임
+    wb.SheetNames.push(title);
+
+    //열이름변경
+    changeColName(ws, columnNameArray);
+
+    //필요없는 열 삭제
+    if (dataJsonKeyLength - returnColumnCount > 0) {
+        delete_cols(ws, returnColumnCount + 1, dataJsonKeyLength - returnColumnCount);
+    }
+
+    //시트에 데이터를 연결
+    wb.Sheets[title] = ws;
+
+    //다운로드
+    saveAs(new Blob([
+        s2ab(XLSX.write(wb, {
+            bookType: 'xlsx',
+            type: 'binary'
+        }))
+    ], {
+        type: "application/octet-stream"
+    }), title + '.xlsx');
+
+}

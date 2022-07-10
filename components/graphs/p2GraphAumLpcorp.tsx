@@ -18,7 +18,7 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
             },
         ],
     });
-    console.log(data)
+
     const configClickData :{isPercent:boolean,content:Function,meta:any} = {}
     const nonClickF = (item) => {
         return `${(item.loanamt)}억`

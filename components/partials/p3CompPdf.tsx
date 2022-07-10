@@ -12,7 +12,6 @@ const PDFViewer = ({fileLoc, display}: { fileLoc: string, display: boolean }) =>
     if (!display) {
         d = "none"
     }
-    console.log(fileLoc)
 
     function onDocumentLoadSuccess({numPages}: { numPages: number }) {
         setNumPages(numPages);

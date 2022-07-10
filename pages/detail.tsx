@@ -112,7 +112,7 @@ const Detail: NextPage = () => {
     const [selctState, setSelect] = useState(SORT_LABELS['it']);
     const [ascState, setAscState] = useState(true);
     // card component dependent param def
-    const preProcessCard = (data: fromApiV1[]): pageCountTyp => {
+    const preProcessCard = (data: fromApiV1[],pageNow:string): pageCountTyp => {
         function durationParser(num: number): string {
             // @ts-ignore
             let year = parseInt(num / 12);
@@ -125,13 +125,14 @@ const Detail: NextPage = () => {
                 durStr += year == 0 ? "" : " "
                 durStr += `${month}개월`
             }
-            return durStr;
+            return durStr ? durStr : "데이터 없음";
         }
 
-        function imagePath(img: string): string {
+        function imagePath(img: string,at:string): string {
             if (!parseInt(img)) {
                 // after mock image file added.
-                return ''  //e.g. mock_pic/{img}.png
+                // SET no PIC building TYPE : 1 or 2
+                return `no_pic_building/${at}2.png`  //e.g. mock_pic/{img}.png
             } else {
                 return `building_pic/${img}.png` // only {number} returned in api
             }
@@ -149,7 +150,7 @@ const Detail: NextPage = () => {
                     loanamt: parseInt(parseIntDef(val.loanamt, null) / 1E8),
                     sdaterate: parseFloatDef(val.sdaterate, null),
                     duration: durationParser(parseIntDef(val.duration, 0)),
-                    img: imagePath(val.img),
+                    img: imagePath(val.img,val.at),
                     fc: val.fc,
                     idx: val.idx,
                     loancls: val.loancls,
@@ -157,6 +158,7 @@ const Detail: NextPage = () => {
                     it: val.it,
                     at: val.at,
                     rate: val.rate,
+                    loandate:val.loandate.replace(/-/g,".")
                 }
             })
         } else {
@@ -164,7 +166,7 @@ const Detail: NextPage = () => {
         }
         return {
             data: compData,
-            hasMore: (data.rC >= (cardApiState.pagecnt) * 10) ? true : false,// check next page is available
+            hasMore: (data.rC >= (pageNow) * 10) ? true : false,// check next page is available
             rcn: data.rC
         }
     }
@@ -172,9 +174,10 @@ const Detail: NextPage = () => {
     async function getCardPage(props: any) {
         // setter: State setter callback, should be given in the Hook or elsewhere,
         let params
+        const pageNow: string = (typeof props == 'undefined') ? cardApiState.pagecnt : props.pagecount
         if (!contentType) {
             params = Object.assign({}, apiParamGen(filterInfo),
-                {'pageCount': (typeof props == 'undefined') ? cardApiState.pagecnt : props.pagecount});
+                {'pageCount': pageNow});
         } else {
             params = apiParamGen(filterInfo)
         }
@@ -195,7 +198,7 @@ const Detail: NextPage = () => {
             }
         }
         // @ts-ignore
-        res = preProcessCard(res.data)
+        res = preProcessCard(res.data,pageNow)
         console.log("data card", res)
         return res;
     }
@@ -264,9 +267,15 @@ const Detail: NextPage = () => {
                     </div>)}
                 </span>
                     {contentType ? (
-                        <div>
+                        <div style={{justifyContent:'end',display:'flex',flexFlow:'row wrap'}}>
                             <CompDataTable data={cardApiState.data}/>
+                            <Button
+                                style={{marginTop:"-1.5%",marginBottom:"20%"}}
+                                onClick={() => (setContentType(!contentType))}>
+                            <span>다운로드</span>
+                            </Button>
                         </div>
+
                     ) : (
                         <span className={styles.board}>
                     <CompCardGroup data={cardApiState.data}

@@ -57,16 +57,16 @@ const Home = () => {
 
 
     useLayoutEffect(() => {
-        var querydetail : ParsedUrlQuery
+        var querydetail: ParsedUrlQuery
         if (Object.keys(router.query).length !== 0) {
             querydetail = router.query;
-            setCookie('detailInfoCookie',JSON.stringify(querydetail), {secure: true, 'max-age': 3600})
+            setCookie('detailInfoCookie', JSON.stringify(querydetail), {secure: true, 'max-age': 3600})
         } else {
             var cookietemp = getCookie('detailInfoCookie')
             if (cookietemp) {
                 querydetail = JSON.parse(cookietemp)
             } else {
-                querydetail = {fc:'',idx:''}
+                querydetail = {fc: '', idx: ''}
             }
         }
         DataFetch(querydetail.fc as string, querydetail.idx as string);
@@ -88,14 +88,14 @@ const Home = () => {
                     key="1" style={{margin: '0 10px'}} size="large"
                     type={showDesc ? 'primary' : 'default'}
                     onClick={(e) => handleClickDesc(e)}>
-                    상세 정보
+                    <span style={{'justifyContent': 'center'}}>상세 정보</span>
                 </Button>
                 <Button
                     className={!showDesc ? Buttonstyles["ant-btn-primary"] : Buttonstyles["ant-btn-default"]}
                     key="2" size="large" style={{margin: '0 10px'}}
                     type={!showDesc ? 'primary' : 'default'}
                     onClick={(e) => handleClickPDF(e)}>
-                    계약서 보기
+                    <span style={{'justifyContent': 'center'}}>계약서 보기</span>
                 </Button>
             </div>
         )
@@ -103,14 +103,14 @@ const Home = () => {
     const PDF = useMemo(() => {
         if (!fundData) return;
         return (<PDFViewer fileLoc={`/pdf/${fundData.data.fc}/${fundData.data.file}.pdf`} display={showPDF}/>)
-    }, [fundData,showPDF])
+    }, [fundData, showPDF])
 
     return (
 
         <div
-            style={{display: 'flex', flexDirection: 'row'}}>
+            style={{display: 'flex', flexDirection: 'row',justifyContent:'center'}}>
             <Layout>
-                <Header link = {"/detail"} />
+                <Header link={"/detail"}/>
                 <Content
                     style={{margin: '24px 290px 24px'}}
                 >
