@@ -53,6 +53,7 @@ import Header from '../components/Header'
 import Footer from "../components/Footer";
 import CompDataTable from "../components/partials/p2CompTable";
 import {clickReducer} from "../components/reducers/ClickReducer";
+import {filter} from "@antv/util";
 
 export const windowContext = createContext({windowStatus: ''});
 
@@ -285,6 +286,11 @@ const Detail: NextPage = () => {
                     </div>
                     <Button className={styles.contentButton} onClick={() => (setContentType(!contentType))}>
                         {contentType ? '카드보기' : '테이블 보기'}
+                    </Button>
+                    <Button className={styles.contentButton} onClick={() => {
+                        filDispat({typ: FILTER_ACTION.REPLACE, value: {category:filterInfo.category,float:filterInfo.float}})
+                    }}>
+                        필터초기화
                     </Button>
                     {contentType ? (<div/>) : (<div className={styles.sort}>
                         {sortSelect}
