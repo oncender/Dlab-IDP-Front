@@ -105,12 +105,12 @@ const AsideFilters = ({fromHomeData,filDispat, start}:
     }, [sldrval])
     return (
          <aside className={styles.aside}>
-                    {loanClsButton}
-                    {iTButton}
                     {aTButton}
+                    {iTButton}
+                    {loanClsButton}
                     {seniorstrButton}
-                    {rateButton}
                     {lamtSldr}
+                    {rateButton}
                 </aside>
     )
 }

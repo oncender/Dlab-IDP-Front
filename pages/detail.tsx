@@ -156,7 +156,13 @@ const Detail: NextPage = () => {
                 }
             })
         } else {
-            compData = data.data
+            if (!data.data.length) return
+            const tempKey = Object.keys(data.data[0])
+            compData = data.data.map((val) => {
+                val.area = val.area.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                tempKey.map((k) => {val[k] = val[k].replace(/(Null|^\s*$)/g,'-')})
+                return val
+            })
         }
         return {
             data: compData,
@@ -299,7 +305,7 @@ const Detail: NextPage = () => {
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]): chartTyp => {
         let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: [], two: []}
         // @ts-ignore
-
+        console.log('left data1',data1)
         alldata['one'] = data1.map((item) => {
             return {
                 "자산명": item.an,
