@@ -1,9 +1,9 @@
 import {Column, G2} from '@ant-design/plots';
 import {Button} from "antd";
 
-const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
+const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,clickFilterDispat}:
                        { data: any, chartClc: boolean,  onClick: Function,
-                         chartClcNoEtc: boolean, onchartClcNoEtc: Function }) => {
+                         chartClcNoEtc: boolean, onchartClcNoEtc: Function ,clickFilterDispat:Function}) => {
     G2.registerInteraction('element-link', {
         start: [
             {
@@ -59,6 +59,9 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
         tooltip: true,
         interactions: [
             {
+                type: 'element-selected',
+            },
+            {
                 type: 'element-highlight-by-color',
             },
             {
@@ -69,6 +72,15 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
                 cfg: {start: [{trigger: 'element:click', action: 'tooltip:show'}]}
             }
         ],
+        onReady: (plot) => {
+            plot.on('element:click', (...vars) => {
+                var action: string = 'clickmany'
+                clickFilterDispat({typ: action, value: vars[0].data.data.idx})
+                console.log("AumLpcorp",vars)
+                // clickFilterDispat({typ: action, value: vars[0].data.data.idx})
+                }
+            )
+        },
         legend: {
             position: 'right-top',
             offsetY: 30,
@@ -94,7 +106,7 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc}:
 
     return (
         <div style={{"display": 'flex', "flexFlow": 'column nowrap', "justifyContent": "space-between", "marginTop": "4rem"}}>
-            <p className="pl-4 mb-4 text-3xl font-blinker">{!chartClc ? "Percent-Column Plot by Lenders" : "Raw Value Sum-Column Plot by Lenders"}</p>
+            <p className="pl-4 mb-4 text-3xl font-blinker">{!chartClc ? "Loan-Amt Percent-Column Plot by Lenders" : "Loan-Amt Sum-Column Plot by Lenders"}</p>
             <Button
                 style={{
                     "alignSelf": 'flex-end', 'order': 1, "borderRadius": "0.5rem",

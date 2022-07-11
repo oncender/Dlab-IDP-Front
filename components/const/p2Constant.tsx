@@ -20,6 +20,13 @@ export const FILTER_ACTION = {
     'REPLACE':'replaceDispatch'
 };
 
+export const CLICK_ACTION = {
+    'CLICK': 'click',
+    'UNCLICK':'unclick',
+    'CLEAR':'clear',
+    "CLICK_MANY" :'clickmany',
+}
+
 // Filter Default action
 export const INIT_FILST: FilterStateObj = {
     category: [
@@ -34,41 +41,6 @@ export const INIT_FILST: FilterStateObj = {
 export const MM_DEBT:[number,number] = [0,5000E8]
 
 // labels for each filter (label : button1 button2 ...) | (label \n slider ---- )
-
-// sorting params name
-// export const SORT_LABELS = {
-//     'it' : '투자 유형',
-//     'seniorstr': '대출 순위',
-//     'at' : '자산 유형',
-//     'debt' : '대출 약정금',
-//     'rate': '금리 종류',
-//     'fn':"펀드명",
-//     'lpcorp':"대주명회사",
-//     'an':"자산명",
-//     'loanamt':"대출약정금",
-//     'aum':"대출총액",
-//     'sdaterate':"체결이자",
-//     'duration':"듀레이션",
-//     'loancls':'대출 분류',
-//
-// }
-//
-//
-// export const CARD_LABELS = {
-//     'fn':"펀드명",
-//     'lpcorp':"대주명회사",
-//     'an':"자산명",
-//     'loanamt':"대출약정금",
-//     'loan':"대출총액",
-//     'sdaterate':"체결이자",
-//     'duration':"듀레이션",
-//     'at' : '자산 유형',
-//     'it' : '투자 유형',
-//     'seniorstr': '대출 순위',
-//     'rate': '금리 종류',
-//     'loancls':'대출 분류',
-//     'loandate':'대출 체결일'
-//     }
 
 export const APIURL = {
     ROWCOUNT:"/api/v1/debtRowCount",
@@ -135,6 +107,7 @@ export const LABELS = {
 
 export const ALL_LABEL: {[key:string]:string}= {
         'fc': '펀드코드'
+        ,'it' : '투자 유형'
         , 'an': '자산명'
         , 'fn': '펀드명'
         , 'loan': 'LOAN 총액'
@@ -205,13 +178,14 @@ export const FundColumns: ColumnsType<FundDataType> = [
     { title: '자산명', dataIndex: 'an', key: 'an', fixed:'left', width: 150, ellipsis: true },
     { title: '펀드코드', dataIndex: 'fc', key: 'fc',width: 100, ellipsis: true ,sorter : true },
     { title: '펀드명', dataIndex: 'fn', key: 'fn',  width: 250, ellipsis: true,sorter : true },
-    { title: 'LOAN 총액', dataIndex: 'loan', key: 'loan', width: 200 , ellipsis: true ,sorter : true },
-    { title: '대출약정금', dataIndex: 'loanamt', key: 'loanamt', width: 200 ,ellipsis: true , sorter : true },
+    { title: 'LOAN 총액(원)', dataIndex: 'loan', key: 'loan', width: 200 , ellipsis: true ,sorter : true },
+    { title: '대출약정금(원)', dataIndex: 'loanamt', key: 'loanamt', width: 200 ,ellipsis: true , sorter : true },
     { title: '대주명', dataIndex: 'lpcorp', key: 'lpcorp', width: 170, ellipsis: true },
     { title: '대주명분류', dataIndex: 'lpt', key: 'lpt', width: 120 ,ellipsis: true ,},
     { title: '대출순위', dataIndex: 'seniorstr', key: 'seniorstr', width: 100 },
-    { title: '체결일이자율', dataIndex: 'sdaterate', key: 'sdaterate', width: 120, sorter : true  ,ellipsis: true },
-
+    { title: '체결일이자율(%)', dataIndex: 'sdaterate', key: 'sdaterate', width: 120, sorter : true  ,ellipsis: true },
+    { title: '변동이자율기준', dataIndex: 'loanintfloat', key: 'loanintfloat', width: 120 ,ellipsis: true },
+    { title: '스프레드', dataIndex: 'spread', key: 'spread', width: 120 ,ellipsis: true },
     { title: '토지주소', dataIndex: 'addr', key: 'addr', width: 150, ellipsis: true },
     { title: '설정일', dataIndex: 'sdate', key: 'sdate', width: 120 , sorter : true ,ellipsis: true },
     { title: '만기일', dataIndex: 'mdate', key: 'mdate', width: 120 , sorter : true,ellipsis: true  },
@@ -219,9 +193,9 @@ export const FundColumns: ColumnsType<FundDataType> = [
     { title: '펀드구분', dataIndex: 'ft', key: 'ft', width: 100 ,ellipsis: true },
     { title: '투자전략', dataIndex: 'strat', key: 'strat', width: 100 ,ellipsis: true },
     { title: '연면적(평)', dataIndex: 'area', key: 'area', width: 100 ,ellipsis: true },
-    { title: 'EQUITY 총액', dataIndex: 'equity', key: 'equity', width: 200 , sorter : true,ellipsis: true  },
+    { title: 'EQUITY 총액(원)', dataIndex: 'equity', key: 'equity', width: 200 , sorter : true,ellipsis: true  },
 
-    { title: 'AUM 총액', dataIndex: 'aum', key: 'aum', width: 200 , sorter : true ,ellipsis: true },
+    { title: 'AUM 총액(원)', dataIndex: 'aum', key: 'aum', width: 200 , sorter : true ,ellipsis: true },
     { title: 'LTV', dataIndex: 'ltv', key: 'ltv', width: 120 , sorter : true ,ellipsis: true },
     { title: '롤오버', dataIndex: 'ro', key: 'ro', width: 100 ,ellipsis: true },
     { title: '대출계약체결일', dataIndex: 'loandate', key: 'loandate', width: 130 ,ellipsis: true },
@@ -236,9 +210,7 @@ export const FundColumns: ColumnsType<FundDataType> = [
     { title: '대출금상환방식', dataIndex: 'loanrpy', key: 'loanrpy', width: 200 ,ellipsis: true },
     { title: '금리종류', dataIndex: 'rate', key: 'rate', width: 100 ,ellipsis: true },
     { title: '대출이자율분류', dataIndex: 'loanintcls', key: 'loanintcls', width: 120 ,ellipsis: true },
-    { title: '변동이자율기준', dataIndex: 'loanintfloat', key: 'loanintfloat', width: 120 ,ellipsis: true },
 
-    { title: '스프레드', dataIndex: 'spread', key: 'spread', width: 120 ,ellipsis: true },
     { title: '대출취급수수료', dataIndex: 'loanpremium', key: 'loanpremium', width: 120 ,ellipsis: true },
     { title: '이자기간', dataIndex: 'intdur', key: 'intdur', width: 100 ,ellipsis: true },
     { title: '연체이자율', dataIndex: 'laterate', key: 'laterate', width: 150 ,ellipsis: true },
