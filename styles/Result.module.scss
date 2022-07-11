@@ -13,9 +13,9 @@
     color:rgb(0, 95, 132);
     width: 100%;
     
-    @include mobile { margin-top: 2rem; }
-    @include tablet { margin-top: 2.3rem; margin-bottom: 0.5rem}
-    @include desktop { margin-top: 3rem; margin-bottom: 1rem;}
+    @include mobile { margin-top: 2rem; margin-bottom: 1rem}
+    @include tablet { margin-top: 2.3rem; margin-bottom: 1.5rem}
+    @include desktop { margin-top: 3rem; margin-bottom: 3rem;}
     .titlePhrase {
         align-self: center;
         font-weight: 700;

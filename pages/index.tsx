@@ -9,17 +9,24 @@ import MacroContents from '../components/partials/p1CompMacroContents';
 import HowItWorksContents from '../components/partials/p1CompHowItWorksContents';
 import axios from "axios";
 import useMoveScrool from "../components/hook/useScroll";
-
+import { formatDate } from "../components/const/p2Utils";
 
 
 const Home: NextPage = () => {
   const [loanPriority, setLoanPriority] = useState('선');
   const [loanType, setLoanType] = useState('담보');
   const [loading, setLoading] = useState(false);
-  const [modelResult, setModelResult] = useState()
+  const [modelResult, setModelResult] = useState();
+  const [macroData, setMacroData] = useState();
   const focusRef = useRef<HTMLDivElement>(null);
   const goToDetailStr = "";
-  const API_URL = "/api/v1/model/pred";
+  type API_URL_TYPE = {
+    [key : string]: string;
+  };
+  const API_URL : API_URL_TYPE = {
+    MODEL : "/api/v1/model/pred",
+    MACRO : "/api/v1/macro/dataTable",
+  }
 
   const handleLoanPriority = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setLoanPriority(event.target.value)
@@ -29,7 +36,7 @@ const Home: NextPage = () => {
   }
 
   const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    await getModelData();
+    await getData();
     const min=1200, max=4000;
     const term = Math.floor(Math.random() * (max-min) + min) // 0.5 ~ 2.5 second
     setLoading(true)
@@ -38,14 +45,18 @@ const Home: NextPage = () => {
     focusRef.current!.scrollIntoView();
   }
 
-  const getModelData = async () => {
-    let url = API_URL + `?seniorstr=${loanPriority}&loancls=${loanType}`;
+  const getData = async () => {
+    const dateUntil = new Date();
+    const dateFrom = new Date(new Date(dateUntil).setMonth(dateUntil.getMonth() - 2));
 
-    await axios.get(url)
-    .then((res)=>{
-      setModelResult(res.data);
-    })
-    .catch(e => { console.log(e) });
+    const promises = [];
+    promises.push(axios.get(
+      API_URL["MODEL"] + `?seniorstr=${loanPriority}&loancls=${loanType}`)
+      .then((res)=>{setModelResult(res.data)}).catch(e => { console.log(e) }))
+    promises.push(axios.get(
+      API_URL["MACRO"] + `?dateFrom=${formatDate(dateFrom)}&dateUntil=${formatDate(dateUntil)}`)
+      .then((res)=>{setMacroData(res.data)}).catch(e => { console.log(e) }))
+    Promise.all(promises);
   }
 
   const prioritySelectValue = [
@@ -117,10 +128,8 @@ const Home: NextPage = () => {
                 loanType={loanType} 
                 loanPriority={loanPriority}
                 modelPredict={modelResult!}/>
-              <MacroContents 
-                loanType={loanType} 
-                loanPriority={loanPriority} 
-                modelPredict={modelResult!}/>
+              <MacroContents
+                macroData={macroData!}/>
               </div>
             }
           </div>
