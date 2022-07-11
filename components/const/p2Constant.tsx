@@ -5,7 +5,7 @@ import {
     faBuildingCircleCheck, faHandHoldingDollar, faUsers, faMoneyCheckAlt,
     faCircleCheck, faCircleMinus, faCircleExclamation, faPercent,
     faEllipsis, faWaveSquare ,
-    faBuildingLock,faClipboardList,faFileInvoiceDollar,faBridge,
+    faBuildingLock,faClipboardList,faFileInvoiceDollar,faBridge,faShop
 } from "@fortawesome/free-solid-svg-icons";
 import { faViacoin, faEtsy
 } from "@fortawesome/free-brands-svg-icons"
@@ -33,7 +33,7 @@ export const INIT_FILST: FilterStateObj = {
 
     ],
     float :[
-        {'name':'debt','value':[200E8,800E8]},
+        {'name':'debt','value':[0,5000E8]},
     ]
 };
 
@@ -75,7 +75,8 @@ export const NAME_ICON = {
     '물류': faTruck,
     '호텔': faHotel,
     '리테일': faCartShopping,
-    '복합': faBuilding,
+    '복합(오피스)': faBuilding,
+    '복합(리테일)': faShop,
     '주거': faHouseChimney,
     '특별자산': faOilWell,
     '기타': faEllipsis,

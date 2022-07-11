@@ -1,4 +1,4 @@
-import {Scatter} from '@ant-design/plots';
+import {G2, Scatter} from '@ant-design/plots';
 import {AutoComplete} from 'antd';
 import {tupleNum} from 'antd/lib/_util/type';
 import {start} from 'repl';
@@ -13,6 +13,12 @@ const RateAtPlot = ({
     if (typeof data == undefined || data.length === 0) {
         return
     }
+    G2.registerInteraction('element-hovering', {
+        showEnable: [
+        { trigger: 'element:mouseenter', action: 'cursor:pointer' },
+        { trigger: 'element:mouseleave', action: 'cursor:default' },
+        ],
+    });
     const config = {
         data: data,
         padding: 'Auto',
@@ -109,6 +115,9 @@ const RateAtPlot = ({
             {
                 type: 'element-active',
             },
+            {
+                type: 'element-hovering',
+            }
         ],
         onReady: (plot) => {
             plot.on('element:dblclick', (...vars) => {
