@@ -102,7 +102,9 @@ const Home = () => {
     }, [showDesc])
     const PDF = useMemo(() => {
         if (!fundData) return;
-        return (<PDFViewer fileLoc={`/pdf/${fundData.data.fc}/${fundData.data.file}.pdf`} display={showPDF}/>)
+        const realPDF = `/pdf/${fundData.data.fc}/${fundData.data.file}.pdf`
+        const testPDF = `/test_pdf/대출계약서-1_merged.pdf`
+        return (<PDFViewer fileLoc={testPDF} display={showPDF}/>)
     }, [fundData, showPDF])
 
     return (

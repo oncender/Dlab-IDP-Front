@@ -38,7 +38,7 @@ import {
     urlGen,
     detailQueryParser,
     parseFloatDef,
-    parseIntDef, setCookie, getCookie, sortForChartOnly
+    parseIntDef, setCookie, getCookie, sortForChartOnly, to_date, groupbyKeyString
 } from "../components/const/p2Utils";
 import {
     fromApiV1,
@@ -52,6 +52,7 @@ import axios from "axios";
 import Header from '../components/Header'
 import Footer from "../components/Footer";
 import CompDataTable from "../components/partials/p2CompTable";
+import {clickReducer} from "../components/reducers/ClickReducer";
 
 export const windowContext = createContext({windowStatus: ''});
 
@@ -65,6 +66,8 @@ const Detail: NextPage = () => {
     // @ts-ignore
     const [filterInfo, filDispat] = useReducer(filReducer, INIT_FILST); // all filter variable controller def
     const [asideFil, setAsideFil] = useState<HTMLElement | null>(null);
+    const [clickFilter, clickFilterDispat] = useReducer(clickReducer, {clickFilters: []});
+
     useLayoutEffect(() => {
         var filterI: FilterStateObj
         if (Object.keys(router.query).length !== 0) {
@@ -98,6 +101,7 @@ const Detail: NextPage = () => {
         setCookie('filterInfoCookie', JSON.stringify(filterInfo), {secure: true, 'max-age': 3600})
         onScrollTop()
         cardclearData()
+        clickFilterDispat({typ: "clear"})
     }, [filterInfo])
 
     const [cardApiState, cardApiDispatch, cardfetchData, cardclearData] = useAsyncer(getCardPage, [], [contentType], start, setStart);  // After cardPage updated, Card data is updated.
@@ -106,7 +110,7 @@ const Detail: NextPage = () => {
     const [selctState, setSelect] = useState(ALL_LABEL['it']);
     const [ascState, setAscState] = useState(true);
     // card component dependent param def
-    const preProcessCard = (data: fromApiV1[],pageNow:string): pageCountTyp => {
+    const preProcessCard = (data: fromApiV1[], pageNow: string): pageCountTyp => {
         function durationParser(num: number): string {
             // @ts-ignore
             let year = parseInt(num / 12);
@@ -122,7 +126,7 @@ const Detail: NextPage = () => {
             return durStr ? durStr : "데이터 없음";
         }
 
-        function imagePath(img: string,at:string): string {
+        function imagePath(img: string, at: string): string {
             if (!parseInt(img)) {
                 // after mock image file added.
                 // SET no PIC building TYPE : 1 or 2
@@ -133,9 +137,9 @@ const Detail: NextPage = () => {
 
         }
 
-        let compData : cardComp[]
+        let compData: cardComp[]
         if (!contentType) {
-            compData  = data.data.map((val) => {
+            compData = data.data.map((val) => {
                 return {
                     fn: val.fn,
                     lpcorp: val.lpcorp,
@@ -144,7 +148,7 @@ const Detail: NextPage = () => {
                     loanamt: parseInt(parseIntDef(val.loanamt, null) / 1E8),
                     sdaterate: parseFloatDef(val.sdaterate, null),
                     duration: durationParser(parseIntDef(val.duration, 0)),
-                    img: imagePath(val.img,val.at),
+                    img: imagePath(val.img, val.at),
                     fc: val.fc,
                     idx: val.idx,
                     loancls: val.loancls,
@@ -152,7 +156,7 @@ const Detail: NextPage = () => {
                     it: val.it,
                     at: val.at,
                     rate: val.rate,
-                    loandate:val.loandate.replace(/-/g,".")
+                    loandate: val.loandate.replace(/-/g, ".")
                 }
             })
         } else {
@@ -160,7 +164,9 @@ const Detail: NextPage = () => {
             const tempKey = Object.keys(data.data[0])
             compData = data.data.map((val) => {
                 val.area = val.area.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                tempKey.map((k) => {val[k] = val[k].replace(/(Null|^\s*$)/g,'-')})
+                tempKey.map((k) => {
+                    val[k] = val[k].replace(/(Null|^\s*$)/g, '-')
+                })
                 return val
             })
         }
@@ -197,7 +203,7 @@ const Detail: NextPage = () => {
             }
         }
         // @ts-ignore
-        res = preProcessCard(res.data,pageNow)
+        res = preProcessCard(res.data, pageNow)
         return res;
     }
 
@@ -250,10 +256,24 @@ const Detail: NextPage = () => {
                                         setcurntOption={setSelect} setdesAsc={setAscState}/>)
     const cardComps = useMemo(() => {
             if (!cardApiState.data.length) return
-            const headers :{label:string,key:string}[] = Object.keys(cardApiState.data[0]).map((val) => {return {label:ALL_LABEL[val],key:val}})
+            var newData
+            const clickFilterSet = new Set(clickFilter.clickFilters)
+            if (!clickFilterSet.size) {
+                newData = cardApiState.data.slice()
+            } else {
+                newData = cardApiState.data.filter((val) => {
+                    return clickFilterSet.has(val.idx)
+                })
+                if (!newData.length) {
+                    newData = cardApiState.data.slice()
+                }
+            }
+            const headers: { label: string, key: string }[] = Object.keys(cardApiState.data[0]).map((val) => {
+                return {label: ALL_LABEL[val], key: val}
+            })
             var name = filterInfo.category.map((val) => val.value).join("_")
-            if (filterInfo.float.length){
-                name += "__"+filterInfo.float[0].value.map((val)=> val.toString()).join("_")
+            if (filterInfo.float.length) {
+                name += "__" + filterInfo.float[0].value.map((val) => val.toString()).join("_")
             }
             return (
                 <div className={styles.card}>
@@ -263,21 +283,21 @@ const Detail: NextPage = () => {
                         <span><b>{cardApiState.rcn}</b></span>
                         <span>건 입니다.</span>
                     </div>
-                    <Button onClick={() => (setContentType(!contentType))}>
+                    <Button className={styles.contentButton} onClick={() => (setContentType(!contentType))}>
                         {contentType ? '카드보기' : '테이블 보기'}
                     </Button>
-                    {contentType ? (<div />) : (<div className={styles.sort}>
+                    {contentType ? (<div/>) : (<div className={styles.sort}>
                         {sortSelect}
                     </div>)}
                 </span>
                     {contentType ? (
-                        <div style={{justifyContent:'end',display:'flex',flexFlow:'row wrap',overflowX:'scroll'}}>
-                            <CompDataTable data={cardApiState.data} headers={headers} exportFileName={`${name}.csv`} />
+                        <div style={{justifyContent: 'end', display: 'flex', flexFlow: 'row wrap', overflowX: 'scroll'}}>
+                            <CompDataTable data={newData} headers={headers} exportFileName={`${name}.csv`}/>
                         </div>
 
                     ) : (
                         <span className={styles.board}>
-                    <CompCardGroup data={cardApiState.data}
+                    <CompCardGroup data={newData}
                                    refFunc={lastCardRef}
                                    fontRel={cardFontRel}/>
                     <div className={styles.boardError}>
@@ -288,11 +308,11 @@ const Detail: NextPage = () => {
                     )}
                 </div>)
         }
-        , [cardApiState.data, cardFontRel]
+        , [cardApiState.data, cardFontRel, clickFilter.clickFilters]
     )
 
     ///////////////////////////////////  chart //////////////////////////
-    const [chartClc, setChartClc] = useState(false);  // chart y data type -> % scale ~ raw numeric value
+    const [chartClc, setChartClc] = useState(true);  // chart y data type -> % scale ~ raw numeric value
     const [chartClcNoEtc, setChartClcNoEtc] = useState(false);  // include '기타' or not
     const chartDInit = {
         loading: false, data: [{one: [], two: []}],
@@ -305,9 +325,10 @@ const Detail: NextPage = () => {
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]): chartTyp => {
         let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: [], two: []}
         // @ts-ignore
-        console.log('left data1',data1)
         alldata['one'] = data1.map((item) => {
             return {
+                'fc': item.fc,
+                'idx': item.idx,
                 "자산명": item.an,
                 "체결이자": parseFloatDef(item.sdaterate, null),
                 "자산 유형": item.at,
@@ -318,13 +339,14 @@ const Detail: NextPage = () => {
 
         data2 = data2.map((item) => {
             return {
+                'idx': item.idx,
                 "lpcorp": item.lpcorp,
                 "loandate": parseIntDef(item.loandate.slice(0, 4)),
-                "loanamt": parseIntDef(item.loanamt, 0) / 1E8
+                "loanamt": parseInt(parseIntDef(item.loanamt, 0) / 1E8)
+
             }
         });
-
-        const topNcorp: Set<string> = groupbyKeys(data2, 'loanamt', ['lpcorp']).filter((val) => {
+        var topNArrOb: { loanamt: number, lpcorp: string }[] = groupbyKeys(data2, 'loanamt', ['lpcorp']).filter((val) => {
             // to ignoring 이지스사모... corp names
             {
                 return !val.lpcorp.includes("사모")
@@ -332,29 +354,33 @@ const Detail: NextPage = () => {
         }).sort(
             // sort by all loan amount sum of each corp & slicing only top 10
             (a, b) => sortObjectVal(a, b, 'loanamt')).slice(-10).reverse()
-            .reduce((r, o) => {
-                r.add(o.lpcorp)
-                return r
-            }, new Set)
-        data2 = groupbyKeys(data2, 'loanamt', ['lpcorp', 'loandate'])
-
+        const topNcorp: Set<string> = topNArrOb.reduce((r, o) => {
+            r.add(o.lpcorp)
+            return r
+        }, new Set)
+        var topNArr: string[] = topNArrOb.map((val) => val.lpcorp)
+        var GroupedAll = groupbyKeys(data2, 'loanamt', ['lpcorp', 'loandate'])
+        var GroupedAllidx = groupbyKeyString(data2, 'idx', ['lpcorp', 'loandate'])
+        GroupedAll.map((val,idnum) => {val['idx'] = GroupedAllidx[idnum]['idx'].slice(0,-1)})
         // @ts-ignore
         // top 10 copr select
-        const topn: rateAtData[] = data2.filter((val) => {
+        const topn: rateAtData[] = GroupedAll.filter((val) => {
             return topNcorp.has(val["lpcorp"])
-        })
+        }).sort((a, b) => topNArr.indexOf(a.lpcorp) - topNArr.indexOf(b.lpcorp));
         // @ts-ignore
         // non top 10 copr should be replaced to "기타"
-        const nontopn: rateAtData[] = groupbyKeys(data2.filter((val) => {
+        const nontopN = GroupedAll.filter((val) => {
                 return !topNcorp.has(val["lpcorp"])
-            }),
-            'loanamt', ['loandate']).map((item) => {
-                return {
-                    "lpcorp": "기타(상위 10개 대주 제외)", "loandate": item.loandate, "loanamt": item.loanamt
-                }
-            }
-        )
-        alldata['two'] = topn.concat(nontopn).sort(
+            })
+        var nontopnAll: rateAtData[] = groupbyKeys(nontopN,
+            'loanamt', ['loandate'])
+        var nontopnAllIdx = groupbyKeyString(nontopN, 'idx', ['loandate'])
+        nontopnAll = nontopnAll.map((item,idnum) => {
+            return {
+                "lpcorp": "기타(상위 10개 대주 제외)", "loandate": item.loandate, "loanamt": item.loanamt,
+                "idx":nontopnAllIdx[idnum]['idx'].slice(0,-1)
+            }})
+        alldata['two'] = topn.concat(nontopnAll).sort(
             (a, b) => sortForChartOnly(a, b, 'loandate')
         );
         //     .sort(
@@ -403,7 +429,9 @@ const Detail: NextPage = () => {
     }
 
     const chartOne = useMemo(() => {
-        return (chartApiState.data[0] && <RateAtPlot data={chartApiState.data[0].one}/>)
+        return (chartApiState.data[0] &&
+            <RateAtPlot data={chartApiState.data[0].one} clickFilter={clickFilter.clickFilters}
+                        clickFilterDispat={clickFilterDispat}/>)
     }, [chartApiState.data[0].one])
     const chartTwo = useMemo(() => {
         return (chartApiState.data[0] && <AumLpcorp data={chartApiState.data[0].two}
@@ -411,6 +439,7 @@ const Detail: NextPage = () => {
                                                     onClick={setChartClc}
                                                     chartClcNoEtc={chartClcNoEtc}
                                                     onchartClcNoEtc={setChartClcNoEtc}
+                                                    clickFilterDispat={clickFilterDispat}
         />)
     }, [chartApiState.data[0].two, chartClc, chartClcNoEtc])
 

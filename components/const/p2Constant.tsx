@@ -20,6 +20,13 @@ export const FILTER_ACTION = {
     'REPLACE':'replaceDispatch'
 };
 
+export const CLICK_ACTION = {
+    'CLICK': 'click',
+    'UNCLICK':'unclick',
+    'CLEAR':'clear',
+    "CLICK_MANY" :'clickmany',
+}
+
 // Filter Default action
 export const INIT_FILST: FilterStateObj = {
     category: [
@@ -34,41 +41,6 @@ export const INIT_FILST: FilterStateObj = {
 export const MM_DEBT:[number,number] = [0,5000E8]
 
 // labels for each filter (label : button1 button2 ...) | (label \n slider ---- )
-
-// sorting params name
-// export const SORT_LABELS = {
-//     'it' : '투자 유형',
-//     'seniorstr': '대출 순위',
-//     'at' : '자산 유형',
-//     'debt' : '대출 약정금',
-//     'rate': '금리 종류',
-//     'fn':"펀드명",
-//     'lpcorp':"대주명회사",
-//     'an':"자산명",
-//     'loanamt':"대출약정금",
-//     'aum':"대출총액",
-//     'sdaterate':"체결이자",
-//     'duration':"듀레이션",
-//     'loancls':'대출 분류',
-//
-// }
-//
-//
-// export const CARD_LABELS = {
-//     'fn':"펀드명",
-//     'lpcorp':"대주명회사",
-//     'an':"자산명",
-//     'loanamt':"대출약정금",
-//     'loan':"대출총액",
-//     'sdaterate':"체결이자",
-//     'duration':"듀레이션",
-//     'at' : '자산 유형',
-//     'it' : '투자 유형',
-//     'seniorstr': '대출 순위',
-//     'rate': '금리 종류',
-//     'loancls':'대출 분류',
-//     'loandate':'대출 체결일'
-//     }
 
 export const APIURL = {
     ROWCOUNT:"/api/v1/debtRowCount",
@@ -135,6 +107,7 @@ export const LABELS = {
 
 export const ALL_LABEL: {[key:string]:string}= {
         'fc': '펀드코드'
+        ,'it' : '투자 유형'
         , 'an': '자산명'
         , 'fn': '펀드명'
         , 'loan': 'LOAN 총액'

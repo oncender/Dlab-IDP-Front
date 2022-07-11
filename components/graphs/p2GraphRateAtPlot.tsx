@@ -2,17 +2,19 @@ import {Scatter} from '@ant-design/plots';
 import {AutoComplete} from 'antd';
 import {tupleNum} from 'antd/lib/_util/type';
 import {start} from 'repl';
-import {to_date} from "../const/p2Utils"
+import {useRouter} from "next/router";
+import {aumLpcorp} from "../const/p2Usertyp";
 
-const RateAtPlot = ({data}: { data: any }) => {
-    const newData = data.map((val) => {
-        val['대출 체결일'] = to_date(val['대출 체결일'])
-        return val
-    })
-
-
+const RateAtPlot = ({
+                        data,
+                        clickFilterDispat
+                    }: { data: aumLpcorp[], clickFilterDispat: Function }) => {
+    const router = useRouter()
+    if (typeof data == undefined || data.length === 0) {
+        return
+    }
     const config = {
-        data: newData,
+        data: data,
         padding: 'Auto',
         appendPadding: [30, 70, 0, 15],
         xField: '대출 체결일',
@@ -30,8 +32,11 @@ const RateAtPlot = ({data}: { data: any }) => {
             '대출 체결일': {
                 alias: '대출 체결일',
                 formatter: (v) => {
-                    let d1 = new Date(v).toISOString()
+                    let d1 = new Date(v)
+                    d1.setDate(d1.getDate() + 1);
+                    d1 = d1.toISOString()
                     return `${d1.substring(0, 10).replace(/-/g, ".")}`
+                    // return v.replace(/-/g,'.')
                 }
             },
             '체결이자': {
@@ -98,17 +103,27 @@ const RateAtPlot = ({data}: { data: any }) => {
             offsetX: -50,
         },
         interactions: [
-          {
-            type: 'element-selected',
-          },
-          {
-            type: 'element-active',
-          },
+            {
+                type: 'element-selected',
+            },
+            {
+                type: 'element-active',
+            },
         ],
         onReady: (plot) => {
-          plot.on('element:click', (...vars) => {
-            console.log(vars);
-          });
+            plot.on('element:dblclick', (...vars) => {
+                router.push({
+                        pathname: '/detailInfo',
+                        query: {idx: vars[0].data.data.idx, fc: vars[0].data.data.fc},
+                        options: {shallow: true}
+                    },
+                    "/detailInfo")
+            });
+            plot.on('element:click', (...vars) => {
+                    var action: string = 'click'
+                    clickFilterDispat({typ: action, value: vars[0].data.data.idx})
+                }
+            )
         },
     }
     if (data.length === 0) {

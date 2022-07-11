@@ -30,7 +30,7 @@ const AssetDescSummary: React.FC = ({data}: { data: any }) => {
         imageLoc = `building_pic/${data.data.img}.png` // only {number} returned in api
     }
     var antagsPreprocess: string
-    const maxLength:int = 50
+    const maxLength:number = 50
     if (data.data.an.length > maxLength) {
         antagsPreprocess = data.data.an.slice(0, maxLength)+"...";
     } else {

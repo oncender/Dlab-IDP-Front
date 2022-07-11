@@ -1,3 +1,4 @@
+@import "constant";
 @mixin scale_size($size) {
   @if $size == 'large' {
     $lblankS: 1 !global;
@@ -96,8 +97,6 @@
 }
 
 
-
-;
 
 .chart {
   display: flex;
