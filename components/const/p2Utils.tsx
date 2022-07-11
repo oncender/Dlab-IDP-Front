@@ -312,3 +312,11 @@ export function downloadExcel(title:string, dataJsonArray:Object[], orderedColum
     }), title + '.xlsx');
 
 }
+
+export function formatDate(d: Date) {
+    return d.getFullYear().toString() + ("0" + (d.getMonth()+1).toString()).slice(-2) + ("0" + d.getDate().toString()).slice(-2)
+}
+
+export function formatPrintDate(d: string) {
+    return d.substring(0,4) + "." + d.substring(4,6) + "." + d.substring(6,8)
+}
