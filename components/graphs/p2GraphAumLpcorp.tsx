@@ -5,6 +5,10 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,click
                        { data: any, chartClc: boolean,  onClick: Function,
                          chartClcNoEtc: boolean, onchartClcNoEtc: Function ,clickFilterDispat:Function}) => {
     G2.registerInteraction('element-link', {
+        showEnable: [
+        { trigger: 'element:mouseenter', action: 'cursor:pointer' },
+        { trigger: 'element:mouseleave', action: 'cursor:default' },
+        ],
         start: [
             {
                 trigger: 'interval:mouseenter',
@@ -79,10 +83,9 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,click
             plot.on('element:click', (...vars) => {
                 var action: string = 'clickmany'
                 clickFilterDispat({typ: action, value: vars[0].data.data.idx})
-                console.log("AumLpcorp",vars)
                 // clickFilterDispat({typ: action, value: vars[0].data.data.idx})
                 }
-            )
+                )
         },
         legend: {
             position: 'right-top',
@@ -106,10 +109,15 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,click
     };
     let bl = !chartClc ? "-92px" : "-55px"
     let bll = !chartClc ? "-52px" : "-52px"
-
+    const chartTitle = !chartClc ? (
+        <>
+            <span>Loan-Amt </span>
+            <span style={{color:'red'}}>Percent</span>
+            <span>-Column Plot by Lenders</span>
+            </>) : (<><span>Loan-Amt </span><span style={{color:'red'}}>Sum</span><span>-Column Plot by Lenders</span></>)
     return (
         <div style={{"display": 'flex', "flexFlow": 'column nowrap', "justifyContent": "space-between", "marginTop": "4rem"}}>
-            <p className="pl-4 mb-4 text-3xl font-blinker">{!chartClc ? "Loan-Amt Percent-Column Plot by Lenders" : "Loan-Amt Sum-Column Plot by Lenders"}</p>
+            <p className="pl-4 mb-4 text-3xl font-blinker">{chartTitle}</p>
             <Button
                 style={{
                     "alignSelf": 'flex-end', 'order': 1, "borderRadius": "0.5rem",
