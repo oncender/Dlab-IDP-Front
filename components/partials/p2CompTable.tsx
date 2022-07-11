@@ -43,19 +43,21 @@ const CompDataTable: React.FC = ({data,headers,exportFileName}: { data: any, hea
                     ).map((dat2) => {
                         return {text: dat2, value: dat2}
                     })
+                    val['onFilter'] = (value: string, record) => record[val.key].startsWith(value);
+                    val['filterSearch'] = true;
                 }
             })
         } else {
             newcolumnType.map((val) => {
                 if (FilterColumns.has(val.key)) {
-                    console.log(val)
                     val['width'] = val['width'] - filNum
                     delete val["filters"]
+                    delete val["onFilter"]
+                    delete val["filterSearch"]
                 }
             })
         }
         setColumnType(newcolumnType)
-        console.log("newcolumnType", filterAdd, newcolumnType)
     }, [filterAdd])
     useEffect(() => {
         setColumnType(columnType)
@@ -117,7 +119,7 @@ const CompDataTable: React.FC = ({data,headers,exportFileName}: { data: any, hea
                         };
                     }}
                     onHeaderRow={(columns, index) => {
-                        console.log("columns,index", columns, index)
+                        // console.log("columns,index", columns, index)
                         return {
                             onClick: () => {
                             }, // click header row
@@ -131,19 +133,16 @@ const CompDataTable: React.FC = ({data,headers,exportFileName}: { data: any, hea
                             return
                         }
                         const availKeys: string = Object.keys(filters).filter((k) => (filters[k]))
-                        var nowData = extra.currentDataSource
+                        var nowData = data.slice()
                         if (availKeys.length && filterAdd) {
                             var filterTarget: Set<string>
                             for (let i = 0; i < availKeys.length; i++) {
                                 filterTarget = new Set(filters[availKeys[i]])
                                 nowData = nowData.filter((dat) => (filterTarget.has(dat[availKeys[i]])))
                             }
-                        } else {
-                            nowData = data
                         }
                         nowData = sortingLogic(sorter.order, nowData, sorter.columnKey)
                         setCurrentData(nowData)
-                        console.log("extra", extra)
                     }}
                 />
             </ReactDragListView.DragColumn>
@@ -153,7 +152,7 @@ const CompDataTable: React.FC = ({data,headers,exportFileName}: { data: any, hea
             >
                 <CSVLink
                     headers={headers}
-                    data={currentData}
+                    data={[]}
                     filename={`${exportFileName}.csv`}
                     target="_blank"
                 >

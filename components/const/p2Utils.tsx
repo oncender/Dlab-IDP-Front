@@ -63,6 +63,17 @@ export function groupbyKeys(obArr: Array<any>, targetKey: string, keys: string[]
         return r.set(key, item);
     }, new Map).values()];
 }
+export function groupbyKeyString(obArr: Array<any>, targetKey: string, keys: string[]) {
+    return [...obArr.reduce((r, o) => {
+        const key = keys.map((k) => o[k]).join("-")
+        const item = r.get(key) || Object.assign({}, o, {
+            [targetKey]: '',
+        });
+        item[targetKey] += o[targetKey] ? o[targetKey]+"," : '';
+        return r.set(key, item);
+    }, new Map).values()];
+}
+
 
 // export function groupbyKeysObject(obArr: Array<any>,keys: string[]) {
 //     return [...obArr.reduce((r, o) => {
@@ -103,7 +114,7 @@ export function to_date(date_str:string){
     var sDate = yyyyMMdd.substring(8,10);
 
     //alert("sYear :"+sYear +"   sMonth :"+sMonth + "   sDate :"+sDate);
-    return new Date(Number(sYear), Number(sMonth)-1, Number(sDate));
+    return new Date(Number(sYear), Number(sMonth), Number(sDate));
 }
 
 export function sortForChartOnly(a: any, b: any, targetKey: string) {

@@ -4,6 +4,10 @@ interface FilterStateObj {
     float: FloatObj[]
 }
 
+interface ClickStateObj {
+    clickFilters : string[]
+}
+
 interface CategoryObj {
     name: string
     value: string
@@ -28,6 +32,11 @@ interface ActionObj {
     value: CategoryObj | FloatObj | FilterStateObj
 }
 
+interface ClickActionObj {
+    typ : string,
+    value : string
+}
+
 // for chart Data
 interface rateAtData {
     sdaterate: string
@@ -41,11 +50,9 @@ interface fromApiV1 {
 }
 
 interface aumLpcorp {
-    sdaterate: number
-    at: string
-    loandate: string
-    loanamt: number
-    an: string
+    "체결이자": number
+    "대출약정금": number
+    [key: string]:string
 }
 
 interface rateAtData {
@@ -80,7 +87,7 @@ interface pageCountTyp {
 }
 
 interface chartTyp {
-    data: { one: fromApiV1[], two: fromApiV1[] }[],
+    data: { one: aumLpcorp[], two: rateAtData[] }[],
     hasMore: boolean,
     rcn: number,
 }
@@ -146,4 +153,5 @@ interface FundDataType {
 export type {
     ActionObj, FilterStateObj, FloatObj, CategoryObj, ApiFlowObj,
     fromApiV1, rateAtData, aumLpcorp, cardComp, pageCountTyp, chartTyp, FundDataType
+    ,ClickStateObj,ClickActionObj
 }
