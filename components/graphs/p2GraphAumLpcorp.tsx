@@ -24,7 +24,7 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,click
         return `${(item.loanamt)}억`
     }
     const onClickF = (item) => {
-        return `${parseFloat(item.loanamt * 100).toFixed(2)}%`;
+        return `${parseFloat(item.loanamt * 100).toFixed(0)}%`;
     }
     configClickData['isPercent'] = !chartClc
     configClickData['content'] = chartClc ? nonClickF : onClickF
@@ -69,7 +69,10 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,click
             },
             {
                 type: 'tooltip',
-                cfg: {start: [{trigger: 'element:click', action: 'tooltip:show'}]}
+                cfg: {start: [
+                    {trigger: 'interval:mouseenter', action: 'tooltip:show'},
+                    {trigger: 'element:click', action: 'tooltip:show'}]
+                }
             }
         ],
         onReady: (plot) => {

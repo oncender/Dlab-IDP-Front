@@ -22,7 +22,7 @@ const AsideFilters = ({fromHomeData,filDispat, start}:
     const seniorstrClicked = selectArr(seniorstrValue, fromHomeData.category, 'seniorstr');
     const [clickArrSeniorstr, setClickArrSeniorstr] = useState(seniorstrClicked);
 
-    const atValue: Array<string> = ['오피스', '물류', '호텔', '리테일', '복합(리테일)', '주거', '특별자산', '기타'];
+    const atValue: Array<string> = ['오피스', '물류', '호텔', '리테일', '복합(리테일)','복합(오피스)', '주거', '특별자산', '기타'];
     const atClicked = selectArr(atValue, fromHomeData.category, 'at');
     const [clickArrAt, setClickArrAt] = useState(atClicked);
 
