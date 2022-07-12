@@ -15,8 +15,8 @@ const RateAtPlot = ({
     }
     G2.registerInteraction('element-hovering', {
         showEnable: [
-        { trigger: 'element:mouseenter', action: 'cursor:pointer' },
-        { trigger: 'element:mouseleave', action: 'cursor:default' },
+            {trigger: 'element:mouseenter', action: 'cursor:pointer'},
+            {trigger: 'element:mouseleave', action: 'cursor:default'},
         ],
     });
     const config = {
@@ -107,7 +107,19 @@ const RateAtPlot = ({
             layout: 'vertical',
             position: 'right',
             offsetX: -50,
+            itemValue: {
+                formatter: (text, item) => {
+                    const items = data.filter((d) => d['자산 유형'] === item.value);
+                    return items.length ? (items.reduce((a, b) => {
+                        return (a + parseFloat(b['체결이자']))
+                    }, 0) / items.length).toFixed(2)+"%" : '-';
+                },
+                style: {
+                    opacity: 0.65,
+                }
+            }
         },
+
         interactions: [
             {
                 type: 'element-selected',
