@@ -1,4 +1,4 @@
-import {Scatter} from '@ant-design/plots';
+import {G2, Scatter} from '@ant-design/plots';
 import {AutoComplete} from 'antd';
 import {tupleNum} from 'antd/lib/_util/type';
 import {start} from 'repl';
@@ -13,6 +13,12 @@ const RateAtPlot = ({
     if (typeof data == undefined || data.length === 0) {
         return
     }
+    G2.registerInteraction('element-hovering', {
+        showEnable: [
+            {trigger: 'element:mouseenter', action: 'cursor:pointer'},
+            {trigger: 'element:mouseleave', action: 'cursor:default'},
+        ],
+    });
     const config = {
         data: data,
         padding: 'Auto',
@@ -41,7 +47,7 @@ const RateAtPlot = ({
             },
             '체결이자': {
                 alias: '체결이자',
-                formatter: (v) => `${Number(v).toFixed(2)}'%`,
+                formatter: (v) => `${Number(v).toFixed(2)}%`,
             },
             '대출약정금': {
                 alias: '대출약정금',
@@ -101,7 +107,31 @@ const RateAtPlot = ({
             layout: 'vertical',
             position: 'right',
             offsetX: -50,
+            itemValue: {
+                formatter: (text, item) => {
+                    const items = data.filter((d) => d['자산 유형'] === item.value);
+                    if (item.value=='주거'){
+                        items.reduce((a, b) => {
+                            console.log("asdasdas",a,b['체결이자'],parseFloat(b['체결이자']))
+                            return (a + parseFloat(b['체결이자']))
+                    },0)
+                    }
+                    return items.length ? (items.reduce((a, b) => {
+                        var bval
+                        if (b['체결이자']){
+                            bval = parseFloat(b['체결이자'])
+                        } else {
+                            bval =0
+                        }
+                        return (a + bval)
+                    }, 0) / items.length).toFixed(2)+"%" : '-';
+                },
+                style: {
+                    opacity: 0.65,
+                }
+            }
         },
+
         interactions: [
             {
                 type: 'element-selected',
@@ -109,6 +139,9 @@ const RateAtPlot = ({
             {
                 type: 'element-active',
             },
+            {
+                type: 'element-hovering',
+            }
         ],
         onReady: (plot) => {
             plot.on('element:dblclick', (...vars) => {
