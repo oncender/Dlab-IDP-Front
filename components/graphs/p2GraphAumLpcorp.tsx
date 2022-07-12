@@ -126,8 +126,8 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,click
             // width: '70vw'
         }
     };
-    let bl = !chartClc ? "-92px" : "-55px"
-    let bll = !chartClc ? "-52px" : "-52px"
+    let bl = !chartClc ? "-115px" : "-98px"
+    let bll = !chartClc ? "-75px" : "-94px"
     const chartTitle = !chartClc ? (
         <>
             <span>Loan-Amt </span>
