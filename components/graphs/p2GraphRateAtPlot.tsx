@@ -47,7 +47,7 @@ const RateAtPlot = ({
             },
             '체결이자': {
                 alias: '체결이자',
-                formatter: (v) => `${Number(v).toFixed(2)}'%`,
+                formatter: (v) => `${Number(v).toFixed(2)}%`,
             },
             '대출약정금': {
                 alias: '대출약정금',
@@ -110,8 +110,20 @@ const RateAtPlot = ({
             itemValue: {
                 formatter: (text, item) => {
                     const items = data.filter((d) => d['자산 유형'] === item.value);
+                    if (item.value=='주거'){
+                        items.reduce((a, b) => {
+                            console.log("asdasdas",a,b['체결이자'],parseFloat(b['체결이자']))
+                            return (a + parseFloat(b['체결이자']))
+                    },0)
+                    }
                     return items.length ? (items.reduce((a, b) => {
-                        return (a + parseFloat(b['체결이자']))
+                        var bval
+                        if (b['체결이자']){
+                            bval = parseFloat(b['체결이자'])
+                        } else {
+                            bval =0
+                        }
+                        return (a + bval)
                     }, 0) / items.length).toFixed(2)+"%" : '-';
                 },
                 style: {
