@@ -90,6 +90,25 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,click
         legend: {
             position: 'right-top',
             offsetY: 30,
+            itemValue: {
+                formatter: (text, item) => {
+                    const items = data.filter((d) => d['lpcorp'] === item.value);
+                    if (items.length){
+                        var formatval = (items.reduce((a, b) => {
+                            return (a + parseFloat(b['loanamt']))
+                    }, 0))
+                        var allloan = data.reduce((a, b) => {
+                            return (a + parseFloat(b['loanamt']))}, 0)
+                        formatval = chartClc ? (formatval).toFixed(0)+"억" : (100*formatval/allloan).toFixed(0)+"%"
+                        return formatval
+                    } else{
+                        return '-';
+                    }
+                },
+                style: {
+                    opacity: 0.65,
+                }
+            },
             itemName: {
                 formatter: (val) => {
                     if (val === '기타(상위 10개 대주 제외)') {
