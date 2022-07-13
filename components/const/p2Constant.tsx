@@ -117,7 +117,7 @@ export const ALL_LABEL: {[key:string]:string}= {
         , 'lpt': '대주명분류'
         , 'seniorstr': '대출순위'
         , 'sdaterate': '체결일이자율'
-
+        ,'debt' : '대출 약정금'
         , 'addr': '토지주소'
         , 'sdate': '설정일'
         , 'mdate': '만기일'

@@ -188,6 +188,7 @@ const Detail: NextPage = () => {
         } else {
             params = apiParamGen(filterInfo)
         }
+        console.log(filterInfo,urlGen(APIURL.CARDPAGE, params))
         var cancel
         var reqConfig: {} = {
             method: "GET",

@@ -37,7 +37,9 @@ function filReducer(state : FilterStateObj,action: ActionObj) {
             };
         case FILTER_ACTION.FLOAT_UPDATE:
             var index = state.float.findIndex(i => i.name == action.value.name)
+            // var index = 0
             var newFloat = [...state.float]
+            console.log("index,newFloat",index,newFloat)
             newFloat[index] = action.value as FloatObj
             // console.log("slider updated",newFloat[index].value)
             return {
