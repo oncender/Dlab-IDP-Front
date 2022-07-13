@@ -34,6 +34,7 @@ const AsideFilters = ({fromHomeData,filDispat, start}:
     const loanClsClicked = selectArr(loanClsValue, fromHomeData.category, 'loancls');
     const [clickLoanCls, setClickLoanCls] = useState(loanClsClicked);
     // slider component dependent def
+
     const [sldrval, setSldrval] = useState(fromHomeData.float.filter((val)=> val.name==='debt')[0].value)
     useEffect(() => {
         // if (!start) return
@@ -42,6 +43,7 @@ const AsideFilters = ({fromHomeData,filDispat, start}:
         setClickArrAt(atClicked)
         setClickArrRate(rateClicked)
         setClickLoanCls(loanClsClicked)
+        console.log("fromHomeData.float",fromHomeData.float)
         setSldrval(fromHomeData.float.filter((val)=> val.name==='debt')[0].value)
     },[fromHomeData])
 

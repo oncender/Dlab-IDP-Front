@@ -112,7 +112,6 @@ const RateAtPlot = ({
                     const items = data.filter((d) => d['자산 유형'] === item.value);
                     if (item.value=='주거'){
                         items.reduce((a, b) => {
-                            console.log("asdasdas",a,b['체결이자'],parseFloat(b['체결이자']))
                             return (a + parseFloat(b['체결이자']))
                     },0)
                     }
