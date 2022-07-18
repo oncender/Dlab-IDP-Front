@@ -10,8 +10,10 @@ import React, {
     ReactNode,
     createContext,
     useLayoutEffect
+
 } from 'react'
-import type {NextPage} from 'next'
+import type {NextPage, GetStaticProps, InferGetStaticPropsType} from 'next'
+import type {GetServerSideProps, InferGetServerSidePropsType} from 'next'
 import {useRouter} from 'next/router'
 import {Button} from "antd";
 
@@ -46,7 +48,7 @@ import {
     aumLpcorp,
     cardComp,
     pageCountTyp,
-    chartTyp, FilterStateObj
+    chartTyp, FilterStateObj, tableComp, CategoryObj, FloatObj
 } from "../components/const/p2Usertyp"
 import axios from "axios";
 import Header from '../components/Header'
@@ -57,8 +59,10 @@ import {filter} from "@antv/util";
 
 export const windowContext = createContext({windowStatus: ''});
 
-const Detail: NextPage = () => {
-
+// const Detail: NextPage = ({chartData,cardData}: InferGetServerSidePropsType<typeof getServerSideProps>
+const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getStaticProps>
+) => {
+    console.log("start data", dataFieldData)
     // Get URL parameters via next router and setting up filter states
     const router = useRouter();
     const [start, setStart] = useState(false);
@@ -101,11 +105,11 @@ const Detail: NextPage = () => {
         // after filter updated, Graph should be reloaded
         setCookie('filterInfoCookie', JSON.stringify(filterInfo), {secure: true, 'max-age': 3600})
         onScrollTop()
-        cardclearData()
+        // cardclearData()
         clickFilterDispat({typ: "clear"})
     }, [filterInfo])
 
-    const [cardApiState, cardApiDispatch, cardfetchData, cardclearData] = useAsyncer(getCardPage, [], [contentType], start, setStart);  // After cardPage updated, Card data is updated.
+    const [cardApiState, cardApiDispatch, cardfetchData, cardclearData] = useAsyncer(filterCardPage, [], [filterInfo, contentType], start, setStart);  // After cardPage updated, Card data is updated.
     const [cardFontRel, setcardFontRel] = useState({fn: 42, an: 56, lpcorp: 56})
     // sorting State
     const [selctState, setSelect] = useState(ALL_LABEL['it']);
@@ -140,7 +144,7 @@ const Detail: NextPage = () => {
 
         let compData: cardComp[]
         if (!contentType) {
-            compData = data.data.map((val) => {
+            compData = data.map((val) => {
                 return {
                     fn: val.fn,
                     lpcorp: val.lpcorp,
@@ -161,9 +165,9 @@ const Detail: NextPage = () => {
                 }
             })
         } else {
-            if (!data.data.length) return
-            const tempKey = Object.keys(data.data[0])
-            compData = data.data.map((val) => {
+            if (!data.length) return
+            const tempKey = Object.keys(data[0])
+            compData = data.map((val) => {
                 val.area = val.area.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 tempKey.map((k) => {
                     val[k] = val[k].replace(/(Null|^\s*$)/g, '-')
@@ -173,9 +177,41 @@ const Detail: NextPage = () => {
         }
         return {
             data: compData,
-            hasMore: (data.rC >= (pageNow) * 10) ? true : false,// check next page is available
-            rcn: data.rC
+            hasMore: false,//(data.rC >= (pageNow) * 10) ? true : false,// check next page is available
+            rcn: compData.length//data.rC
         }
+    }
+    const filterObjectGen = (catenow: CategoryObj[]) => {
+        return catenow.reduce((r, o) => {
+            if (o.name in r) {
+                if (typeof r[o.name] == 'string') {
+                    r[o.name] = new Set([r[o.name], o.value])
+                } else {
+                    r[o.name].add(o.value)
+                }
+            } else {
+                r[o.name] = o.value
+            }
+            return r
+        }, {})
+    }
+    const fiterDataGen = (filterI: FilterStateObj) => {
+        const newFil = filterObjectGen(filterI.category)
+        var allData = Object.keys(newFil).reduce((filteredD: fromApiV1[], nowfil: string) => {
+            if (typeof newFil[nowfil] == 'string') {
+                return filteredD.filter((val) => val[nowfil] == newFil[nowfil])
+            } else {
+                return filteredD.filter((val) => newFil[nowfil].has(val[nowfil]))
+            }
+        }, dataFieldData)
+        allData = filterI.float.reduce((filteredD: fromApiV1[], Float: FloatObj) => {
+            if (Float['name'] == 'debt') {
+                return filteredD.filter((val) => (Float.value[0] <= parseFloatDef(val.loanamt, 0)) && (parseFloatDef(val.loanamt, 0) <= Float.value[1]))
+            } else {
+                return filteredD.filter((val) => (Float.value[0] <= parseFloatDef(val[Float.name], 0)) && (parseFloatDef(val[Float.name], 0) <= Float.value[1]))
+            }
+        }, allData)
+        return allData
     }
 
     async function getCardPage(props: any) {
@@ -188,7 +224,7 @@ const Detail: NextPage = () => {
         } else {
             params = apiParamGen(filterInfo)
         }
-        console.log(filterInfo,urlGen(APIURL.CARDPAGE, params))
+        console.log(filterInfo, urlGen(APIURL.CARDPAGE, params))
         var cancel
         var reqConfig: {} = {
             method: "GET",
@@ -207,6 +243,12 @@ const Detail: NextPage = () => {
         // @ts-ignore
         res = preProcessCard(res.data, pageNow)
         return res;
+    }
+
+    async function filterCardPage(props: any) {
+        // setter: State setter callback, should be given in the Hook or elsewhere,
+        const allData: fromApiV1[] = fiterDataGen(filterInfo)
+        return preProcessCard(allData, 1)
     }
 
     // infinite scroll ref
@@ -257,28 +299,55 @@ const Detail: NextPage = () => {
     const sortSelect = (<CompSortSelect curntOption={selctState} desAsc={ascState}
                                         setcurntOption={setSelect} setdesAsc={setAscState}/>)
     const cardComps = useMemo(() => {
-            if (!cardApiState.data.length) return
-            var newData
-            const clickFilterSet = new Set(clickFilter.clickFilters)
-            if (!clickFilterSet.size) {
-                newData = cardApiState.data.slice()
+            if (!cardApiState.data.length) {
+                return (
+                    <div className={styles.card}>
+                        <span className={styles.filter}>
+                            <div className={styles.title}>
+                                <span>총 대출건수는 </span>
+                                <span><b>{0}</b></span>
+                                <span>건 입니다.</span>
+                            </div>
+                            <Button className={styles.contentButton} onClick={() => (setContentType(!contentType))}>
+                                {contentType ? '카드보기' : '테이블 보기'}
+                            </Button>
+                            <Button className={styles.contentButton} onClick={() => {
+                                filDispat({
+                                    typ: FILTER_ACTION.REPLACE,
+                                    value: {category: filterInfo.category, float: filterInfo.float}
+                                })
+                            }}>
+                                필터초기화
+                            </Button>
+                            {contentType ? (<div />) : (<div className={styles.sort}>
+                                {sortSelect}
+                            </div>)}
+                        </span>
+                            <div style={{justifyContent: 'end', display: 'flex', flexFlow: 'row wrap', overflowX: 'scroll'}}>
+                            </div>
+                    </div>)
             } else {
-                newData = cardApiState.data.filter((val) => {
-                    return clickFilterSet.has(val.idx)
-                })
-                if (!newData.length) {
+                var newData
+                const clickFilterSet = new Set(clickFilter.clickFilters)
+                if (!clickFilterSet.size) {
                     newData = cardApiState.data.slice()
+                } else {
+                    newData = cardApiState.data.filter((val) => {
+                        return clickFilterSet.has(val.idx)
+                    })
+                    if (!newData.length) {
+                        newData = cardApiState.data.slice()
+                    }
                 }
-            }
-            const headers: { label: string, key: string }[] = Object.keys(cardApiState.data[0]).map((val) => {
-                return {label: ALL_LABEL[val], key: val}
-            })
-            var name = filterInfo.category.map((val) => val.value).join("_")
-            if (filterInfo.float.length) {
-                name += "__" + filterInfo.float[0].value.map((val) => val.toString()).join("_")
-            }
-            return (
-                <div className={styles.card}>
+                const headers: { label: string, key: string }[] = Object.keys(cardApiState.data[0]).map((val) => {
+                    return {label: ALL_LABEL[val], key: val}
+                })
+                var name = filterInfo.category.map((val) => val.value).join("_")
+                if (filterInfo.float.length) {
+                    name += "__" + filterInfo.float[0].value.map((val) => val.toString()).join("_")
+                }
+                return (
+                    <div className={styles.card}>
                 <span className={styles.filter}>
                     <div className={styles.title}>
                         <span>총 대출건수는 </span>
@@ -289,7 +358,10 @@ const Detail: NextPage = () => {
                         {contentType ? '카드보기' : '테이블 보기'}
                     </Button>
                     <Button className={styles.contentButton} onClick={() => {
-                        filDispat({typ: FILTER_ACTION.REPLACE, value: {category:filterInfo.category,float:filterInfo.float}})
+                        filDispat({
+                            typ: FILTER_ACTION.REPLACE,
+                            value: {category: filterInfo.category, float: filterInfo.float}
+                        })
                     }}>
                         필터초기화
                     </Button>
@@ -297,13 +369,14 @@ const Detail: NextPage = () => {
                         {sortSelect}
                     </div>)}
                 </span>
-                    {contentType ? (
-                        <div style={{justifyContent: 'end', display: 'flex', flexFlow: 'row wrap', overflowX: 'scroll'}}>
-                            <CompDataTable data={newData} headers={headers} exportFileName={`${name}.csv`}/>
-                        </div>
+                        {contentType ? (
+                            <div
+                                style={{justifyContent: 'end', display: 'flex', flexFlow: 'row wrap', overflowX: 'scroll'}}>
+                                <CompDataTable data={newData} headers={headers} exportFileName={`${name}.csv`}/>
+                            </div>
 
-                    ) : (
-                        <span className={styles.board}>
+                        ) : (
+                            <span className={styles.board}>
                     <CompCardGroup data={newData}
                                    refFunc={lastCardRef}
                                    fontRel={cardFontRel}/>
@@ -312,8 +385,9 @@ const Detail: NextPage = () => {
                         {cardApiState.error && "에러발생XXXX"}
                     </div>
                 </span>
-                    )}
-                </div>)
+                        )}
+                    </div>)
+            }
         }
         , [cardApiState.data, cardFontRel, clickFilter.clickFilters]
     )
@@ -326,7 +400,7 @@ const Detail: NextPage = () => {
         error: false, hasMore: true,
         rcn: 0, pagecnt: 1
     }   // for useAsyncer hook error handling
-    const [chartApiState, chartApiDispatch, _, chartclearData] = useAsyncer(getGraph, [], [filterInfo],
+    const [chartApiState, chartApiDispatch, _, chartclearData] = useAsyncer(filterGraph, [], [filterInfo],
         start, setStart, chartDInit);  // After filterInfo updated, chart data is updated.
     // chart component dependent param def
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]): chartTyp => {
@@ -368,7 +442,9 @@ const Detail: NextPage = () => {
         var topNArr: string[] = topNArrOb.map((val) => val.lpcorp)
         var GroupedAll = groupbyKeys(data2, 'loanamt', ['lpcorp', 'loandate'])
         var GroupedAllidx = groupbyKeyString(data2, 'idx', ['lpcorp', 'loandate'])
-        GroupedAll.map((val,idnum) => {val['idx'] = GroupedAllidx[idnum]['idx'].slice(0,-1)})
+        GroupedAll.map((val, idnum) => {
+            val['idx'] = GroupedAllidx[idnum]['idx'].slice(0, -1)
+        })
         // @ts-ignore
         // top 10 copr select
         const topn: rateAtData[] = GroupedAll.filter((val) => {
@@ -377,16 +453,17 @@ const Detail: NextPage = () => {
         // @ts-ignore
         // non top 10 copr should be replaced to "기타"
         const nontopN = GroupedAll.filter((val) => {
-                return !topNcorp.has(val["lpcorp"])
-            })
+            return !topNcorp.has(val["lpcorp"])
+        })
         var nontopnAll: rateAtData[] = groupbyKeys(nontopN,
             'loanamt', ['loandate'])
         var nontopnAllIdx = groupbyKeyString(nontopN, 'idx', ['loandate'])
-        nontopnAll = nontopnAll.map((item,idnum) => {
+        nontopnAll = nontopnAll.map((item, idnum) => {
             return {
                 "lpcorp": "기타(상위 10개 대주 제외)", "loandate": item.loandate, "loanamt": item.loanamt,
-                "idx":nontopnAllIdx[idnum]['idx'].slice(0,-1)
-            }})
+                "idx": nontopnAllIdx[idnum]['idx'].slice(0, -1)
+            }
+        })
         alldata['two'] = topn.concat(nontopnAll).sort(
             (a, b) => sortForChartOnly(a, b, 'loandate')
         );
@@ -435,6 +512,13 @@ const Detail: NextPage = () => {
         return preProcessChart(res1.data['datag1'], res2.data['datag2'])
     }
 
+    async function filterGraph(props: any) {
+        // setter: State setter callback, should be given in the Hook or elsewhere,
+        const allData: fromApiV1[] = fiterDataGen(filterInfo)
+        return preProcessChart(allData, allData)
+    }
+
+
     const chartOne = useMemo(() => {
         return (chartApiState.data[0] &&
             <RateAtPlot data={chartApiState.data[0].one} clickFilter={clickFilter.clickFilters}
@@ -478,6 +562,41 @@ const Detail: NextPage = () => {
             <Footer/>
         </div>
     )
+}
+
+export const getStaticProps: GetStaticProps = async (context) => {
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+    const dev = process.env.NODE_ENV !== 'production';
+    const server = dev ? 'http://127.0.0.1:8080' : 'http://127.0.0.1:8080';
+    const dataFieldData = await fetch(`${server}${APIURL.CARDPAGE}`).then(res => {
+        return res.json()
+    }).then(res => res.data)
+    // const chartData: { one: rateAtData[], two: aumLpcorp[] } = {
+    //     one: dataFieldData.tableD.map((val) => {
+    //         return {
+    //             fc: val.fc,
+    //             idx: val.idx,
+    //             an: val.an,
+    //             sdaterate: val.sdaterate,
+    //             loandate: val.loandate,
+    //             at: val.at,
+    //             loanamt: val.loanamt
+    //         }
+    //     }),
+    //     two: dataFieldData.tableD.map((val) => {
+    //         return {
+    //             idx: val.idx,
+    //             lpcorp : val.lpcorp,
+    //             loandate:val.loandate,
+    //             loanamt:val.loanamt
+    //         }
+    //     })
+    // }
+    return {
+        props: {
+            dataFieldData,
+        }
+    }
 }
 
 export default Detail
