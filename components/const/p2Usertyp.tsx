@@ -86,7 +86,7 @@ interface cardComp {
 }
 
 interface pageCountTyp {
-    data: cardComp[],
+    data: fromApiV1[] |cardComp[],
     hasMore: boolean,
     rcn: number
 }
