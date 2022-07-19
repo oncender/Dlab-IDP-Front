@@ -40,7 +40,7 @@ import {
     urlGen,
     detailQueryParser,
     parseFloatDef,
-    parseIntDef, setCookie, getCookie, sortForChartOnly, to_date, groupbyKeyString
+    parseIntDef, setCookie, getCookie, sortForChartOnly, to_date, groupbyKeyString, sortString, getKeyByValue, sortFloat
 } from "../components/const/p2Utils";
 import {
     fromApiV1,
@@ -105,11 +105,12 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
         // after filter updated, Graph should be reloaded
         setCookie('filterInfoCookie', JSON.stringify(filterInfo), {secure: true, 'max-age': 3600})
         onScrollTop()
-        // cardclearData()
+        setPageCnt(1)
         clickFilterDispat({typ: "clear"})
     }, [filterInfo])
 
     const [cardApiState, cardApiDispatch, cardfetchData, cardclearData] = useAsyncer(filterCardPage, [], [filterInfo, contentType], start, setStart);  // After cardPage updated, Card data is updated.
+    const [pageCnt,setPageCnt] = useState(1)
     const [cardFontRel, setcardFontRel] = useState({fn: 42, an: 56, lpcorp: 56})
     // sorting State
     const [selctState, setSelect] = useState(ALL_LABEL['it']);
@@ -266,8 +267,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
             // @ts-ignore
             observer.current = new IntersectionObserver((entries) => {
                 if (entries[0].isIntersecting && cardApiState.hasMore) {
-                    cardfetchData(true)
-                    // setCardPage((prev) => prev + 1);
+                    setPageCnt((prev) => prev+1);
                 }
             });
             if (node) {
@@ -335,9 +335,6 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                     newData = cardApiState.data.filter((val) => {
                         return clickFilterSet.has(val.idx)
                     })
-                    if (!newData.length) {
-                        newData = cardApiState.data.slice()
-                    }
                 }
                 const headers: { label: string, key: string }[] = Object.keys(cardApiState.data[0]).map((val) => {
                     return {label: ALL_LABEL[val], key: val}
@@ -345,6 +342,16 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                 var name = filterInfo.category.map((val) => val.value).join("_")
                 if (filterInfo.float.length) {
                     name += "__" + filterInfo.float[0].value.map((val) => val.toString()).join("_")
+                }
+                if (!contentType){
+                    const sortkey = getKeyByValue(ALL_LABEL,selctState as string) as string
+                    var sortfunc : Function
+                    if (typeof newData[0][sortkey] == 'string'){
+                            sortfunc = sortString
+                    } else {
+                        sortfunc = sortFloat
+                    }
+                    newData = newData.slice(0,pageCnt*10).sort((a, b) => sortfunc(a, b, sortkey, ascState))
                 }
                 return (
                     <div className={styles.card}>
@@ -358,6 +365,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                         {contentType ? '카드보기' : '테이블 보기'}
                     </Button>
                     <Button className={styles.contentButton} onClick={() => {
+                        // to trigger rendering datatable
                         filDispat({
                             typ: FILTER_ACTION.REPLACE,
                             value: {category: filterInfo.category, float: filterInfo.float}
@@ -389,7 +397,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                     </div>)
             }
         }
-        , [cardApiState.data, cardFontRel, clickFilter.clickFilters]
+        , [cardApiState.data, cardFontRel, clickFilter.clickFilters,pageCnt,selctState,ascState]
     )
 
     ///////////////////////////////////  chart //////////////////////////
