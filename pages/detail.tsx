@@ -149,8 +149,8 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                     fn: val.fn,
                     lpcorp: val.lpcorp,
                     an: val.an,
-                    loan: parseInt(parseIntDef(val.loan, null) / 1E8),
-                    loanamt: parseInt(parseIntDef(val.loanamt, null) / 1E8),
+                    loan: parseInt(parseIntDef(val.loan, 0) / 1E8),
+                    loanamt: parseInt(parseIntDef(val.loanamt, 0) / 1E8),
                     sdaterate: parseFloatDef(val.sdaterate, null),
                     duration: durationParser(parseIntDef(val.duration, 0)),
                     img: imagePath(val.img, val.at),
@@ -161,7 +161,15 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                     it: val.it,
                     at: val.at,
                     rate: val.rate,
-                    loandate: val.loandate.replace(/-/g, ".")
+                    loandate: val.loandate.replace(/-/g, "."),
+                    lpt:val.lpt,
+                    ft:val.ft,
+                    area: parseFloatDef(val.area, 0),
+                    equity:parseFloatDef(val.equity, 0),
+                    aum:parseFloatDef(val.aum, 0),
+                    ltv:parseFloatDef(val.ltv, 0),
+                    spread:val.spread,
+                    dscr:val.dscr
                 }
             })
         } else {
@@ -345,12 +353,12 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                 if (!contentType){
                     const sortkey = getKeyByValue(ALL_LABEL,selctState as string) as string
                     var sortfunc : Function
-                    if (typeof newData[0][sortkey] == 'string'){
-                            sortfunc = sortString
+                    if (typeof newData[0][sortkey] == 'number'){
+                            sortfunc = sortFloat
                     } else {
-                        sortfunc = sortFloat
+                        sortfunc = sortString
                     }
-                    newData = newData.slice(0,pageCnt*10).sort((a, b) => sortfunc(a, b, sortkey, ascState))
+                    newData = newData.sort((a, b) => sortfunc(a, b, sortkey, ascState)).slice(0,pageCnt*10)
                 }
                 return (
                     <div className={styles.card}>
