@@ -46,6 +46,7 @@ interface rateAtData {
 }
 
 interface fromApiV1 {
+    data : any[],
     [key: string]: string
 }
 
@@ -59,6 +60,10 @@ interface rateAtData {
     lpcorp: string
     loandate: string
     loanamt: number
+}
+
+interface tableComp {
+    [key: string]:string
 }
 
 interface cardComp {
@@ -152,6 +157,6 @@ interface FundDataType {
 
 export type {
     ActionObj, FilterStateObj, FloatObj, CategoryObj, ApiFlowObj,
-    fromApiV1, rateAtData, aumLpcorp, cardComp, pageCountTyp, chartTyp, FundDataType
+    fromApiV1, rateAtData, aumLpcorp, tableComp, cardComp, pageCountTyp, chartTyp, FundDataType
     ,ClickStateObj,ClickActionObj
 }

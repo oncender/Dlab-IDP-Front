@@ -43,7 +43,7 @@ function apiReducer(state: ApiFlowObj,
         case 'ERROR':
             return {
                 loading: false,
-                data: [],
+                data: state.data,
                 error: action.error,
                 hasMore: true,
                 rcn: state.rcn,
@@ -113,7 +113,7 @@ function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [],
             })
         } catch (e) {
             console.log('error in dispatch', e)
-            apiDispatch({type: 'NOMORE'});
+            apiDispatch({type: 'ERROR'});
         }
         // console.log(data.data)
     };
