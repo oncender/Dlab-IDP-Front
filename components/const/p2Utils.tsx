@@ -14,7 +14,9 @@ export function parseIntDef(val: string, defaultval: any) {
     let newval = val.replace(/,/g, "")
     return parseInt(newval) ? parseInt(newval) : defaultval
 }
-
+export function commaSep(num: number){
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}
 export function windowSizeStr(windowNow: { width: number | undefined, height: number | undefined }): string {
     var {width, height} = windowNow
     if (width && (width > 1180)) {

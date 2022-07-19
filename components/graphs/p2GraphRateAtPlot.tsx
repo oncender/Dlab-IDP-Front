@@ -4,6 +4,7 @@ import {tupleNum} from 'antd/lib/_util/type';
 import {start} from 'repl';
 import {useRouter} from "next/router";
 import {aumLpcorp} from "../const/p2Usertyp";
+import {commaSep, sortString} from "../const/p2Utils";
 
 const RateAtPlot = ({
                         data,
@@ -19,8 +20,10 @@ const RateAtPlot = ({
             {trigger: 'element:mouseleave', action: 'cursor:default'},
         ],
     });
+
+
     const config = {
-        data: data,
+        data: data.sort((a, b) => sortString(a, b, '대출 체결일', true)),
         padding: 'Auto',
         appendPadding: [30, 70, 0, 15],
         xField: '대출 체결일',
@@ -51,7 +54,7 @@ const RateAtPlot = ({
             },
             '대출약정금': {
                 alias: '대출약정금',
-                formatter: (v) => `${v}억원`,
+                formatter: (v) => `${commaSep(v)}억원`,
             },
             '자산명': {
                 alias: '자산명'
@@ -140,7 +143,7 @@ const RateAtPlot = ({
             },
             {
                 type: 'element-hovering',
-            }
+            },
         ],
         onReady: (plot) => {
             plot.on('element:dblclick', (...vars) => {

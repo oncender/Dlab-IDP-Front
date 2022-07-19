@@ -1,55 +1,72 @@
 import {Column, G2} from '@ant-design/plots';
 import {Button} from "antd";
+import {commaSep} from "../const/p2Utils";
 
-const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,clickFilterDispat}:
-                       { data: any, chartClc: boolean,  onClick: Function,
-                         chartClcNoEtc: boolean, onchartClcNoEtc: Function ,clickFilterDispat:Function}) => {
+const AumLpcorp = ({data, chartClc, onClick, chartClcNoEtc, onchartClcNoEtc, clickFilterDispat}:
+                       {
+                           data: any, chartClc: boolean, onClick: Function,
+                           chartClcNoEtc: boolean, onchartClcNoEtc: Function, clickFilterDispat: Function
+                       }) => {
     G2.registerInteraction('element-link', {
         showEnable: [
-        { trigger: 'element:mouseenter', action: 'cursor:pointer' },
-        { trigger: 'element:mouseleave', action: 'cursor:default' },
+            {trigger: 'element:mouseenter', action: 'cursor:pointer'},
+            {trigger: 'element:mouseleave', action: 'cursor:default'},
         ],
         start: [
             {
-                trigger: 'interval:mouseenter',
+                trigger: 'element:mouseenter',
                 action: 'element-link-by-color:link',
             },
         ],
         end: [
             {
-                trigger: 'interval:mouseleave',
+                trigger: 'element:mouseleave',
                 action: 'element-link-by-color:unlink',
             },
         ],
     });
 
-    const configClickData :{isPercent:boolean,content:Function,meta:any} = {}
+    const configClickData: { isPercent: boolean, content: Function, meta: any } = {}
     const nonClickF = (item) => {
-        return `${(item.loanamt)}억`
+        return `${commaSep(item.loanamt)}`
     }
     const onClickF = (item) => {
         return `${parseFloat(item.loanamt * 100).toFixed(0)}%`;
     }
     configClickData['isPercent'] = !chartClc
     configClickData['content'] = chartClc ? nonClickF : onClickF
-    configClickData['meta'] = chartClc ? {} : {value: {min: 0, max: 1,}}
+    configClickData['meta'] = {
+        'loandate': {
+            alias: '대출 연도',
+        },
+        'loanamt': {
+            alias: '대출약정금',
+            formatter: (v) => chartClc ? `${commaSep(v)}억원` : `${commaSep(v)}`,
+        },
+        'lpcorp': {
+            alias: '대주'
+        }
+    }
+    if (chartClc){
+        configClickData['meta'] = Object.assign(configClickData['meta'], {value: {min: 0, max: 1}});
+    }
     var newD
     if (chartClcNoEtc) {
         newD = data.filter((val) => val.lpcorp != "기타(상위 10개 대주 제외)")
     } else {
         newD = data
     }
-    if (typeof newD == undefined || newD.length ===0){
+    if (typeof newD == undefined || newD.length === 0) {
         return
     }
     const config = {
-        data:newD,
+        data: newD,
         appendPadding: 30,
         xField: 'loandate',
         yField: 'loanamt',
         seriesField: 'lpcorp',
         colorField: 'lpcorp',
-        color: ['#f96900','#ffd500', '#82cab2', '#193442', '#d18768', '#9a1b7a', '#3c82a5', '#e728a7', '#0093ff', '#96959c','#786E96','C8C5C0'],
+        color: ['#f96900', '#ffd500', '#82cab2', '#193442', '#d18768', '#9a1b7a', '#3c82a5', '#e728a7', '#0093ff', '#96959c', '#786E96', 'C8C5C0'],
         isPercent: configClickData['isPercent'],
         isStack: true,
         meta: configClickData['meta'],
@@ -58,6 +75,7 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,click
             content: configClickData['content'],
             style: {
                 fill: '#fff',
+                fontSize:'10px'
             },
         },
         tooltip: true,
@@ -73,19 +91,25 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,click
             },
             {
                 type: 'tooltip',
-                cfg: {start: [
-                    {trigger: 'interval:mouseenter', action: 'tooltip:show'},
-                    {trigger: 'element:click', action: 'tooltip:show'}]
+                cfg: {
+                    start: [
+                        {trigger: 'element:mouseenter', action: 'tooltip:show'},
+                        {trigger: 'interval:click', action: 'tooltip:show'}],
+                      end: [
+                        {
+                            trigger: 'element:mouseleave',
+                            action: 'tooltip:hide',
+                        }]
                 }
             }
         ],
         onReady: (plot) => {
             plot.on('element:click', (...vars) => {
-                var action: string = 'clickmany'
-                clickFilterDispat({typ: action, value: vars[0].data.data.idx})
-                // clickFilterDispat({typ: action, value: vars[0].data.data.idx})
+                    var action: string = 'clickmany'
+                    clickFilterDispat({typ: action, value: vars[0].data.data.idx})
+                    // clickFilterDispat({typ: action, value: vars[0].data.data.idx})
                 }
-                )
+            )
         },
         legend: {
             position: 'right-top',
@@ -93,15 +117,16 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,click
             itemValue: {
                 formatter: (text, item) => {
                     const items = data.filter((d) => d['lpcorp'] === item.value);
-                    if (items.length){
+                    if (items.length) {
                         var formatval = (items.reduce((a, b) => {
                             return (a + parseFloat(b['loanamt']))
-                    }, 0))
+                        }, 0))
                         var allloan = data.reduce((a, b) => {
-                            return (a + parseFloat(b['loanamt']))}, 0)
-                        formatval = chartClc ? (formatval).toFixed(0)+"억" : (100*formatval/allloan).toFixed(0)+"%"
+                            return (a + parseFloat(b['loanamt']))
+                        }, 0)
+                        formatval = chartClc ? commaSep((formatval).toFixed(0)) + "억" : (100 * formatval / allloan).toFixed(0) + "%"
                         return formatval
-                    } else{
+                    } else {
                         return '-';
                     }
                 },
@@ -121,21 +146,24 @@ const AumLpcorp = ({data, chartClc, onClick,chartClcNoEtc, onchartClcNoEtc,click
         style: {
             position: 'relative',
             order: 0,
-            zIndex: 0
-            // height: '300px',
-            // width: '70vw'
-        }
+            zIndex: 0,
+        },
     };
     let bl = !chartClc ? "-115px" : "-98px"
     let bll = !chartClc ? "-75px" : "-94px"
     const chartTitle = !chartClc ? (
         <>
             <span>Loan-Amt </span>
-            <span style={{color:'red'}}>Percent</span>
+            <span style={{color: 'red'}}>Percent</span>
             <span>-Column Plot by Lenders</span>
-            </>) : (<><span>Loan-Amt </span><span style={{color:'red'}}>Sum</span><span>-Column Plot by Lenders</span></>)
+        </>) : (<><span>Loan-Amt </span><span style={{color: 'red'}}>Sum</span><span>-Column Plot by Lenders</span></>)
     return (
-        <div style={{"display": 'flex', "flexFlow": 'column nowrap', "justifyContent": "space-between", "marginTop": "4rem"}}>
+        <div style={{
+            "display": 'flex',
+            "flexFlow": 'column nowrap',
+            "justifyContent": "space-between",
+            "marginTop": "4rem"
+        }}>
             <p className="pl-4 mb-4 text-3xl font-blinker">{chartTitle}</p>
             <Button
                 style={{
