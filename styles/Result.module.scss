@@ -18,19 +18,14 @@
     @include desktop { margin-top: 3rem; margin-bottom: 3rem;}
     .titlePhrase {
         align-self: center;
-        font-weight: 700;
         margin-right: 0.2rem;
         @include mobile { font-size: 1.5rem; }
         @include tablet { font-size: 2rem; }
         @include desktop { font-size: 3rem; }
-    }
-    .titleDate {
-        font-family: 'blinker';
-        font-weight: 300;
-        align-self: flex-end;
-        @include mobile { font-size: 1.2rem; }
-        @include tablet { font-size: 1.7rem; }
-        @include desktop { font-size: 1.5rem; }
+        p {
+            font-family: "Gothic A1";
+            font-weight: 700;
+        }
     }
 }
 
@@ -40,7 +35,6 @@
         bottom: 3rem;
     }
     
-    font-family: 'sans';
     border-collapse: collapse;
     border-top: 3px solid #168;
     text-align: center;
