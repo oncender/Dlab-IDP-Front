@@ -48,7 +48,7 @@ import {
     aumLpcorp,
     cardComp,
     pageCountTyp,
-    chartTyp, FilterStateObj, tableComp, CategoryObj, FloatObj
+    chartTyp, FilterStateObj, tableComp, CategoryObj, FloatObj, ActionObj
 } from "../components/const/p2Usertyp"
 import axios from "axios";
 import Header from '../components/Header'
@@ -62,7 +62,6 @@ export const windowContext = createContext({windowStatus: ''});
 // const Detail: NextPage = ({chartData,cardData}: InferGetServerSidePropsType<typeof getServerSideProps>
 const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getStaticProps>
 ) => {
-    console.log("start data", dataFieldData)
     // Get URL parameters via next router and setting up filter states
     const router = useRouter();
     const [start, setStart] = useState(false);
@@ -70,11 +69,11 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
     /* State & Reducer DEF */
     // @ts-ignore
     const [filterInfo, filDispat] = useReducer(filReducer, INIT_FILST); // all filter variable controller def
-    const [asideFil, setAsideFil] = useState<HTMLElement | null>(null);
+    const [asideFil, setAsideFil] = useState<JSX.Element | null>(null);
     const [clickFilter, clickFilterDispat] = useReducer(clickReducer, {clickFilters: []});
 
     useLayoutEffect(() => {
-        var filterI: FilterStateObj
+        let filterI: FilterStateObj
         if (Object.keys(router.query).length !== 0) {
             filterI = detailQueryParser(router.query);
         } else {
@@ -85,17 +84,17 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                 filterI = INIT_FILST
             }
         }
-        var newaction = {typ: FILTER_ACTION.REPLACE, value: filterI}
         setStart(true)
-        filDispat(newaction)
-        setAsideFil(
-            <div className={styles.asideFiltersJs} key="asidefilterjs" index={1}>
+        // @ts-ignore
+        filDispat({typ: FILTER_ACTION.REPLACE, value: filterI})
+        const asideNow:JSX.Element = (<div className={styles.asideFiltersJs} key="asidefilterjs" index={1}>
                 <AsideFilters
                     fromHomeData={filterI}
                     filDispat={filDispat}
                     start={start}
                 />
             </div>)
+        setAsideFil(asideNow)
     }, [])
     // window size getter
     const windowNow = useWindowSize() // for body window component size handle different card layout
@@ -143,7 +142,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
 
         }
 
-        let compData: cardComp[]
+        let compData: fromApiV1[] | cardComp[]
         if (!contentType) {
             compData = data.map((val) => {
                 return {
@@ -178,7 +177,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
         }
         return {
             data: compData,
-            hasMore: false,//(data.rC >= (pageNow) * 10) ? true : false,// check next page is available
+            hasMore: (compData.length >= (pageCnt) * 10),// check next page is available
             rcn: compData.length//data.rC
         }
     }
@@ -194,7 +193,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                 r[o.name] = o.value
             }
             return r
-        }, {})
+        }, {}) as {[key:string]:string|Set<string>}
     }
     const fiterDataGen = (filterI: FilterStateObj) => {
         const newFil = filterObjectGen(filterI.category)
