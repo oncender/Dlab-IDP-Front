@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "npx patch-package"
   },
   "dependencies": {
     "@ant-design/plots": "^1.0.9",

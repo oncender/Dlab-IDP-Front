@@ -68,21 +68,29 @@ interface tableComp {
 
 interface cardComp {
     img?: string  // source url for each card image or icon
-    fn: string
-    lpcorp: string
-    an: string
-    loan: number
-    sdaterate: number
-    duration: string
-    loanamt: number
-    idx: string
+    loandate:string,
     fc: string,
-    loancls: string,
-    seniorstr: string,
     it: string,
+    an: string
+    fn: string
+    loan: number
+    loanamt: number
+    sdaterate: number
+    lpcorp: string
+    seniorstr: string,
     at: string,
     rate: string,
-    loandate:string,
+    duration: string
+    loancls: string,
+    idx: string
+    lpt:string,
+    ft:string,
+    area:number,
+    equity:number,
+    aum:number,
+    ltv:number,
+    spread:string
+    dscr:string
 }
 
 interface pageCountTyp {

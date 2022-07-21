@@ -1,6 +1,6 @@
 import {ReactNode, useContext, useEffect, useState} from "react";
 import {Select} from "antd";
-import {ALL_LABEL} from "../const/p2Constant";
+import {ALL_LABEL, CARDDATA, CARDSORTDATA} from "../const/p2Constant";
 import {getKeyByValue} from "../const/p2Utils"
 import {windowContext} from "../../pages/detail";
 
@@ -30,7 +30,7 @@ const CompSortSelect = ({curntOption, desAsc, setcurntOption, setdesAsc}:
     ({styleJs} = styleGen(windowStatus))
 
 
-    const sortOptions = Object.keys(ALL_LABEL).map((k) => {
+    const sortOptions = CARDSORTDATA.map((k) => {
         // @ts-ignore
         return (<Option key={"sortOptions"+ALL_LABEL[k]} value={ALL_LABEL[k]}></Option>)
     })

@@ -5,9 +5,13 @@ export function zip(a1: any, a2: any) {
     return a1.map((x:any, i:any) => [x, a2[i]]);
 }
 
-export function parseFloatDef(val: string, defaultval: any) {
-    let newval = val.replace(/,/g, "")
-    return parseFloat(newval) ? parseFloat(newval) : defaultval
+export function parseFloatDef(val: string | undefined, defaultval: any) {
+    if (val){
+        let newval = val.replace(/,/g, "")
+        return parseFloat(newval) ? parseFloat(newval) : defaultval
+    } else {
+        return defaultval
+    }
 }
 
 export function parseIntDef(val: string, defaultval: any) {
@@ -137,8 +141,8 @@ interface ObjType {
     [index: string]: string
 }
 export function sortFloat(a: any, b: any, targetKey: string,asc=true) {
-    var fa = parseFloatDef(a[targetKey],-1e5);
-    var fb = parseFloatDef(b[targetKey],-1e5);
+    var fa = (typeof a[targetKey] == 'number') ? a[targetKey] : parseFloatDef(a[targetKey],-1e5);
+    var fb = (typeof b[targetKey] == 'number') ? b[targetKey] : parseFloatDef(b[targetKey],-1e5);
     if (asc){
         return fa - fb
     } else {
@@ -147,10 +151,11 @@ export function sortFloat(a: any, b: any, targetKey: string,asc=true) {
 }
 
 export function sortString(a: any, b: any, targetKey: string,asc=true) {
-    var fa = a[targetKey].toLowerCase();
-    var fb = b[targetKey].toLowerCase();
+    var fa = (a[targetKey]) ? a[targetKey].toLowerCase() : '';
+    var fb = (b[targetKey]) ? b[targetKey].toLowerCase() : '';
     var backvalue:number
     var frontvalue:number
+    // console.log(fa,fb,fa<fb,fa>fb)
     if (asc){
         frontvalue = 1
         backvalue = -1
