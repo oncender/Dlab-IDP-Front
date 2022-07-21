@@ -166,7 +166,7 @@ const RateAtPlot = ({
     }
     return (
         <div className="mt-8">
-            <p className="pl-4 mb-4 text-3xl font-blinker">Debt Rate Bubble Chart</p>
+            <p className="pl-4 mb-4 text-3xl font-blinker font-semibold">Debt Rate Bubble Chart</p>
             <Scatter {...config} />
         </div>);
 };

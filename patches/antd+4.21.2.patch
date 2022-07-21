@@ -1,0 +1,57 @@
+diff --git a/node_modules/antd/es/slider/style/index.css b/node_modules/antd/es/slider/style/index.css
+index 2998d1f..319f9d2 100644
+--- a/node_modules/antd/es/slider/style/index.css
++++ b/node_modules/antd/es/slider/style/index.css
+@@ -87,7 +87,7 @@
+ .ant-slider-track {
+   position: absolute;
+   height: 4px;
+-  background-color: #91d5ff;
++  background-color: rgba(16, 28, 59, 0.97);
+   border-radius: 2px;
+   transition: background-color 0.3s;
+ }
+@@ -97,7 +97,7 @@
+   height: 14px;
+   margin-top: -5px;
+   background-color: #fff;
+-  border: solid 2px #91d5ff;
++  border: solid 2px rgba(16, 28, 59, 0.97);
+   border-radius: 50%;
+   box-shadow: 0;
+   cursor: pointer;
+@@ -107,21 +107,21 @@
+   z-index: 1;
+ }
+ .ant-slider-handle:focus {
+-  border-color: #46a6ff;
++  border-color: rgba(33, 62, 129, 0.97);
+   outline: none;
+   box-shadow: 0 0 0 5px rgba(24, 144, 255, 0.12);
+ }
+ .ant-slider-handle.ant-tooltip-open {
+-  border-color: #1890ff;
++  border-color: rgba(16, 28, 59, 0.97);
+ }
+ .ant-slider:hover .ant-slider-rail {
+   background-color: #e1e1e1;
+ }
+ .ant-slider:hover .ant-slider-track {
+-  background-color: #69c0ff;
++  background-color: rgba(33, 62, 129, 0.97);
+ }
+ .ant-slider:hover .ant-slider-handle:not(.ant-tooltip-open) {
+-  border-color: #69c0ff;
++  border-color: rgba(33, 62, 129, 0.97);
+ }
+ .ant-slider-mark {
+   position: absolute;
+@@ -163,7 +163,7 @@
+   cursor: pointer;
+ }
+ .ant-slider-dot-active {
+-  border-color: #8cc8ff;
++  border-color: rgba(33, 62, 129, 0.97);
+ }
+ .ant-slider-disabled {
+   cursor: not-allowed;

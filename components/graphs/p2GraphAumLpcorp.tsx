@@ -152,11 +152,11 @@ const AumLpcorp = ({data, chartClc, onClick, chartClcNoEtc, onchartClcNoEtc, cli
     let bl = !chartClc ? "-115px" : "-98px"
     let bll = !chartClc ? "-75px" : "-94px"
     const chartTitle = !chartClc ? (
-        <>
+        <p className="pl-4 mb-4 text-3xl font-blinker font-semibold" style={{fontSize:'180%'}}>
             <span>Loan-Amt </span>
             <span style={{color: 'red'}}>Percent</span>
             <span>-Column Plot by Lenders</span>
-        </>) : (<><span>Loan-Amt </span><span style={{color: 'red'}}>Sum</span><span>-Column Plot by Lenders</span></>)
+        </p>) : (<p className="pl-4 mb-4 text-3xl font-blinker font-semibold" style={{fontSize:'180%'}}><span>Loan-Amt </span><span style={{color: 'red'}}>Sum</span><span>-Column Plot by Lenders</span></p>)
     return (
         <div style={{
             "display": 'flex',
@@ -164,7 +164,7 @@ const AumLpcorp = ({data, chartClc, onClick, chartClcNoEtc, onchartClcNoEtc, cli
             "justifyContent": "space-between",
             "marginTop": "4rem"
         }}>
-            <p className="pl-4 mb-4 text-3xl font-blinker">{chartTitle}</p>
+            {chartTitle}
             <Button
                 style={{
                     "alignSelf": 'flex-end', 'order': 1, "borderRadius": "0.5rem",

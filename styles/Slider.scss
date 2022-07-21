@@ -9,4 +9,11 @@
     opacity: 0.3;
     border-color: map-get($slider,"handle","border");
   }
+  &:focus{
+    border-color: map-get($slider,"handle","border");
+  };
+  .ant-slider:hover .ant-slider-handle:not(.ant-tooltip-open){
+    border-color: map-get($slider,"handle","border");
+  }
+
 }
