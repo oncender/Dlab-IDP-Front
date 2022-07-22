@@ -27,7 +27,7 @@ import AumLpcorp from "../components/graphs/p2GraphAumLpcorp";
 import CompCardGroup from "../components/partials/p2CompCardGroup";
 import CompSortSelect from "../components/partials/p2CompSortSelect";
 // Component dependent Import
-import {ALL_LABEL, APIURL, FILTER_ACTION, INIT_FILST} from "../components/const/p2Constant"
+import {ALL_LABEL, APIURL, FILTER_ACTION, INIT_FILST, SERVER_URL} from "../components/const/p2Constant"
 import {
     apiParamGen,
     detailQueryParser,
@@ -68,6 +68,7 @@ export const windowContext = createContext({windowStatus: ''});
 const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getStaticProps>
 ) => {
     // Get URL parameters via next router and setting up filter states
+    console.log(process, process.env)
     const router = useRouter();
     const [start, setStart] = useState(false);
     const [contentType, setContentType] = useState(true); // if true talbe will be viewed.
@@ -587,31 +588,11 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
 export const getStaticProps: GetStaticProps = async (context) => {
 // export const getServerSideProps: GetServerSideProps = async (context) => {
     const dev = process.env.NODE_ENV == 'debug';
-    const server = dev ? 'http://127.0.0.1:8080' : '';
+    console.log(process.env)
+    const server = dev ? 'http://127.0.0.1:8080' : SERVER_URL;
     const dataFieldData = await fetch(`${server}${APIURL.CARDPAGE}`).then(res => {
         return res.json()
     }).then(res => res.data)
-    // const chartData: { one: rateAtData[], two: aumLpcorp[] } = {
-    //     one: dataFieldData.tableD.map((val) => {
-    //         return {
-    //             fc: val.fc,
-    //             idx: val.idx,
-    //             an: val.an,
-    //             sdaterate: val.sdaterate,
-    //             loandate: val.loandate,
-    //             at: val.at,
-    //             loanamt: val.loanamt
-    //         }
-    //     }),
-    //     two: dataFieldData.tableD.map((val) => {
-    //         return {
-    //             idx: val.idx,
-    //             lpcorp : val.lpcorp,
-    //             loandate:val.loandate,
-    //             loanamt:val.loanamt
-    //         }
-    //     })
-    // }
     return {
         props: {
             dataFieldData,

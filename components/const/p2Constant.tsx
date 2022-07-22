@@ -1,16 +1,34 @@
 import {FilterStateObj, FundDataType} from "./p2Usertyp";
 import type {ColumnsType} from "antd/lib/table"
 import {
-    faBriefcase, faTruck, faHotel, faCartShopping, faHouseChimney, faOilWell, faBuilding,
-    faBuildingCircleCheck, faHandHoldingDollar, faUsers, faMoneyCheckAlt,
-    faCircleCheck, faCircleMinus, faCircleExclamation, faPercent,
-    faEllipsis, faWaveSquare,
-    faBuildingLock, faClipboardList, faFileInvoiceDollar, faBridge, faShop
+    faBridge,
+    faBriefcase,
+    faBuilding,
+    faBuildingCircleCheck,
+    faBuildingLock,
+    faCartShopping,
+    faCircleCheck,
+    faCircleExclamation,
+    faCircleMinus,
+    faClipboardList,
+    faEllipsis,
+    faFileInvoiceDollar,
+    faHandHoldingDollar,
+    faHotel,
+    faHouseChimney,
+    faMoneyCheckAlt,
+    faOilWell,
+    faPercent,
+    faShop,
+    faTruck,
+    faUsers,
+    faWaveSquare
 } from "@fortawesome/free-solid-svg-icons";
-import {
-    faViacoin, faEtsy
-} from "@fortawesome/free-brands-svg-icons"
-// faCircleEllipsisVertical, faWavePulse : pro
+import {faEtsy, faViacoin} from "@fortawesome/free-brands-svg-icons"
+
+// DEPLOY SERVER URL
+export const SERVER_URL = 'http://ec2-54-219-93-206.us-west-1.compute.amazonaws.com:8080'
+
 
 // Filter Default action
 export const FILTER_ACTION = {

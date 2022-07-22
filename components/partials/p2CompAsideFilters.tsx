@@ -2,9 +2,7 @@ import styles from "../../styles/Aside.module.scss"
 import {selectArr} from "../reducers/FilterReducer";
 import {LABELS, MM_DEBT} from "../const/p2Constant";
 import React, {useEffect, useMemo, useState} from "react";
-import {
-    FilterStateObj
-} from "../const/p2Usertyp"
+import {FilterStateObj} from "../const/p2Usertyp"
 import CompButtonGroup from "./p2CompButtonGroup";
 import CompSliderfil from "./p2CompSliderfil";
 
@@ -43,7 +41,6 @@ const AsideFilters = ({fromHomeData,filDispat, start}:
         setClickArrAt(atClicked)
         setClickArrRate(rateClicked)
         setClickLoanCls(loanClsClicked)
-        console.log("fromHomeData.float",fromHomeData.float)
         setSldrval(fromHomeData.float.filter((val)=> val.name==='debt')[0].value)
     },[fromHomeData])
 
