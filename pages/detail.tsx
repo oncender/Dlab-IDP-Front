@@ -1,19 +1,16 @@
 import styles from "../styles/Detail.module.scss"
 
 import React, {
-    useEffect,
-    useReducer,
-    useMemo,
-    useState,
-    useRef,
-    useCallback,
-    ReactNode,
     createContext,
-    useLayoutEffect
-
+    useCallback,
+    useEffect,
+    useLayoutEffect,
+    useMemo,
+    useReducer,
+    useRef,
+    useState
 } from 'react'
-import type {NextPage, GetStaticProps, InferGetStaticPropsType} from 'next'
-import type {GetServerSideProps, InferGetServerSidePropsType} from 'next'
+import type {GetStaticProps, InferGetStaticPropsType, NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {Button} from "antd";
 
@@ -24,38 +21,46 @@ import useAsyncer from "../components/hook/useAsyncer";
 import useMoveScrool from "../components/hook/useScroll"
 import useWindowSize from "../components/hook/useWindowSize"
 // Component Import
-
 import AsideFilters from "../components/partials/p2CompAsideFilters"
 import RateAtPlot from "../components/graphs/p2GraphRateAtPlot";
 import AumLpcorp from "../components/graphs/p2GraphAumLpcorp";
 import CompCardGroup from "../components/partials/p2CompCardGroup";
 import CompSortSelect from "../components/partials/p2CompSortSelect";
 // Component dependent Import
-import {APIURL, FILTER_ACTION, INIT_FILST, ALL_LABEL} from "../components/const/p2Constant"
+import {ALL_LABEL, APIURL, FILTER_ACTION, INIT_FILST} from "../components/const/p2Constant"
 import {
-    windowSizeStr,
     apiParamGen,
-    groupbyKeys,
-    sortObjectVal,
-    urlGen,
     detailQueryParser,
+    getCookie,
+    getKeyByValue,
+    groupbyKeys,
+    groupbyKeyString,
     parseFloatDef,
-    parseIntDef, setCookie, getCookie, sortForChartOnly, to_date, groupbyKeyString, sortString, getKeyByValue, sortFloat
+    parseIntDef,
+    setCookie,
+    sortFloat,
+    sortForChartOnly,
+    sortObjectVal,
+    sortString,
+    urlGen,
+    windowSizeStr
 } from "../components/const/p2Utils";
 import {
-    fromApiV1,
-    rateAtData,
     aumLpcorp,
     cardComp,
+    CategoryObj,
+    chartTyp,
+    FilterStateObj,
+    FloatObj,
+    fromApiV1,
     pageCountTyp,
-    chartTyp, FilterStateObj, tableComp, CategoryObj, FloatObj, ActionObj
+    rateAtData
 } from "../components/const/p2Usertyp"
 import axios from "axios";
 import Header from '../components/Header'
 import Footer from "../components/Footer";
 import CompDataTable from "../components/partials/p2CompTable";
 import {clickReducer} from "../components/reducers/ClickReducer";
-import {filter} from "@antv/util";
 
 export const windowContext = createContext({windowStatus: ''});
 
@@ -581,8 +586,8 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
 
 export const getStaticProps: GetStaticProps = async (context) => {
 // export const getServerSideProps: GetServerSideProps = async (context) => {
-    const dev = process.env.NODE_ENV !== 'production';
-    const server = dev ? 'http://127.0.0.1:8080' : 'http://127.0.0.1:8080';
+    const dev = process.env.NODE_ENV == 'debug';
+    const server = dev ? 'http://127.0.0.1:8080' : '';
     const dataFieldData = await fetch(`${server}${APIURL.CARDPAGE}`).then(res => {
         return res.json()
     }).then(res => res.data)
