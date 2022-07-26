@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import type { NextPage } from 'next';
 import MovingComponent from 'react-moving-text';
 import mainStyles from "../styles/Main.module.scss";
@@ -7,8 +7,8 @@ import BigSelect from '../components/partials/p1CompBigSelectMain';
 import ResultContents from '../components/partials/p1CompResultContents';
 import MacroContents from '../components/partials/p1CompMacroContents';
 import HowItWorksContents from '../components/partials/p1CompHowItWorksContents';
+import Footer from "../components/Footer";
 import axios from "axios";
-import useMoveScrool from "../components/hook/useScroll";
 import { formatDate } from "../components/const/p2Utils";
 
 
@@ -99,12 +99,10 @@ const Home: NextPage = () => {
                   direction="normal"
                   timing="ease"
                   iteration="1"
-                  fillMode="none">
-                  <button className="bg-[#67FFBF] w-full h-12 text-2xl my-4 mb-10
-                  sm:w-72 sm:h-16 sm:text-3xl sm:m-10 
-                  md:w-96 md:h-20 md:text-4xl md:mb-20 
-                  rounded-lg text-blue-900 transition hover:scale-110 hover:duration-150 hover:ease-in-out hover:bg-[#BAFBE0]"
-                    onClick={handleClick}>
+                  fillMode="none"
+                  className="text-center">
+                  <button className={mainStyles.CheckRateButton}
+                  onClick={handleClick}>
                     지금 확인해보기
                   </button>
                 </MovingComponent>
@@ -120,7 +118,7 @@ const Home: NextPage = () => {
           <div className="flex justify-center items-center" ref={focusRef}>
             {loading?
             <div className="my-20 transition transform delay-150 duration-300">
-              <GridLoader loading={loading} color='#67FFBF' size={30} />
+              <GridLoader loading={loading} color='#0078d0' size={30} />
             </div>
             :
             <div>
@@ -136,6 +134,7 @@ const Home: NextPage = () => {
         </div>
         <HowItWorksContents />
       </div>
+      <Footer />
     </div>
   )
 }

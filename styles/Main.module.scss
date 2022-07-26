@@ -55,3 +55,62 @@
         text-align: left;
     }
 }
+
+.CheckRateButton {
+    background-color: #0078d0;
+    border: 0;
+    border-radius: 56px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: system-ui,-apple-system,system-ui,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",sans-serif;
+    font-weight: 500;
+    outline: 0;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    transition: all .3s;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    &:before {
+        background-color: initial;
+        background-image: linear-gradient(#fff 0, rgba(255, 255, 255, 0) 100%);
+        border-radius: 125px;
+        content: "";
+        height: 50%;
+        left: 4%;
+        opacity: .5;
+        position: absolute;
+        top: 0;
+        transition: all .3s;
+        width: 92%;
+    }
+    &:hover {
+        box-shadow: rgba(255, 255, 255, .2) 0 3px 15px inset, rgba(0, 0, 0, .1) 0 3px 5px, rgba(0, 0, 0, .1) 0 10px 13px;
+        transform: scale(1.05);
+    }
+    &:active {
+        transform: scale(1);
+    }
+    @include mobile{
+        font-size: 1.5rem;
+        width: 18rem;
+        height: 3rem;
+        margin-top: 1rem;
+        margin-bottom: 2.5rem;
+    }
+    @include tablet{
+        font-size: 1.875rem;
+        width: 24rem;
+        height: 4rem;
+        margin: 2.5rem;
+    }
+    @include desktop{
+        font-size: 2.25rem;
+        width: 80%;
+        height: 5rem;
+        margin-top: 2rem;
+        margin-bottom: 5rem;
+    }
+}

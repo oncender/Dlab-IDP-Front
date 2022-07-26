@@ -62,11 +62,6 @@ export default function MacroContents(props: macroProp) {
       const weekAgo = getWeekAgoDate(value, rDate);
       const monthAgo = getMonthAgoDate(value, rDate);
 
-      console.log(key)
-      console.log(recent)
-      console.log(weekAgo)
-      console.log(monthAgo)
-
       filteredData.push({
         id: key,
         name: benchmarks[key],
