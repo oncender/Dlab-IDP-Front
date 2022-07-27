@@ -68,7 +68,6 @@ export const windowContext = createContext({windowStatus: ''});
 const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getStaticProps>
 ) => {
     // Get URL parameters via next router and setting up filter states
-    console.log(process, process.env)
     const router = useRouter();
     const [start, setStart] = useState(false);
     const [contentType, setContentType] = useState(true); // if true talbe will be viewed.
@@ -87,7 +86,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
             if (cookietemp) {
                 filterI = JSON.parse(cookietemp)
             } else {
-                filterI = INIT_FILST
+                filterI = JSON.parse(window.localStorage.getItem('filterInfoCookie')) ||  INIT_FILST
             }
         }
         setStart(true)
@@ -109,6 +108,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
     useEffect(() => {
         // after filter updated, Graph should be reloaded
         setCookie('filterInfoCookie', JSON.stringify(filterInfo), {secure: true, 'max-age': 3600})
+        window.localStorage.setItem('filterInfoCookie', JSON.stringify(filterInfo))
         onScrollTop()
         setPageCnt(1)
         clickFilterDispat({typ: "clear"})
@@ -226,37 +226,6 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
             }
         }, allData)
         return allData
-    }
-
-    async function getCardPage(props: any) {
-        // setter: State setter callback, should be given in the Hook or elsewhere,
-        let params
-        const pageNow: string = (typeof props == 'undefined') ? cardApiState.pagecnt : props.pagecount
-        if (!contentType) {
-            params = Object.assign({}, apiParamGen(filterInfo),
-                {'pageCount': pageNow});
-        } else {
-            params = apiParamGen(filterInfo)
-        }
-        console.log(filterInfo, urlGen(APIURL.CARDPAGE, params))
-        var cancel
-        var reqConfig: {} = {
-            method: "GET",
-            url: APIURL.CARDPAGE,
-            params: params,
-            cancelToken: new axios.CancelToken(c => cancel = c)
-        }
-        let res;
-        try {
-            res = await axios(reqConfig);
-        } catch (e) {
-            if (axios.isCancel(e)) {
-                console.log("error", e)
-            }
-        }
-        // @ts-ignore
-        res = preProcessCard(res.data, pageNow)
-        return res;
     }
 
     async function filterCardPage(props: any) {
@@ -377,6 +346,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                     <Button className={styles.contentButton} onClick={() => (setContentType(!contentType))}>
                         {contentType ? '카드보기' : '테이블 보기'}
                     </Button>
+
                     <Button className={styles.contentButton} onClick={() => {
                         // to trigger rendering datatable
                         filDispat({
@@ -425,7 +395,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
         start, setStart, chartDInit);  // After filterInfo updated, chart data is updated.
     // chart component dependent param def
     const preProcessChart = (data1: fromApiV1[], data2: fromApiV1[]): chartTyp => {
-        let alldata: { one: aumLpcorp[], two: rateAtData[] } = {one: [], two: []}
+        let alldata: { one: rateAtData[], two: aumLpcorp[] } = {one: [], two: []}
         // @ts-ignore
         alldata['one'] = data1.map((item) => {
             return {
@@ -494,45 +464,6 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
         return {data: [alldata], hasMore: false, rcn: 0}
     }
 
-    async function getGraph(props: any) {
-        // setter: State setter callback, should be given in the Hook or elsewhere,
-        let params = apiParamGen(filterInfo)
-        let cancel
-
-        let reqConfig1: {} = {
-            method: "GET",
-            url: APIURL.PLTONE + "?",
-            params: params,
-            cancelToken: new axios.CancelToken(c => cancel = c)
-        }
-
-        let reqConfig2: {} = {
-            method: "GET",
-            url: APIURL.PLTTWO,
-            params: params,
-            cancelToken: new axios.CancelToken(c => cancel = c)
-        }
-        let res1
-        let res2
-        try {
-            res1 = await axios(reqConfig1);
-        } catch (e) {
-            if (axios.isCancel(e)) {
-                console.log("error1", e)
-            }
-        }
-        try {
-            res2 = await axios(reqConfig2);
-        } catch (e) {
-            if (axios.isCancel(e)) {
-                console.log("error2", e)
-            }
-        }
-
-        // @ts-ignore
-        return preProcessChart(res1.data['datag1'], res2.data['datag2'])
-    }
-
     async function filterGraph(props: any) {
         // setter: State setter callback, should be given in the Hook or elsewhere,
         const allData: fromApiV1[] = fiterDataGen(filterInfo)
@@ -587,8 +518,8 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
 
 export const getStaticProps: GetStaticProps = async (context) => {
 // export const getServerSideProps: GetServerSideProps = async (context) => {
-    const dev = process.env.NODE_ENV == 'debug';
-    console.log(process.env)
+    var dev = process.env.NEXT_PUBLIC_ENV == 'debug';
+    dev = true
     const server = dev ? 'http://127.0.0.1:8080' : SERVER_URL;
     const dataFieldData = await fetch(`${server}${APIURL.CARDPAGE}`).then(res => {
         return res.json()
