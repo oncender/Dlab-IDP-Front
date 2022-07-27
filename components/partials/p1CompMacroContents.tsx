@@ -160,7 +160,7 @@ export default function MacroContents(props: macroProp) {
             ))}
           </tbody>
         </table>
-
+        <p>⚠️ 금융채의 경우 금융기관별로 산출되는데 정확히 어떻게 적용할지 연구중입니다.</p>
         <div className="mt-8 text-right">
           <button className={styles.GoToCasesButton}>
             <CSVLink data={macroMonthTable} filename={ `MacroData.csv` } target="_blank">
@@ -169,7 +169,6 @@ export default function MacroContents(props: macroProp) {
           </button>
         </div>
 
-        <p>⚠️ 금융채의 경우 금융기관별로 산출되는데 정확히 어떻게 적용할지 연구중입니다.</p>
           {/* <br/>
           ⚠️ 상기 표의 데이터는 6개월물 시중은행을 사용하였습니다.</p> */}
       </div>
