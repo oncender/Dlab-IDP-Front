@@ -2,6 +2,7 @@ import { macroProp } from '../const/p1Types';
 import styles from "../../styles/Macro.module.scss";
 import { formatDate, formatPrintDate } from "../const/p2Utils";
 import { macroType } from "../const/p1Types"
+import { CSVLink } from "react-csv";
 
 const upIcon = "▲";
 const downIcon = "▼";
@@ -121,6 +122,15 @@ export default function MacroContents(props: macroProp) {
             ))}
           </tbody>
         </table>
+        <div className="mt-8 text-right">
+          <button className={styles.GoToCasesButton}>
+            <CSVLink data={[]} filename={ `MacroData.csv` } target="_blank">
+                벤치마크 다운로드              
+            </CSVLink>
+          </button>
+        </div>
+
+
         <p>⚠️ 금융채의 경우 금융기관별로 산출되는데 정확히 어떻게 적용할지 연구중입니다.</p>
           {/* <br/>
           ⚠️ 상기 표의 데이터는 6개월물 시중은행을 사용하였습니다.</p> */}
