@@ -1,7 +1,6 @@
-import { macroProp } from '../const/p1Types';
+import { macroProp, macroType, macroTable } from '../const/p1Types';
 import styles from "../../styles/Macro.module.scss";
 import { formatDate, formatPrintDate } from "../const/p2Utils";
-import { macroType } from "../const/p1Types"
 import { CSVLink } from "react-csv";
 
 const upIcon = "▲";
@@ -41,6 +40,12 @@ export default function MacroContents(props: macroProp) {
     }
     return min;
   }
+
+  function getMonthTable(arr: macroType[], recentDate: Date) : macroType[] {
+    const minDate = formatDate(new Date(new Date(recentDate).setMonth(recentDate.getMonth() - 1)))
+    let newArr = arr.filter((item) => item.date >= minDate);
+    return newArr
+  }
   
   function getMonthAgoDate(arr: macroType[], recentDate: Date) : macroType {
     const minDate = formatDate(new Date(new Date(recentDate).setMonth(recentDate.getMonth() - 1)))
@@ -76,6 +81,39 @@ export default function MacroContents(props: macroProp) {
     }
   }
 
+  let macroMonthTable = []
+  let macroMonthTableHead = ['date']
+  let switchMode = 0
+
+  for (let [key, value] of Object.entries(data)) {
+    if (key in benchmarks) {
+      // head
+      macroMonthTableHead.push(key)
+
+      const recent = getRecentDate(value);
+      const rDate = new Date(Number(recent.date.substring(0,4)), Number(recent.date.substring(4,6))-1, Number(recent.date.substring(6,8)));
+      const table = getMonthTable(value, rDate)
+      
+      // monkey patch
+      for (var i = 0; i < table.length; i++) {
+        if (switchMode == 0) {
+          macroMonthTable.push(
+            [table[i]['date'], table[i]['value']]
+          )
+        } else {
+          if (macroMonthTable[i][0] == table[i]['date']) {
+            macroMonthTable[i].push(
+              table[i]['value']
+            )
+          } else {
+            macroMonthTable[i].push("")
+          }
+        }
+      }
+      switchMode = 1
+    }
+  }
+  macroMonthTable.unshift(macroMonthTableHead)
   return (
     !props.macroData ? null :
     <div className={styles.macroContainer}>
@@ -122,14 +160,14 @@ export default function MacroContents(props: macroProp) {
             ))}
           </tbody>
         </table>
+
         <div className="mt-8 text-right">
           <button className={styles.GoToCasesButton}>
-            <CSVLink data={[]} filename={ `MacroData.csv` } target="_blank">
+            <CSVLink data={macroMonthTable} filename={ `MacroData.csv` } target="_blank">
                 벤치마크 다운로드              
             </CSVLink>
           </button>
         </div>
-
 
         <p>⚠️ 금융채의 경우 금융기관별로 산출되는데 정확히 어떻게 적용할지 연구중입니다.</p>
           {/* <br/>
