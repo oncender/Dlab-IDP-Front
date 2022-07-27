@@ -55,8 +55,8 @@ const AssetDescSummary: React.FC = ({data}: { data: any }) => {
             >
                 <Card style={{width: 800}}>
                     <Descriptions title="Summary">
-                        <Descriptions.Item label="대출약정금">{data.data.loanamt + " ₩"}</Descriptions.Item>
-                        <Descriptions.Item label="대출총액">{data.data.loan + " ₩"}</Descriptions.Item>
+                        <Descriptions.Item label="대출약정금">{data.data.loanamt + " 원"}</Descriptions.Item>
+                        <Descriptions.Item label="대출총액">{data.data.loan + " 원"}</Descriptions.Item>
                         <Descriptions.Item label="체결이자">{data.data.sdaterate}</Descriptions.Item>
                         <Descriptions.Item label="듀레이션">{data.data.duration}</Descriptions.Item>
                         <Descriptions.Item label="투자전략">{data.data.strat}</Descriptions.Item>

@@ -13,6 +13,7 @@ const LargeFundDesc: React.FC = ({ data, display }: { data:any, display: boolean
         >
             <Card style={{ width: 1080 }}>
                 <Descriptions title="Asset Detail" bordered>
+                    <Descriptions.Item label="AUM 총액(현재)" span={3}>{data.data.aum + " 원"}</Descriptions.Item>
                     <Descriptions.Item label="대주수" span={3}>{data.data.lpnum}</Descriptions.Item>
                     <Descriptions.Item label="대주명분류" span={3}>{data.data.lpt}</Descriptions.Item>
                     <Descriptions.Item label="대출순위" span={3}>{data.data.seniorstr}</Descriptions.Item>

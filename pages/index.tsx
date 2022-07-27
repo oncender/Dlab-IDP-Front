@@ -25,7 +25,7 @@ const Home: NextPage = () => {
   };
   const API_URL : API_URL_TYPE = {
     MODEL : "/api/v1/model/pred",
-    MACRO : "/api/v1/macro/dataTable",
+    MACRO : "/api/v2/macro/dataTable",
   }
 
   const handleLoanPriority = (event: React.ChangeEvent<HTMLSelectElement>) => {
