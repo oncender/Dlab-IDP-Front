@@ -30,4 +30,8 @@ interface macroProp {
     macroData: macroDataType;
 }
 
-export type { modelPredictType, resultProp, macroProp, macroType }
+interface macroTable {
+    [key: string] : []
+}
+
+export type { modelPredictType, resultProp, macroProp, macroType, macroTable }
