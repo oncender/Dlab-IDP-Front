@@ -180,7 +180,8 @@ const AumLpcorp = ({data, chartClc, onClick, chartClcNoEtc, onchartClcNoEtc, cli
             "display": 'flex',
             "flexFlow": 'column nowrap',
             "justifyContent": "space-between",
-            "marginTop": "4rem"
+            "marginTop": "4rem",
+            "marginBottom": "-4%"
         }}>
             {chartTitle}
             <Button
