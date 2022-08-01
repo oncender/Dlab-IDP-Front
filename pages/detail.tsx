@@ -29,7 +29,6 @@ import CompSortSelect from "../components/partials/p2CompSortSelect";
 // Component dependent Import
 import {ALL_LABEL, APIURL, FILTER_ACTION, INIT_FILST, SERVER_URL} from "../components/const/p2Constant"
 import {
-    apiParamGen,
     detailQueryParser,
     getCookie,
     getKeyByValue,
@@ -42,7 +41,6 @@ import {
     sortForChartOnly,
     sortObjectVal,
     sortString,
-    urlGen,
     windowSizeStr
 } from "../components/const/p2Utils";
 import {
@@ -56,7 +54,6 @@ import {
     pageCountTyp,
     rateAtData
 } from "../components/const/p2Usertyp"
-import axios from "axios";
 import Header from '../components/Header'
 import Footer from "../components/Footer";
 import CompDataTable from "../components/partials/p2CompTable";
@@ -490,8 +487,8 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
     useEffect(() => {
         setChartComps(
             <div className={styles.chart} ref={scrollTop}>
-                {chartOne}
                 {chartTwo}
+                {chartOne}
             </div>
         )
     }, [chartApiState.data[0], chartClc, chartClcNoEtc])

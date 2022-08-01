@@ -1,11 +1,12 @@
 import {G2, Scatter} from '@ant-design/plots';
-import {AutoComplete} from 'antd';
-import {tupleNum} from 'antd/lib/_util/type';
-import {start} from 'repl';
 import {useRouter} from "next/router";
 import {aumLpcorp} from "../const/p2Usertyp";
 import {commaSep, sortString} from "../const/p2Utils";
 
+
+const STATUS_ACTIVE = "active";
+const STATUS_UNACTIVE = "inactive";
+const STATUS_SELECTED = "selected";
 const RateAtPlot = ({
                         data,
                         clickFilterDispat
@@ -29,15 +30,19 @@ const RateAtPlot = ({
         yField: '체결이자',
         sizeField: '대출약정금',
         colorField: '자산 유형',
-        etc:'자산명',
-        color: ['#004B57','#006A89',
-            '#002F5C','#002A7C',
-            '#008DC0','#86BEDA',
-            '#AED3E3','#BBD2EC',
-            '#C5D4EB','#5B61A1',
-            '#A7AED3','#DFE9F5'],
-        // ['#004B57', '#AED3E3', '#82cab2', '#193442', '#d18768', '#9a1b7a', '#3c82a5', '#e728a7', '#0093ff', '#96959c', '#786E96', '#C8C5C0']
-        //['#ffd500', '#82cab2', '#193442', '#d18768', '#9a1b7a', '#3c82a5', '#e728a7', '#0093ff', '#96959c'],
+        color:
+        // ['#004B57','#006A89',
+        // '#002F5C','#002A7C',
+        // '#008DC0','#86BEDA',
+        // '#AED3E3','#BBD2EC',
+        // '#C5D4EB','#5B61A1',
+        // '#A7AED3','#DFE9F5'],
+        // ['#004B57', '#AED3E3', '#82cab2', '#193442',
+        // '#d18768', '#9a1b7a', '#3c82a5', '#e728a7',
+        // '#0093ff', '#96959c', '#786E96', '#C8C5C0']
+            ['#f96900', '#ffd500', '#82cab2', '#193442', '#d18768',
+                '#9a1b7a', '#3c82a5', '#e728a7',
+                '#0093ff', '#96959c'],
         size: [4, 30],
         shape: 'circle',
         pointStyle: {
@@ -148,47 +153,61 @@ const RateAtPlot = ({
             {
                 type: 'element-active',
             },
-            {
-                type: 'element-highlight-etc'
-            },
-
             { type : 'element-hovering-cursor'},
-
         ],
         onReady: (plot) => {
-            // plot.on('element:mouseleave',(...vars) => {
-            //     vars[0].view.geometries[0].elements = vars[0].view.geometries[0].elements.reduce((r:Element[],dat:Element) => {
-            //         if ((dat.data['자산명'] == vars[0].data.data['자산명']) && (dat.elementIndex !=vars[0].gEvent.target._INDEX)){
-            //             dat.states = []
-            //         }
-            //         r.push(dat)
-            //         return r
-            //     },[])
-            //     console.log(vars[0].view.geometries[0].elements.filter((dat) => dat.data['자산명'] == vars[0].data.data['자산명']))
-            //     });
-            // plot.on('element:mouseenter',(...vars) => {
-            //     vars[0].view.geometries[0].elements = vars[0].view.geometries[0].elements.reduce((r:Element[],dat:Element) => {
-            //         if ((dat.data['자산명'] == vars[0].data.data['자산명']) && (dat.elementIndex !=vars[0].gEvent.target._INDEX)){
-            //             dat.states = ["selected"]
-            //         }
-            //         r.push(dat)
-            //         return r
-            //     },[])
-            //     console.log(vars[0].view.geometries[0].elements.filter((dat) => dat.data['자산명'] == vars[0].data.data['자산명']))
-            //     });
-            plot.on('element:dragenter',(...vars) => {
-                console.log("dragenter : ",vars)
+            plot.on('element:mouseleave', (...vars) => {
+                const elements: Element[] = vars[0].view.geometries[0].elements
+                var hasSelected: boolean = false
+                for (var dat of elements) {
+                    if (dat.hasState(STATUS_SELECTED)) {
+                        hasSelected = true
+                        break
+                    }
+                }
+                console.log(hasSelected)
+                elements.forEach((dat) => {
+                    if (hasSelected) {
+                        if (!dat.hasState(STATUS_SELECTED)) {
+                            dat.setState(STATUS_UNACTIVE, true)
+                            dat.setState(STATUS_ACTIVE, false)
+                        }
+                    } else {
+                        dat.setState(STATUS_UNACTIVE, false)
+                        dat.setState(STATUS_ACTIVE, false)
+                    }
+                })
             });
-            plot.on('element:dragover',(...vars) => {
-                console.log("dragover : ",vars)
+            plot.on('element:mouseenter', (...vars) => {
+                const elements: Element[] = vars[0].view.geometries[0].elements
+                const TriggeredAN: string = vars[0].data.data['자산명']
+                const selectedElements = elements.reduce((r: Element[], dat: Element) => {
+                    if (dat.data['자산명'] == TriggeredAN) {
+                        r.push(dat)
+                        if (dat.hasState(STATUS_UNACTIVE)) {
+                            dat.setState(STATUS_UNACTIVE, false);
+                        }
+                        dat.setState(STATUS_ACTIVE, true)
+                    } else {
+                        if (!dat.hasState(STATUS_SELECTED)) {
+                            dat.setState(STATUS_UNACTIVE, true)
+                        }
+                    }
+                    return r
+                }, [])
             });
-            plot.on('element:dragleave',(...vars) => {
-                console.log("dragleave : ",vars)
-            });
-            plot.on('element:drop',(...vars) => {
-                console.log("drop : ",vars)
-            });
-
+            // plot.on('element:dragenter',(...vars) => {
+            //     console.log("dragenter : ",vars)
+            // });
+            // plot.on('element:dragover',(...vars) => {
+            //     console.log("dragover : ",vars)
+            // });
+            // plot.on('element:dragleave',(...vars) => {
+            //     console.log("dragleave : ",vars)
+            // });
+            // plot.on('element:drop',(...vars) => {
+            //     console.log("drop : ",vars)
+            // });
             plot.on('element:dblclick', (...vars) => {
                 router.push({
                         pathname: '/detailInfo',
@@ -198,43 +217,39 @@ const RateAtPlot = ({
                     "/detailInfo")
             });
             plot.on('element:click', (...vars) => {
-                    var action: string = 'click'
-                console.log("ele click",vars[0],vars[0].data.data)
-                vars[0].view.geometries[0].elements = vars[0].view.geometries[0].elements.reduce((r:Element[],dat:Element) => {
-                    // if ((dat.data['자산명'] == vars[0].data.data['자산명']) && (dat.elementIndex !=vars[0].gEvent.target._INDEX)){
-                    //     if ("selected" in dat.states){
-                    //         dat.states = []
-                    //     } else {
-                    //         dat.states = ["selected"]
-                    //     }
-                    // }
-                    if (dat.elementIndex ==vars[0].gEvent.target._INDEX){
-                        if (dat.states.includes("selected")){
-                            vars[0].data.style = Object.assign({},vars[0].data.style,{zIndex:-1})
+                const clickedVarsIndex: number = vars[0].gEvent.target._INDEX
+                const TriggeredAN: string = vars[0].data.data['자산명']
+                const elements: Element[] = vars[0].view.geometries[0].elements
+                var triggeredIdx: number[] = []
+                elements.forEach((dat) => {
+                    if (dat.elementIndex == clickedVarsIndex) {
+                        if (dat.hasState(STATUS_SELECTED)) {
+                            vars[0].data.style = Object.assign({}, vars[0].data.style, {zIndex: -1})
                             dat.shape.cfg.zIndex = -1
-                            // vars[0].gEvent.target._INDEX
                         } else {
-                            vars[0].data.style = Object.assign({},vars[0].data.style,{zIndex:dat.elementIndex})
+                            vars[0].data.style = Object.assign({}, vars[0].data.style, {zIndex: dat.elementIndex})
                             dat.shape.cfg.zIndex = dat.elementIndex
-                            // dat.shape._INDEX = dat.elementIndex
                         }
-                        console.log(dat.shape.cfg.zIndex,dat.elementIndex)
+                        triggeredIdx.push(dat.data.idx)
+                    } else if (dat.data['자산명'] == TriggeredAN) {
+                        if (dat.hasState(STATUS_SELECTED)) {
+                            dat.setState(STATUS_SELECTED, false)
+                        } else {
+                            dat.setState(STATUS_SELECTED, true)
+                        }
+                        triggeredIdx.push(dat.data.idx)
                     }
-                    r.push(dat)
-                    return r
-                },[])
-                console.log(vars[0].view.geometries[0].elements.filter((dat) => dat.data['자산명'] == vars[0].data.data['자산명']))
-
-                clickFilterDispat({typ: action, value: vars[0].data.data.idx})
+                })
+                var action: string = 'click'
+                clickFilterDispat({typ: action, value: triggeredIdx})
+            })
             }
-            )
-        },
     }
     if (data.length === 0) {
         return
     }
     return (
-        <div className="mt-8">
+        <div className="mb-8">
             <p className="pl-4 mb-4 text-3xl font-blinker font-semibold">Debt Rate Bubble Chart</p>
             <Scatter {...config} />
         </div>);

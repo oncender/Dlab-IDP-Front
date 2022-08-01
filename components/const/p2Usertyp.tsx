@@ -34,7 +34,7 @@ interface ActionObj {
 
 interface ClickActionObj {
     typ : string,
-    value : string
+    value: string | string[]
 }
 
 // for chart Data
