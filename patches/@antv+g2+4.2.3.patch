@@ -1,0 +1,65 @@
+diff --git a/node_modules/@antv/g2/src/index.ts b/node_modules/@antv/g2/src/index.ts
+index 446066b..89f4213 100644
+--- a/node_modules/@antv/g2/src/index.ts
++++ b/node_modules/@antv/g2/src/index.ts
+@@ -184,6 +184,7 @@ import ElementSingleActive from './interaction/action/element/single-active';
+ 
+ import ElementHighlight from './interaction/action/element/highlight';
+ import ElementHighlightByColor from './interaction/action/element/highlight-by-color';
++import ElementHighlightByEtc from './interaction/action/element/highlight-by-etc';
+ import ElementHighlightByX from './interaction/action/element/highlight-by-x';
+ 
+ import ElementRangeHighlight, { ELEMENT_RANGE_HIGHLIGHT_EVENTS } from './interaction/action/element/range-highlight';
+@@ -232,6 +233,7 @@ registerAction('element-range-active', ElementRangeActive);
+ registerAction('element-highlight', ElementHighlight);
+ registerAction('element-highlight-by-x', ElementHighlightByX);
+ registerAction('element-highlight-by-color', ElementHighlightByColor);
++registerAction('element-highlight-by-etc', ElementHighlightByEtc);
+ 
+ registerAction('element-single-highlight', ElementSingleHighlight);
+ registerAction('element-range-highlight', ElementRangeHighlight);
+@@ -375,6 +377,11 @@ registerInteraction('element-highlight-by-color', {
+   start: [{ trigger: 'element:mouseenter', action: 'element-highlight-by-color:highlight' }],
+   end: [{ trigger: 'element:mouseleave', action: 'element-highlight-by-color:reset' }],
+ });
++registerInteraction('element-highlight-by-etc', {
++  start: [{ trigger: 'element:mouseenter', action: 'element-highlight-by-etc:highlight' }],
++  end: [{ trigger: 'element:mouseleave', action: 'element-highlight-by-etc:reset' }],
++});
++
+ 
+ // legend hover，element active
+ registerInteraction('legend-active', {
+diff --git a/node_modules/@antv/g2/src/interaction/action/element/highlight-by-etc.ts b/node_modules/@antv/g2/src/interaction/action/element/highlight-by-etc.ts
+new file mode 100644
+index 0000000..72c420f
+--- /dev/null
++++ b/node_modules/@antv/g2/src/interaction/action/element/highlight-by-etc.ts
+@@ -0,0 +1,27 @@
++import Element from '../../../geometry/element/';
++import { getElements, getElementValue } from '../util';
++import Highlight from './highlight';
++
++/**
++ * Highlight color
++ * @ignore
++ */
++class HighlightEtc extends Highlight {
++  protected setStateByElement(element: Element, enable: boolean) {
++    const view = this.context.view;
++    const colorAttr = element.geometry.getAttribute('etc');
++    if (!colorAttr) {
++      return;
++    }
++    const scale = view.getScaleByField(colorAttr.getFields()[0]);
++    const value = getElementValue(element, scale.field);
++    const elements = getElements(view);
++    const highlightElements = elements.filter((el) => {
++      return getElementValue(el, scale.field) === value;
++    });
++    console.log("highlightElements",highlightElements,elements)
++    this.setHighlightBy(elements, (el) => highlightElements.includes(el), enable);
++  }
++}
++
++export default HighlightEtc;

@@ -14,19 +14,17 @@
   p {
     margin: 4px 10px 4px 10px;
     &.orgName {
-      font-size: larger;
-      font-weight: 800;
+      a {
+        margin-left: 6px;
+        font-size: larger;
+        font-weight: 800;
+      }
     }
   }
-  a {
+  .feedback {
     margin: 4px 10px 4px 10px;
-    color: #7dffe3
+    color: #69c0fd;
+    font-size: large;
+    font-weight: 800;
   }
-
-  // height: 32px;
-  // background-color: #0e7490;
-  // display:flex;
-
 }
-
-//class="h-32 bg-cyan-700 p-1"

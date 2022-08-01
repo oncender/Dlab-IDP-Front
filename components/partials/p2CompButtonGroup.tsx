@@ -34,15 +34,15 @@ const ButtonPart = (num: number, isclicked: boolean, name: string, onClick: any)
                 return {styleJs:null,divJs:null,size:null,fontSize:null}
             case 'large':
                 return {styleJs:{width: "100%", fontSize: '1em'},
-                        divJs:{'width': 'fit-content', 'display': 'flex', 'flexFlow':'row wrap'},
+                        divJs:{'width': 'fit-content', 'display': 'flex', 'flexFlow':'row wrap','margin-right':'1%'},
                     size:'lg',fontSize:'1em'}
             case 'medium':
                 return {styleJs:{width: "95%",height:'80%', fontSize: '1em'},
-                        divJs:{'width': 'fit-content', 'display': 'inline-table'},
+                        divJs:{'width': 'fit-content', 'display': 'inline-table','margin-right':'1%'},
                         size:'sm',fontSize:'1em'}
             case 'small':
                 return {styleJs:{width: "90%",height:'80%', fontSize: '1em'},
-                        divJs:{'width': 'fit-content', 'display': 'flex', 'flexFlow':'row wrap'},
+                        divJs:{'width': 'fit-content', 'display': 'flex', 'flexFlow':'row wrap','margin-right':'1%'},
                         size:'xs',fontSize:'1em'}
             default:
                 return {styleJs:{},divJs:{},size:'',fontSize:''}
@@ -66,7 +66,7 @@ const ButtonPart = (num: number, isclicked: boolean, name: string, onClick: any)
             </div>)
     } else {
         return (
-            <div key = {name+"div1"} style={{'width': 'fit-content', 'display': 'inline-table'}}>
+            <div key = {name+"div1"} style={divJs && divJs}>
                 <Button
                     className={styles["ant-btn-default"]}
                     key={name}

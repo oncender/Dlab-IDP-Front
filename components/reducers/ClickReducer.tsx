@@ -6,15 +6,18 @@ function clickReducer(state : ClickStateObj,action: ClickActionObj) {
     var clickSet = new Set(state.clickFilters)
     switch (action.typ){
         case CLICK_ACTION.CLICK:
-            if (clickSet.has(action.value)){
-                clickSet.delete(action.value)
-            } else {
-                clickSet.add(action.value)
-            }
-            return {clickFilters:Array.from(clickSet)};
+            const valueLoop = action.value as string[]
+            valueLoop.forEach((dat) => {
+                if (clickSet.has(dat)) {
+                    clickSet.delete(dat)
+                } else {
+                    clickSet.add(dat)
+                }
+            })
+            return {clickFilters: Array.from(clickSet)};
         case CLICK_ACTION.CLEAR:
             return {
-            clickFilters:[]
+                clickFilters: []
             };
         case CLICK_ACTION.CLICK_MANY:
             if (action.value == undefined) return state;
