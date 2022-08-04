@@ -1,12 +1,14 @@
 import {CategoryObj, FilterStateObj, FloatObj} from "./p2Usertyp";
 import {INIT_FILST} from "./p2Constant"
+import {NextRouter} from "next/router";
+import React from "react";
 
 export function zip(a1: any, a2: any) {
-    return a1.map((x:any, i:any) => [x, a2[i]]);
+    return a1.map((x: any, i: any) => [x, a2[i]]);
 }
 
 export function parseFloatDef(val: string | undefined, defaultval: any) {
-    if (val){
+    if (val) {
         let newval = val.replace(/,/g, "")
         return parseFloat(newval) ? parseFloat(newval) : defaultval
     } else {
@@ -231,6 +233,24 @@ export function detailQueryParser(q: queryParam) {
     return initialFilterState;
 }
 
+export function PageCookieGet(router: NextRouter, cookieName: string, defaultCookie: any = {}): any {
+    if (Object.keys(router.query).length !== 0) {
+        return detailQueryParser(router.query);
+    } else {
+        var cookietemp = getCookie(cookieName)
+        if (cookietemp) {
+            return JSON.parse(cookietemp)
+        } else {
+            return JSON.parse(window.localStorage.getItem(cookieName)) || defaultCookie
+        }
+    }
+}
+
+export function PageCookieSet(filterInfo: FilterStateObj, cookieName: string) {
+    setCookie(cookieName, JSON.stringify(filterInfo), {secure: true, 'max-age': 3600})
+    window.localStorage.setItem(cookieName, JSON.stringify(filterInfo))
+}
+
 export function setCookie(name: string, value: any, options: any = {}) {
     options = {
         path: '/',
@@ -270,55 +290,16 @@ export function deleteCookie(name: string) {
     });
 }
 
-export function downloadExcel(title:string, dataJsonArray:Object[], orderedColumnArray:{NAME:string,CODE:string}[]) {
-
-    var columnCodeArray = [];
-    var columnNameArray = [];
-    orderedColumnArray.forEach(function (orderedColumn) {
-        columnCodeArray.push(orderedColumn.CODE);
-        columnNameArray.push(orderedColumn.NAME);
-    });
-
-    var wb = XLSX.utils.book_new();
-    var arrJSON = JSON.parse(JSON.stringify(dataJsonArray));
-    var dataJsonKeyLength = dataJsonArray.length > 0 && Object.keys(dataJsonArray[0]).length;
-    var returnColumnCount = columnNameArray.length;
-
-    //열순서 및 시트화
-    var ws = XLSX.utils.json_to_sheet(arrJSON, {header: columnCodeArray});
-
-    //엑셀파일정보
-    wb.Props = {
-        Title: title,
-        Subject: "Excel",
-        Author: "Master",
-        CreatedDate: new Date()
-    };
-    //엑셀 첫번째 시트네임
-    wb.SheetNames.push(title);
-
-    //열이름변경
-    changeColName(ws, columnNameArray);
-
-    //필요없는 열 삭제
-    if (dataJsonKeyLength - returnColumnCount > 0) {
-        delete_cols(ws, returnColumnCount + 1, dataJsonKeyLength - returnColumnCount);
-    }
-
-    //시트에 데이터를 연결
-    wb.Sheets[title] = ws;
-
-    //다운로드
-    saveAs(new Blob([
-        s2ab(XLSX.write(wb, {
-            bookType: 'xlsx',
-            type: 'binary'
-        }))
-    ], {
-        type: "application/octet-stream"
-    }), title + '.xlsx');
-
+export function CardFontSizeCalc(cardWidth: number, cardfontSize: number) {
+    console.log("cardWidth", cardWidth, cardfontSize, parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1)
+    var fnPlace = 4 * parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1
+    var anPlace = 4 * parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
+    var lpcorpPlace = 4 * parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
+    console.log('result', {fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
+    return [fnPlace, anPlace, lpcorpPlace]
 }
+
+
 
 export function formatDate(d: Date) {
     return d.getFullYear().toString() + ("0" + (d.getMonth()+1).toString()).slice(-2) + ("0" + d.getDate().toString()).slice(-2)

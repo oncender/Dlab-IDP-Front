@@ -2,6 +2,7 @@ import {G2, Scatter} from '@ant-design/plots';
 import {useRouter} from "next/router";
 import {aumLpcorp} from "../const/p2Usertyp";
 import {commaSep, sortString} from "../const/p2Utils";
+import {ClickedZindexChanging, SelectedHighLight, TargetSelect, TriggerActive} from "../const/p2GraphUtils";
 
 
 const STATUS_ACTIVE = "active";
@@ -157,44 +158,14 @@ const RateAtPlot = ({
         ],
         onReady: (plot) => {
             plot.on('element:mouseleave', (...vars) => {
-                const elements: Element[] = vars[0].view.geometries[0].elements
-                var hasSelected: boolean = false
-                for (var dat of elements) {
-                    if (dat.hasState(STATUS_SELECTED)) {
-                        hasSelected = true
-                        break
-                    }
-                }
-                console.log(hasSelected)
-                elements.forEach((dat) => {
-                    if (hasSelected) {
-                        if (!dat.hasState(STATUS_SELECTED)) {
-                            dat.setState(STATUS_UNACTIVE, true)
-                            dat.setState(STATUS_ACTIVE, false)
-                        }
-                    } else {
-                        dat.setState(STATUS_UNACTIVE, false)
-                        dat.setState(STATUS_ACTIVE, false)
-                    }
-                })
+                SelectedHighLight(vars)
             });
             plot.on('element:mouseenter', (...vars) => {
                 const elements: Element[] = vars[0].view.geometries[0].elements
                 const TriggeredAN: string = vars[0].data.data['자산명']
-                const selectedElements = elements.reduce((r: Element[], dat: Element) => {
-                    if (dat.data['자산명'] == TriggeredAN) {
-                        r.push(dat)
-                        if (dat.hasState(STATUS_UNACTIVE)) {
-                            dat.setState(STATUS_UNACTIVE, false);
-                        }
-                        dat.setState(STATUS_ACTIVE, true)
-                    } else {
-                        if (!dat.hasState(STATUS_SELECTED)) {
-                            dat.setState(STATUS_UNACTIVE, true)
-                        }
-                    }
-                    return r
-                }, [])
+                elements.forEach((dat) => {
+                    TriggerActive((dat.data['자산명'] == TriggeredAN), dat)
+                })
             });
             // plot.on('element:dragenter',(...vars) => {
             //     console.log("dragenter : ",vars)
@@ -223,20 +194,10 @@ const RateAtPlot = ({
                 var triggeredIdx: number[] = []
                 elements.forEach((dat) => {
                     if (dat.elementIndex == clickedVarsIndex) {
-                        if (dat.hasState(STATUS_SELECTED)) {
-                            vars[0].data.style = Object.assign({}, vars[0].data.style, {zIndex: -1})
-                            dat.shape.cfg.zIndex = -1
-                        } else {
-                            vars[0].data.style = Object.assign({}, vars[0].data.style, {zIndex: dat.elementIndex})
-                            dat.shape.cfg.zIndex = dat.elementIndex
-                        }
+                        ClickedZindexChanging(vars, dat)
                         triggeredIdx.push(dat.data.idx)
                     } else if (dat.data['자산명'] == TriggeredAN) {
-                        if (dat.hasState(STATUS_SELECTED)) {
-                            dat.setState(STATUS_SELECTED, false)
-                        } else {
-                            dat.setState(STATUS_SELECTED, true)
-                        }
+                        TargetSelect(dat)
                         triggeredIdx.push(dat.data.idx)
                     }
                 })
