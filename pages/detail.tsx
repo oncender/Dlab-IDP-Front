@@ -516,7 +516,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
 export const getStaticProps: GetStaticProps = async (context) => {
 // export const getServerSideProps: GetServerSideProps = async (context) => {
     var dev = process.env.NEXT_PUBLIC_ENV == 'debug';
-    dev = true
+    // dev = true
     const server = dev ? 'http://127.0.0.1:8080' : SERVER_URL;
     const dataFieldData = await fetch(`${server}${APIURL.CARDPAGE}`).then(res => {
         return res.json()
