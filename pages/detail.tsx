@@ -1,15 +1,6 @@
 import styles from "../styles/Detail.module.scss"
 
-import React, {
-    createContext,
-    useCallback,
-    useEffect,
-    useLayoutEffect,
-    useMemo,
-    useReducer,
-    useRef,
-    useState
-} from 'react'
+import React, {createContext, useEffect, useLayoutEffect, useMemo, useReducer, useState} from 'react'
 import type {GetStaticProps, InferGetStaticPropsType, NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {Button} from "antd";
@@ -29,14 +20,14 @@ import CompSortSelect from "../components/partials/p2CompSortSelect";
 // Component dependent Import
 import {ALL_LABEL, APIURL, FILTER_ACTION, INIT_FILST, SERVER_URL} from "../components/const/p2Constant"
 import {
-    detailQueryParser,
-    getCookie,
+    CardFontSizeCalc,
     getKeyByValue,
     groupbyKeys,
     groupbyKeyString,
+    PageCookieGet,
+    PageCookieSet,
     parseFloatDef,
     parseIntDef,
-    setCookie,
     sortFloat,
     sortForChartOnly,
     sortObjectVal,
@@ -58,6 +49,7 @@ import Header from '../components/Header'
 import Footer from "../components/Footer";
 import CompDataTable from "../components/partials/p2CompTable";
 import {clickReducer} from "../components/reducers/ClickReducer";
+import useInfiniteScroll from "../components/hook/useInfiniteScroll";
 
 export const windowContext = createContext({windowStatus: ''});
 
@@ -76,16 +68,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
 
     useLayoutEffect(() => {
         let filterI: FilterStateObj
-        if (Object.keys(router.query).length !== 0) {
-            filterI = detailQueryParser(router.query);
-        } else {
-            var cookietemp = getCookie('filterInfoCookie')
-            if (cookietemp) {
-                filterI = JSON.parse(cookietemp)
-            } else {
-                filterI = JSON.parse(window.localStorage.getItem('filterInfoCookie')) ||  INIT_FILST
-            }
-        }
+        filterI = PageCookieGet(router, 'filterInfoCookie', INIT_FILST)
         setStart(true)
         // @ts-ignore
         filDispat({typ: FILTER_ACTION.REPLACE, value: filterI})
@@ -104,8 +87,7 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
     const [scrollTop, onScrollTop] = useMoveScrool('center')  // after filter is updated, scroll should go to top
     useEffect(() => {
         // after filter updated, Graph should be reloaded
-        setCookie('filterInfoCookie', JSON.stringify(filterInfo), {secure: true, 'max-age': 3600})
-        window.localStorage.setItem('filterInfoCookie', JSON.stringify(filterInfo))
+        PageCookieSet(filterInfo, 'filterInfoCookie')
         onScrollTop()
         setPageCnt(1)
         clickFilterDispat({typ: "clear"})
@@ -204,8 +186,10 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                 r[o.name] = o.value
             }
             return r
-        }, {}) as {[key:string]:string|Set<string>}
+        }, {}) as { [key: string]: string | Set<string> }
     }
+
+    // To replace data request to Backend
     const fiterDataGen = (filterI: FilterStateObj) => {
         const newFil = filterObjectGen(filterI.category)
         var allData = Object.keys(newFil).reduce((filteredD: fromApiV1[], nowfil: string) => {
@@ -232,44 +216,21 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
     }
 
     // infinite scroll ref
-    const observer = useRef();
-
-    const lastCardRef = useCallback(
-        // observer always refer last card div component
-        (node: any) => {
-            if (cardApiState.loading) return;
-            //
-            if (observer.current) { // @ts-ignore
-                observer.current.disconnect();
-            }
-            // if need to more load (hasMore == true), observer redefine & cardPage +1
-            // @ts-ignore
-            observer.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting && cardApiState.hasMore) {
-                    setPageCnt((prev) => prev+1);
-                }
-            });
-            if (node) {
-                // @ts-ignore
-                observer.current.observe(node);
-            }
+    const [observer, lastCardRef] = useInfiniteScroll(() => {
+            setPageCnt((prev) => prev + 1)
         },
-        [cardApiState.loading, cardApiState.hasMore]
-    );
+        cardApiState.loading,
+        cardApiState.hasMore)
     useEffect(
         () => {
             let cardDOM = document.querySelector("div[custom=col21]");
             if (cardDOM) {
-                var cardWidth = parseFloat(window.getComputedStyle(cardDOM).width)
-                var cardfontSize = parseInt(window.getComputedStyle(cardDOM).fontSize)
-                console.log("cardWidth", cardWidth, cardfontSize, parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1)
-                var fnPlace = 4 * parseInt((cardWidth / (cardfontSize * 2)).toString()) - 1
-                var anPlace = 4 * parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
-                var lpcorpPlace = 4 * parseInt((cardWidth / (cardfontSize * 1.5)).toString()) - 1
-                console.log('result', {fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
+                const [fnPlace, anPlace, lpcorpPlace] = CardFontSizeCalc(
+                    parseFloat(window.getComputedStyle(cardDOM).width),
+                    parseInt(window.getComputedStyle(cardDOM).fontSize)
+                )
                 if (fnPlace != cardFontRel.fn && anPlace != cardFontRel.an && lpcorpPlace != cardFontRel.lpcorp) {
                     setcardFontRel({fn: fnPlace, an: anPlace, lpcorp: lpcorpPlace})
-
                 }
             }
         }, [windowNow]
@@ -277,63 +238,45 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
 
     const sortSelect = (<CompSortSelect curntOption={selctState} desAsc={ascState}
                                         setcurntOption={setSelect} setdesAsc={setAscState}/>)
-    const cardComps = useMemo(() => {
-            if (!cardApiState.data.length) {
-                return (
-                    <div className={styles.card}>
-                        <span className={styles.filter}>
-                            <div className={styles.title}>
-                                <span>총 대출건수는 </span>
-                                <span><b>{0}</b></span>
-                                <span>건 입니다.</span>
-                            </div>
-                            <Button className={styles.contentButton} onClick={() => (setContentType(!contentType))}>
-                                {contentType ? '카드보기' : '테이블 보기'}
-                            </Button>
-                            <Button className={styles.contentButton} onClick={() => {
-                                filDispat({
-                                    typ: FILTER_ACTION.REPLACE,
-                                    value: {category: filterInfo.category, float: filterInfo.float}
-                                })
-                            }}>
-                                필터초기화
-                            </Button>
-                            {contentType ? (<div />) : (<div className={styles.sort}>
-                                {sortSelect}
-                            </div>)}
-                        </span>
-                            <div style={{justifyContent: 'end', display: 'flex', flexFlow: 'row wrap', overflowX: 'scroll'}}>
-                            </div>
-                    </div>)
-            } else {
-                var newData
-                const clickFilterSet = new Set(clickFilter.clickFilters)
-                if (!clickFilterSet.size) {
-                    newData = cardApiState.data.slice()
-                } else {
-                    newData = cardApiState.data.filter((val) => {
-                        return clickFilterSet.has(val.idx)
-                    })
-                }
-                const headers: { label: string, key: string }[] = Object.keys(cardApiState.data[0]).map((val) => {
-                    return {label: ALL_LABEL[val], key: val}
-                })
-                var name = filterInfo.category.map((val) => val.value).join("_")
-                if (filterInfo.float.length) {
-                    name += "__" + filterInfo.float[0].value.map((val) => val.toString()).join("_")
-                }
-                if (!contentType){
-                    const sortkey = getKeyByValue(ALL_LABEL,selctState as string) as string
-                    var sortfunc : Function
-                    if (typeof newData[0][sortkey] == 'number'){
-                            sortfunc = sortFloat
-                    } else {
-                        sortfunc = sortString
-                    }
-                    newData = newData.sort((a, b) => sortfunc(a, b, sortkey, ascState)).slice(0,pageCnt*10)
-                }
-                return (
-                    <div className={styles.card}>
+
+    const sortData = (newData: any[], selctState: string): any[] => {
+        const sortkey = getKeyByValue(ALL_LABEL, selctState) as string
+        var sortfunc: Function
+        if (typeof newData[0][sortkey] == 'number') {
+            sortfunc = sortFloat
+        } else {
+            sortfunc = sortString
+        }
+        return newData.sort((a, b) => sortfunc(a, b, sortkey, ascState)).slice(0, pageCnt * 10)
+    }
+
+    function NoDataCardOrTable() {
+        return (
+            <div className={styles.card}>
+                <span className={styles.filter}>
+                    <div className={styles.title}>
+                        <span>총 대출건수는 </span>
+                        <span><b>{0}</b></span>
+                        <span>건 입니다.</span>
+                    </div>
+                    <Button className={styles.contentButton} onClick={() => (setContentType(!contentType))}>
+                        {contentType ? '카드보기' : '테이블 보기'}
+                    </Button>
+                    <Button className={styles.contentButton}>
+                        필터초기화
+                    </Button>
+                    {contentType ? (<div/>) : (<div className={styles.sort}>
+                        {sortSelect}
+                    </div>)}
+                </span>
+            </div>)
+    }
+
+    //count:number,newData:any[],headers:{ label: string, key: string }[],name:string,contentType : boolean
+    function DataCardOrTable(contentType: boolean, newData: any[], headers: { label: string, key: string }[], name: string) {
+        if (contentType) {
+            return (
+                <div className={styles.card}>
                 <span className={styles.filter}>
                     <div className={styles.title}>
                         <span>총 대출건수는 </span>
@@ -341,9 +284,8 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                         <span>건 입니다.</span>
                     </div>
                     <Button className={styles.contentButton} onClick={() => (setContentType(!contentType))}>
-                        {contentType ? '카드보기' : '테이블 보기'}
+                        카드보기
                     </Button>
-
                     <Button className={styles.contentButton} onClick={() => {
                         // to trigger rendering datatable
                         filDispat({
@@ -353,18 +295,38 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                     }}>
                         필터초기화
                     </Button>
-                    {contentType ? (<div/>) : (<div className={styles.sort}>
-                        {sortSelect}
-                    </div>)}
+                    <div/>
                 </span>
-                        {contentType ? (
-                            <div
-                                style={{justifyContent: 'end', display: 'flex', flexFlow: 'row wrap', overflowX: 'scroll'}}>
-                                <CompDataTable data={newData} headers={headers} exportFileName={`${name}.csv`}/>
-                            </div>
-
-                        ) : (
-                            <span className={styles.board}>
+                    <div style={{justifyContent: 'end', display: 'flex', flexFlow: 'row wrap', overflowX: 'scroll'}}>
+                        <CompDataTable data={newData} headers={headers} exportFileName={`${name}.csv`}/>
+                    </div>
+                </div>)
+        } else {
+            return (
+                <div className={styles.card}>
+                <span className={styles.filter}>
+                    <div className={styles.title}>
+                        <span>총 대출건수는 </span>
+                        <span><b>{cardApiState.rcn}</b></span>
+                        <span>건 입니다.</span>
+                    </div>
+                    <Button className={styles.contentButton} onClick={() => (setContentType(!contentType))}>
+                        테이블 보기
+                    </Button>
+                    <Button className={styles.contentButton} onClick={() => {
+                        // to trigger rendering datatable
+                        filDispat({
+                            typ: FILTER_ACTION.REPLACE,
+                            value: {category: filterInfo.category, float: filterInfo.float}
+                        })
+                    }}>
+                        필터초기화
+                    </Button>
+                    <div className={styles.sort}>
+                        {sortSelect}
+                    </div>
+                </span>
+                    <span className={styles.board}>
                     <CompCardGroup data={newData}
                                    refFunc={lastCardRef}
                                    fontRel={cardFontRel}/>
@@ -373,8 +335,40 @@ const Detail: NextPage = ({dataFieldData}: InferGetStaticPropsType<typeof getSta
                         {cardApiState.error && "에러발생XXXX"}
                     </div>
                 </span>
-                        )}
-                    </div>)
+                </div>)
+        }
+    }
+
+    const dataFilterByIndex = (clickFilter, cardApiState) => {
+        const clickFilterSet = new Set(clickFilter.clickFilters)
+        if (!clickFilterSet.size) {
+            return cardApiState.data
+        } else {
+            return cardApiState.data.filter((val) => {
+                return clickFilterSet.has(val.idx)
+            })
+        }
+    }
+    const csvElementGen = (data: any[], filterInfo: FilterStateObj): [{ label: string, key: string }[], string] => {
+        const headers: { label: string, key: string }[] = Object.keys(data[0]).map((val) => {
+            return {label: ALL_LABEL[val], key: val}
+        })
+        var name = filterInfo.category.map((val) => val.value).join("_")
+        if (filterInfo.float.length) {
+            name += "__" + filterInfo.float[0].value.map((val) => val.toString()).join("_")
+        }
+        return [headers, name]
+    }
+
+    const cardComps = useMemo(() => {
+            if (!cardApiState.data.length) {
+                return (NoDataCardOrTable())
+            } else {
+                var newData
+                newData = dataFilterByIndex(clickFilter, cardApiState)
+                const [headers, name] = csvElementGen(newData, filterInfo)
+                newData = contentType ? newData : sortData(newData, selctState)
+                return DataCardOrTable(contentType, newData, headers, name)
             }
         }
         , [cardApiState.data, cardFontRel, clickFilter.clickFilters,pageCnt,selctState,ascState]

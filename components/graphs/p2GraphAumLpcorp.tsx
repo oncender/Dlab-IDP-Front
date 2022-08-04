@@ -1,6 +1,7 @@
 import {Column, G2} from '@ant-design/plots';
 import {Button} from "antd";
 import {commaSep} from "../const/p2Utils";
+import {SelectedHighLight} from "../const/p2GraphUtils";
 
 const AumLpcorp = ({data, chartClc, onClick, chartClcNoEtc, onchartClcNoEtc, clickFilterDispat}:
                        {
@@ -119,10 +120,13 @@ const AumLpcorp = ({data, chartClc, onClick, chartClcNoEtc, onchartClcNoEtc, cli
             }
         ],
         onReady: (plot) => {
+            plot.on('element:mouseleave', (...vars) => {
+                SelectedHighLight(vars)
+            });
             plot.on('element:click', (...vars) => {
                     var action: string = 'clickmany'
                     clickFilterDispat({typ: action, value: vars[0].data.data.idx})
-                    // clickFilterDispat({typ: action, value: vars[0].data.data.idx})
+                    vars[0].view.geometries[0].elements
                 }
             )
         },
