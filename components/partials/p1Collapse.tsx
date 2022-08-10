@@ -94,7 +94,7 @@ export const Collapse = (props  : qnaProps) => {
                 }>
                     <div>
                     {data.content.split("\n").map(line => (
-                        <p>
+                        <p key={line}>
                             {line}
                             <br />
                         </p>
@@ -114,7 +114,7 @@ export const Collapse = (props  : qnaProps) => {
                             <p className={styles.userName}>{answer.userName}</p>
                             <p className={styles.content}>
                                 {answer.content.split("\n").map(line => (
-                                    <span>
+                                    <span key={line}>
                                         {line}
                                         <br />
                                     </span>
