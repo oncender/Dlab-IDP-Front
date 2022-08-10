@@ -16,7 +16,7 @@ export default function MacroContents(props: macroProp) {
     kr3y : '국고채(3년)',
     cd91d : 'CD(91일)',
     ifd1y : '산금채(1년)',
-    // koribor3m : '(6개월)'
+    fb6m : ' 금융채(6개월)'
   }
 
   function getRecentDate(arr: macroType[]): macroType {
