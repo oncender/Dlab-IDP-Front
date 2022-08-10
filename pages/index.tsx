@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import type { NextPage } from 'next';
+import React, { useState, useRef, useEffect } from 'react';
+import type { NextPage, GetStaticProps, InferGetStaticPropsType  } from 'next';
 import MovingComponent from 'react-moving-text';
 import mainStyles from "../styles/Main.module.scss";
 import GridLoader from 'react-spinners/GridLoader';
@@ -7,19 +7,53 @@ import BigSelect from '../components/partials/p1CompBigSelectMain';
 import ResultContents from '../components/partials/p1CompResultContents';
 import MacroContents from '../components/partials/p1CompMacroContents';
 import HowItWorksContents from '../components/partials/p1CompHowItWorksContents';
+import QnAContents from '../components/partials/p1QnA';
 import Footer from "../components/Footer";
 import axios from "axios";
 import { formatDate } from "../components/const/p2Utils";
+import { qna2Type, questionType } from '../components/const/p1Types'
 
 
-const Home: NextPage = () => {
+const GET_MESSAGE_URL = "/v2/message/totalMessage";
+
+const Home: NextPage = ({ contents }: InferGetStaticPropsType<typeof getStaticProps>) => {
   const [loanPriority, setLoanPriority] = useState('선');
   const [loanType, setLoanType] = useState('담보');
   const [loading, setLoading] = useState(false);
   const [modelResult, setModelResult] = useState();
   const [macroData, setMacroData] = useState();
+  const [qnaData, setQnaData] = useState<questionType[]>([]);
   const focusRef = useRef<HTMLDivElement>(null);
-  const goToDetailStr = "";
+  
+  useEffect(() => {
+    contents.sort((a, b) => a.msgNum - b.msgNum);
+    let newContents: questionType[] = [];
+    contents.map((content: qna2Type) => {
+        if (content.subthread === 0) {
+            newContents.push({
+                msgNum: content.msgNum,
+                userName: content.username,
+                password: content.password,
+                content: content.content,
+                time: content.time,
+                answers: [],
+            });
+        } else {
+            newContents[content.msgNum].answers.push({
+                sequence: content.subthread,
+                userName: content.username,
+                password: content.password,
+                content: content.content,
+                time: content.time,
+            });
+        }
+    })
+    newContents.sort((a, b) => b.msgNum - a.msgNum);
+    newContents = newContents.slice(0,3);
+    newContents.map(item => item.answers.sort((a, b) => b.sequence - a.sequence));
+    setQnaData(newContents)
+}, []);
+
   type API_URL_TYPE = {
     [key : string]: string;
   };
@@ -132,11 +166,25 @@ const Home: NextPage = () => {
             }
           </div>
         </div>
+        <QnAContents content = {qnaData}/>
         <HowItWorksContents />
       </div>
       <Footer />
     </div>
   )
+}
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const apiBaseUrl = process.env.API_SERVER_URL;
+  
+  let res = await fetch(apiBaseUrl + GET_MESSAGE_URL);
+  let contents = await res.json();
+
+  return {
+      props : {
+          contents,
+      },
+  };
 }
 
 export default Home

@@ -34,4 +34,50 @@ interface macroTable {
     [key: string] : []
 }
 
-export type { modelPredictType, resultProp, macroProp, macroType, macroTable }
+interface qnaType {
+    question: string;
+    answer: string;
+}
+
+interface qnaProps {
+    item: questionType;
+}
+
+interface qna2Type {
+    msgNum: number,
+    username: string,
+    password: string,
+    subthread: number,
+    time: string,
+    content: string,
+}
+
+interface answerType {
+    sequence: number,
+    userName: string,
+    password: string,
+    content: string,
+    time: string,
+}
+
+interface questionType {
+    msgNum: number,
+    userName: string,
+    password: string,
+    content: string,
+    time: string,
+    answers : answerType[],
+}
+
+export type { 
+    modelPredictType, 
+    resultProp, 
+    macroProp, 
+    macroType, 
+    macroTable, 
+    qnaType, 
+    qnaProps, 
+    qna2Type,
+    answerType,
+    questionType,
+}
