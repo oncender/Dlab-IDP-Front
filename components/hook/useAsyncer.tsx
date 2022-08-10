@@ -66,7 +66,7 @@ const initialState = {
 }
 
 function useAsyncer(callback: Function, deps: any[] = [], clears: any[] = [],
-                    start: boolean = false, setStart: Function,dataInit?:undefined) {
+                    start: boolean = false, setStart: Function,dataInit?:any) {
     var initials
     if (dataInit){
         initials = dataInit

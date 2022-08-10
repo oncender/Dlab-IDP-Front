@@ -1,11 +1,13 @@
 import {G2, Scatter} from '@ant-design/plots';
-import {AutoComplete} from 'antd';
-import {tupleNum} from 'antd/lib/_util/type';
-import {start} from 'repl';
 import {useRouter} from "next/router";
 import {aumLpcorp} from "../const/p2Usertyp";
 import {commaSep, sortString} from "../const/p2Utils";
+import {ClickedZindexChanging, SelectedHighLight, TargetSelect, TriggerActive} from "../const/p2GraphUtils";
 
+
+const STATUS_ACTIVE = "active";
+const STATUS_UNACTIVE = "inactive";
+const STATUS_SELECTED = "selected";
 const RateAtPlot = ({
                         data,
                         clickFilterDispat
@@ -21,7 +23,6 @@ const RateAtPlot = ({
         ],
     });
 
-
     const config = {
         data: data.sort((a, b) => sortString(a, b, '대출 체결일', true)),
         padding: 'Auto',
@@ -30,7 +31,19 @@ const RateAtPlot = ({
         yField: '체결이자',
         sizeField: '대출약정금',
         colorField: '자산 유형',
-        color: ['#ffd500', '#82cab2', '#193442', '#d18768', '#9a1b7a', '#3c82a5', '#e728a7', '#0093ff', '#96959c'],
+        color:
+        // ['#004B57','#006A89',
+        // '#002F5C','#002A7C',
+        // '#008DC0','#86BEDA',
+        // '#AED3E3','#BBD2EC',
+        // '#C5D4EB','#5B61A1',
+        // '#A7AED3','#DFE9F5'],
+        // ['#004B57', '#AED3E3', '#82cab2', '#193442',
+        // '#d18768', '#9a1b7a', '#3c82a5', '#e728a7',
+        // '#0093ff', '#96959c', '#786E96', '#C8C5C0']
+            ['#f96900', '#ffd500', '#82cab2', '#193442', '#d18768',
+                '#9a1b7a', '#3c82a5', '#e728a7',
+                '#0093ff', '#96959c'],
         size: [4, 30],
         shape: 'circle',
         pointStyle: {
@@ -141,11 +154,31 @@ const RateAtPlot = ({
             {
                 type: 'element-active',
             },
-            {
-                type: 'element-hovering',
-            },
+            { type : 'element-hovering-cursor'},
         ],
         onReady: (plot) => {
+            plot.on('element:mouseleave', (...vars) => {
+                SelectedHighLight(vars)
+            });
+            plot.on('element:mouseenter', (...vars) => {
+                const elements: Element[] = vars[0].view.geometries[0].elements
+                const TriggeredAN: string = vars[0].data.data['자산명']
+                elements.forEach((dat) => {
+                    TriggerActive((dat.data['자산명'] == TriggeredAN), dat)
+                })
+            });
+            // plot.on('element:dragenter',(...vars) => {
+            //     console.log("dragenter : ",vars)
+            // });
+            // plot.on('element:dragover',(...vars) => {
+            //     console.log("dragover : ",vars)
+            // });
+            // plot.on('element:dragleave',(...vars) => {
+            //     console.log("dragleave : ",vars)
+            // });
+            // plot.on('element:drop',(...vars) => {
+            //     console.log("drop : ",vars)
+            // });
             plot.on('element:dblclick', (...vars) => {
                 router.push({
                         pathname: '/detailInfo',
@@ -155,17 +188,29 @@ const RateAtPlot = ({
                     "/detailInfo")
             });
             plot.on('element:click', (...vars) => {
-                    var action: string = 'click'
-                    clickFilterDispat({typ: action, value: vars[0].data.data.idx})
-                }
-            )
-        },
+                const clickedVarsIndex: number = vars[0].gEvent.target._INDEX
+                const TriggeredAN: string = vars[0].data.data['자산명']
+                const elements: Element[] = vars[0].view.geometries[0].elements
+                var triggeredIdx: number[] = []
+                elements.forEach((dat) => {
+                    if (dat.elementIndex == clickedVarsIndex) {
+                        ClickedZindexChanging(vars, dat)
+                        triggeredIdx.push(dat.data.idx)
+                    } else if (dat.data['자산명'] == TriggeredAN) {
+                        TargetSelect(dat)
+                        triggeredIdx.push(dat.data.idx)
+                    }
+                })
+                var action: string = 'click'
+                clickFilterDispat({typ: action, value: triggeredIdx})
+            })
+            }
     }
     if (data.length === 0) {
         return
     }
     return (
-        <div className="mt-8">
+        <div className="mb-8">
             <p className="pl-4 mb-4 text-3xl font-blinker font-semibold">Debt Rate Bubble Chart</p>
             <Scatter {...config} />
         </div>);

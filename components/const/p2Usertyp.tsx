@@ -34,11 +34,11 @@ interface ActionObj {
 
 interface ClickActionObj {
     typ : string,
-    value : string
+    value: string | string[]
 }
 
 // for chart Data
-interface rateAtData {
+interface aumLpcorp {
     sdaterate: string
     at: string
     loandate: string
@@ -46,11 +46,10 @@ interface rateAtData {
 }
 
 interface fromApiV1 {
-    data : any[],
     [key: string]: string
 }
 
-interface aumLpcorp {
+interface rateAtData {
     "체결이자": number
     "대출약정금": number
     [key: string]:string
